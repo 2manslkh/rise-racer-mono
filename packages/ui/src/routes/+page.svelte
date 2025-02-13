@@ -6,9 +6,9 @@
 	import GameArea from '$lib/components/GameArea.svelte';
 	import RacingRoad from '$lib/components/RacingRoad.svelte';
 	import Background from '$lib/components/Background.svelte';
-	import BoostButton from '$lib/components/BoostButton.svelte';
 	import UpgradesPanel from '$lib/components/UpgradesPanel.svelte';
 	import CRTEffects from '$lib/components/CRTEffects.svelte';
+	import ClickEffects from '$lib/components/ClickEffects.svelte';
 	import {
 		gameStore,
 		velocity,
@@ -82,6 +82,7 @@
 </script>
 
 <CRTEffects />
+<ClickEffects />
 
 <div class="flex min-h-screen flex-col bg-black text-white">
 	<div class="mx-auto w-full max-w-4xl sm:px-4">
@@ -93,7 +94,7 @@
 			<MusicPlayer />
 
 			<div class="relative min-h-[calc(100vh-200px)]">
-				<GameArea velocity={$velocity} isBoosting={$isBoosting} onClick={handleClick}>
+				<GameArea>
 					<RacingRoad velocity={$velocity} isBoosting={$isBoosting} onClick={handleClick} />
 				</GameArea>
 			</div>

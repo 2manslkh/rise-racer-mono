@@ -1,7 +1,4 @@
 <script lang="ts">
-	export let velocity: number;
-	export let isBoosting: boolean;
-	export let onClick: () => void;
 </script>
 
 <div class="absolute inset-0">

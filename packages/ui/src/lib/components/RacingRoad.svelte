@@ -2,6 +2,8 @@
 	import { LIGHT_SPEED } from '$lib/types/game';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import type { ClickEffect } from './ClickEffects.svelte';
+	import { globalAddClickEffect } from './ClickEffects.svelte';
 
 	export let velocity: number;
 	export let isBoosting: boolean = false;
@@ -32,6 +34,15 @@
 	const CAR_HEIGHT = 16;
 	const CAR_SCALE = 3;
 	const BOOST_GLOW_COLOR = 'rgba(255, 69, 0, 0.6)';
+
+	function handleClick(event: MouseEvent | TouchEvent) {
+		if (globalAddClickEffect) {
+			const x = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+			const y = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+			globalAddClickEffect(x, y);
+		}
+		onClick();
+	}
 
 	function calculateSpeed(velocity: number): number {
 		const MAX_SPEED = 300;
@@ -239,8 +250,8 @@
 		<canvas
 			bind:this={roadCanvas}
 			class="block h-full w-full"
-			on:click={onClick}
-			on:touchstart|preventDefault={onClick}
+			on:click={handleClick}
+			on:touchstart|preventDefault={handleClick}
 		>
 		</canvas>
 	</div>
