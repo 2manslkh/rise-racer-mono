@@ -6,14 +6,6 @@ const WalletConnectButton = ({ handleClick }: { handleClick: () => void }) => {
       className="relative w-[375px] aspect-[391/133]"
       onClick={handleClick}
     >
-      {/* <div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-        style={{
-          animation: "mirror-sweep 5s linear infinite",
-          backgroundSize: "200% 100%",
-        }}
-      /> */}
-
       <div className="relative w-full h-full ml-[-20px]">
         <Image src={"/WalletConnectBackground.svg"} alt="Wallet Connect" fill />
       </div>
