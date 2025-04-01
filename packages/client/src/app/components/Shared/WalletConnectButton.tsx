@@ -1,0 +1,50 @@
+import Image from "next/image";
+
+const WalletConnectButton = ({ handleClick }: { handleClick: () => void }) => {
+  return (
+    <button
+      className="relative w-[375px] aspect-[391/133]"
+      onClick={handleClick}
+    >
+      {/* <div
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+        style={{
+          animation: "mirror-sweep 5s linear infinite",
+          backgroundSize: "200% 100%",
+        }}
+      /> */}
+
+      <div className="relative w-full h-full ml-[-20px]">
+        <Image src={"/WalletConnectBackground.svg"} alt="Wallet Connect" fill />
+      </div>
+
+      <div className="absolute z-1 top-[48px] left-[66px]">
+        <p
+          className="font-zen text-white text-[28px] relative"
+          style={{
+            WebkitTextStroke: "1.5px #f037ff",
+          }}
+        >
+          Wallet connect
+        </p>
+
+        <p
+          className="font-zen text-transparent text-[28px] absolute inset-0 bg-clip-text pointer-events-none"
+          style={{
+            WebkitTextStroke: "1.5px transparent",
+            WebkitTextFillColor: "transparent",
+            backgroundImage:
+              "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%)",
+            backgroundSize: "200% 100%",
+            backgroundRepeat: "no-repeat",
+            animation: "mirror-sweep 1.5s linear infinite",
+          }}
+        >
+          Wallet connect
+        </p>
+      </div>
+    </button>
+  );
+};
+
+export default WalletConnectButton;
