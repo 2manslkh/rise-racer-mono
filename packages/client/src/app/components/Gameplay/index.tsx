@@ -60,9 +60,8 @@ const Gameplay: React.FC<GameplayProps> = ({
       const { width, height } = dimensions;
       ctx.clearRect(0, 0, width, height);
 
-      // Example road drawing code:
-      const roadWidthTop = width * 0.4;
-      const roadWidthBottom = width * 1;
+      const roadWidthTop = width * 0.3;
+      const roadWidthBottom = width * 1.1;
 
       DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, "#555");
       DrawSideDivider(
@@ -103,7 +102,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         height={dimensions.height}
         className="absolute left-0 top-0 bg-gray-900"
       />
-      <div className="absolute bottom-[50px] left-1/2 transform -translate-x-1/2 w-[140px]">
+      <div className="absolute bottom-[150px] left-1/2 transform -translate-x-1/2 w-[140px]">
         <Image src={vehicle} alt="Car" />
       </div>
     </div>

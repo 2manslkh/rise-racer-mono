@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
 
 const IconButton = ({
@@ -8,7 +7,7 @@ const IconButton = ({
   colorEnd = "#5700A3",
   handleClick,
 }: {
-  icon: any;
+  icon: string;
   alt: string;
   colorStart?: string;
   colorEnd?: string;

@@ -27,7 +27,7 @@ export default function Home() {
     <div className="relative w-screen h-screen overflow-hidden">
       <Navigation />
       <Menu />
-      <div className="relative w-screen h-[90vh]">
+      <div className="relative w-full h-full">
         <Gameplay />
       </div>
     </div>

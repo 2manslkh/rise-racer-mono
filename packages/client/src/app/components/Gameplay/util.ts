@@ -23,21 +23,21 @@ export const DrawCenterDivider = (
   color: string = "#FFF"
 ) => {
   ctx.strokeStyle = color;
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 3;
   ctx.setLineDash([]); // No dashes for center line
 
   const centerX = screenWidth / 2;
 
   // First line (slightly left from center)
   ctx.beginPath();
-  ctx.moveTo(centerX - 8, screenHeight);
-  ctx.lineTo(centerX - 4, 0);
+  ctx.moveTo(centerX - 4, screenHeight);
+  ctx.lineTo(centerX - 2, 0);
   ctx.stroke();
 
   // Second line (slightly right from center)
   ctx.beginPath();
-  ctx.moveTo(centerX + 8, screenHeight);
-  ctx.lineTo(centerX + 4, 0);
+  ctx.moveTo(centerX + 4, screenHeight);
+  ctx.lineTo(centerX + 2, 0);
   ctx.stroke();
 
   return ctx;
@@ -115,17 +115,18 @@ export const DrawLaneDividers = (
 ) => {
   ctx.save();
   ctx.strokeStyle = color;
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 3;
 
   ctx.setLineDash([20, 20]);
   ctx.lineDashOffset = dashOffset;
 
-  const xLeftTop = (screenWidth - roadWidthTop) / 2 + roadWidthTop / 4;
-  const xLeftBottom = (screenWidth - roadWidthBottom) / 2 + roadWidthBottom / 4;
+  const xLeftTop = (screenWidth - roadWidthTop) / 2 + roadWidthTop / 4 + 5;
+  const xLeftBottom =
+    (screenWidth - roadWidthBottom) / 2 + roadWidthBottom / 4 + 5;
 
-  const xRightTop = (screenWidth + roadWidthTop) / 2 - roadWidthTop / 4;
+  const xRightTop = (screenWidth + roadWidthTop) / 2 - roadWidthTop / 4 - 5;
   const xRightBottom =
-    (screenWidth + roadWidthBottom) / 2 - roadWidthBottom / 4;
+    (screenWidth + roadWidthBottom) / 2 - roadWidthBottom / 4 - 5;
 
   // === Left lane ===
   ctx.beginPath();
