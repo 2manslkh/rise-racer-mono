@@ -17,7 +17,7 @@ const IconButtonV2 = ({
 }) => {
   return (
     <button
-      className={`relative w-[70px] h-[42px] rounded-sm border-2 border-solid border-[#E833F8] flex items-center justify-center`}
+      className={`relative w-[70px] h-[42px] rounded-sm border-2 border-solid border-[#E833F8] flex items-center justify-center shadow-lg`}
       onClick={handleClick}
       style={{
         background: `linear-gradient(to right, ${colorStart} 0%, ${colorEnd} 100%)`,

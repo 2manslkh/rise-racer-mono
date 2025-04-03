@@ -8,6 +8,7 @@ import Login from "./components/Login";
 
 export default function Home() {
   const [connected, setConnected] = useState<boolean>(false);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
 
   useEffect(() => {
     if (window) {
@@ -33,9 +34,12 @@ export default function Home() {
   return (
     <div className="relative w-screen h-screen overflow-hidden">
       <Navigation />
-      <Menu />
+      <Menu
+        gameStarted={gameStarted}
+        handleStart={() => setGameStarted(true)}
+      />
       <div className="relative w-full h-full">
-        <Gameplay />
+        <Gameplay gameStarted={gameStarted} />
       </div>
     </div>
   );

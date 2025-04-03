@@ -10,6 +10,7 @@ import {
 } from "./util";
 
 interface GameplayProps {
+  gameStarted: boolean;
   heightPercentage?: number;
   vehicleTier?: number;
 }
@@ -17,18 +18,26 @@ interface GameplayProps {
 const Gameplay: React.FC<GameplayProps> = ({
   heightPercentage = 1,
   vehicleTier = 1,
+  gameStarted,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [roadSpeed, setRoadSpeed] = useState<number>(1);
+  const [roadSpeed, setRoadSpeed] = useState<number>(0);
 
   const vehicle = GetVehicle(vehicleTier);
 
   const handleClick = () => {
+    if (!gameStarted) return;
     setRoadSpeed((prev) => prev + 1);
   };
+
+  useEffect(() => {
+    if (gameStarted) {
+      setRoadSpeed(1);
+    }
+  }, [gameStarted]);
 
   useEffect(() => {
     const updateSize = () => {
