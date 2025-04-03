@@ -33,7 +33,7 @@ export default function Home() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      <Navigation />
+      <Navigation gameStarted={gameStarted} />
       <Menu
         gameStarted={gameStarted}
         handleStart={() => setGameStarted(true)}

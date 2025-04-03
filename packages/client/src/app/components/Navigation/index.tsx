@@ -2,7 +2,7 @@ import Image from "next/image";
 import IconButton from "../Shared/IconButton";
 import { useState } from "react";
 
-const Navigation = () => {
+const Navigation = ({ gameStarted }: { gameStarted: boolean }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   return (
@@ -19,13 +19,23 @@ const Navigation = () => {
         <div className="relative w-[183px] h-[48px]">
           <Image src={"/RiseRacerLogo.png"} alt="Rise Racer" fill />
         </div>
-        <IconButton
-          icon={isPlaying ? "/MusicPlaying.svg" : "/MusicMuted.svg"}
-          alt="Music"
-          colorStart={isPlaying ? "#460082" : "#323232"}
-          colorEnd={isPlaying ? "#5700A3" : "#3E3E3E"}
-          handleClick={() => setIsPlaying((prevState) => !prevState)}
-        />
+        {gameStarted ? (
+          <IconButton
+            icon={isPlaying ? "/MusicPlaying.svg" : "/MusicMuted.svg"}
+            alt="Music"
+            colorStart={isPlaying ? "#460082" : "#323232"}
+            colorEnd={isPlaying ? "#5700A3" : "#3E3E3E"}
+            handleClick={() => setIsPlaying((prevState) => !prevState)}
+          />
+        ) : (
+          <IconButton
+            icon={"/Gear.svg"}
+            alt="Settings"
+            colorStart={"#460082"}
+            colorEnd={"#5700A3"}
+            handleClick={() => {}}
+          />
+        )}
       </nav>
     </div>
   );
