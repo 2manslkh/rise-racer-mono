@@ -3,7 +3,7 @@ import WalletConnectButton from "../Shared/WalletConnectButton";
 
 const Login = ({ handleClick }: { handleClick: () => void }) => {
   return (
-    <div className="w-screen h-screen">
+    <div className="relative w-full h-full">
       <div className="relative w-full h-full">
         <Image src={"/LoginBackground.png"} alt="Login Background" fill />
       </div>

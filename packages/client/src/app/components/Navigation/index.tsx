@@ -6,7 +6,7 @@ const Navigation = ({ gameStarted }: { gameStarted: boolean }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   return (
-    <div className="fixed top-0 left-0 z-1 w-screen">
+    <div className="absolute top-0 left-0 right-0 z-1">
       <div
         className="relative h-[200px] mt-[-54px]"
         style={{

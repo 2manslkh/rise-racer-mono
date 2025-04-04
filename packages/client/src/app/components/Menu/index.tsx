@@ -9,7 +9,7 @@ const Menu = ({
   handleStart: () => void;
 }) => {
   return (
-    <div className="fixed bottom-0 left-0 z-1 w-[375px]">
+    <div className="absolute bottom-0 left-0 z-1 right-0">
       <div
         className="relative h-[68px] flex items-start justify-between px-4"
         style={{
@@ -33,8 +33,8 @@ const Menu = ({
               ? BUTTON_STYLES.DISABLED.top
               : BUTTON_STYLES.DEFAULT.top,
             left: gameStarted
-              ? BUTTON_STYLES.DISABLED.left
-              : BUTTON_STYLES.DEFAULT.left,
+              ? `calc(calc(100% - ${BUTTON_STYLES.DISABLED.width})/2)`
+              : `calc(calc(100% - ${BUTTON_STYLES.DEFAULT.width})/2)`,
           }}
         >
           <StartButton disabled={gameStarted} handleClick={handleStart} />

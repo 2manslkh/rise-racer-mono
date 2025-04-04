@@ -27,19 +27,23 @@ export default function Home() {
     }
   }, []);
 
-  if (!connected) {
-    return <Login handleClick={() => setConnected(true)} />;
-  }
-
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
-      <Navigation gameStarted={gameStarted} />
-      <Menu
-        gameStarted={gameStarted}
-        handleStart={() => setGameStarted(true)}
-      />
-      <div className="relative w-full h-full">
-        <Gameplay gameStarted={gameStarted} />
+    <div className="relative w-screen h-screen flex items-center justify-center">
+      <div className="relative w-full h-full max-w-[414px] max-h-[896px] overflow-hidden">
+        {connected ? (
+          <div className="relative w-full h-full">
+            <Navigation gameStarted={gameStarted} />
+            <Menu
+              gameStarted={gameStarted}
+              handleStart={() => setGameStarted(true)}
+            />
+            <div className="relative w-full h-full">
+              <Gameplay gameStarted={gameStarted} />
+            </div>
+          </div>
+        ) : (
+          <Login handleClick={() => setConnected(true)} />
+        )}
       </div>
     </div>
   );
