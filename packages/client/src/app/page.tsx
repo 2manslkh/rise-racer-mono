@@ -5,10 +5,34 @@ import Gameplay from "./components/Gameplay";
 import Navigation from "./components/Navigation";
 import Menu from "./components/Menu";
 import Login from "./components/Login";
+import { useAppKitAccount } from "@reown/appkit/react";
+
+export type User = {
+  profilePicture: string;
+  displayName: string;
+  language: string;
+  vehicle: number;
+};
+
+const user: User = {
+  profilePicture: "",
+  displayName: "Anthony Mega Storm",
+  language: "EN",
+  vehicle: 1,
+};
+
+enum Views {
+  NULL,
+  SETTINGS,
+  SHOP,
+  LEADERBOARD,
+}
 
 export default function Home() {
-  const [connected, setConnected] = useState<boolean>(false);
+  const { address, isConnected, caipAddress, status, embeddedWalletInfo } =
+    useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [activeView, setActiveView] = useState<Views>(Views.NULL);
 
   useEffect(() => {
     if (window) {
@@ -30,7 +54,7 @@ export default function Home() {
   return (
     <div className="relative w-screen h-screen flex items-center justify-center">
       <div className="relative w-full h-full max-w-[414px] max-h-[896px] overflow-hidden">
-        {connected ? (
+        {isConnected ? (
           <div className="relative w-full h-full">
             <Navigation gameStarted={gameStarted} />
             <Menu
@@ -42,7 +66,7 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <Login handleClick={() => setConnected(true)} />
+          <Login />
         )}
       </div>
     </div>

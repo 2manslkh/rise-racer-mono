@@ -1,7 +1,7 @@
 import Image from "next/image";
 import WalletConnectButton from "../Shared/WalletConnectButton";
 
-const Login = ({ handleClick }: { handleClick: () => void }) => {
+const Login = () => {
   return (
     <div className="relative w-full h-full">
       <div className="relative w-full h-full">
@@ -11,7 +11,7 @@ const Login = ({ handleClick }: { handleClick: () => void }) => {
         <Image src={"/RiseRacerLogo.png"} alt="Rise Racer" fill />
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
-        <WalletConnectButton handleClick={handleClick} />
+        <WalletConnectButton />
       </div>
     </div>
   );

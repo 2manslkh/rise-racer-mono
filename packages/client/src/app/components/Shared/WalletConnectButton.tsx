@@ -1,10 +1,17 @@
 import Image from "next/image";
+import { useAppKit } from "@reown/appkit/react";
 
-const WalletConnectButton = ({ handleClick }: { handleClick: () => void }) => {
+const WalletConnectButton = () => {
+  const { open, close } = useAppKit();
+
+  const handleWalletConnect = () => {
+    open({ view: "Connect", namespace: "eip155" });
+  };
+
   return (
     <button
       className="relative w-[375px] aspect-[391/133]"
-      onClick={handleClick}
+      onClick={handleWalletConnect}
     >
       <div className="relative w-full h-full ml-[-20px]">
         <Image src={"/WalletConnectBackground.svg"} alt="Wallet Connect" fill />
