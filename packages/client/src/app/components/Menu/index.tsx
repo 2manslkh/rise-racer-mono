@@ -1,12 +1,19 @@
 import IconButtonV2 from "../Shared/IconButtonV2";
 import StartButton, { BUTTON_STYLES } from "../Shared/StartButton";
 
+export enum MenuAction {
+  OPEN_SHOP,
+  START_GAME,
+  OPEN_LEADERBOARD,
+}
+
 const Menu = ({
   gameStarted,
-  handleStart,
+  handleClick,
 }: {
   gameStarted: boolean;
   handleStart: () => void;
+  handleClick: (_menuAction: MenuAction) => void;
 }) => {
   return (
     <div className="absolute bottom-0 left-0 z-1 right-0">
@@ -21,7 +28,7 @@ const Menu = ({
           <IconButtonV2
             icon={"/Shop.svg"}
             alt="Shop"
-            handleClick={() => {}}
+            handleClick={() => handleClick(MenuAction.OPEN_SHOP)}
             highlightPosition="top-left"
           />
         </div>
@@ -37,14 +44,17 @@ const Menu = ({
               : `calc(calc(100% - ${BUTTON_STYLES.DEFAULT.width})/2)`,
           }}
         >
-          <StartButton disabled={gameStarted} handleClick={handleStart} />
+          <StartButton
+            disabled={gameStarted}
+            handleClick={() => handleClick(MenuAction.START_GAME)}
+          />
         </div>
 
         <div className="absolute z-2 top-0 right-4">
           <IconButtonV2
             icon={"/Leaderboard.svg"}
             alt="Leaderboard"
-            handleClick={() => {}}
+            handleClick={() => handleClick(MenuAction.OPEN_LEADERBOARD)}
             highlightPosition="bottom-right"
           />
         </div>

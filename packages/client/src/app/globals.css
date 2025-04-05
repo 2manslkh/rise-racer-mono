@@ -11,6 +11,18 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-zen: var(--font-zen-dots);
+  --font-inter: var(--font-inter);
+
+  --text-color-primary: #5b02a1;
+  --text-color-secondary: #fff;
+  --text-color-black: #000;
+
+  --text-color-toggle-on: #5200a8;
+  --text-color-toggle-off: #fff;
+  --border-color-toggle-on: #5700a3;
+  --border-color-toggle-off: #4dffff;
+  --background-color-toggle-on: #4dffff;
+  --background-color-toggle-off: #1b1b1b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,3 +47,32 @@ body {
     background-position: -200%;
   }
 }
+
+/* .pfp::before {
+  content: "";
+  position: absolute;
+
+  background-color: green;
+  top: -4px;
+  height: 24px;
+  width: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 12px 0 0 green;
+  transform: rotate(90deg);
+  right: 61px;
+  z-index: 1000;
+}
+
+.pfp::after {
+  content: "";
+  position: absolute;
+
+  background-color: green;
+  top: -4px;
+  left: -18px;
+  height: 24px;
+  width: 12px;
+  border-bottom-left-radius: 12px;
+  box-shadow: 0 12px 0 0 green;
+  transform: rotate(90deg);
+} */

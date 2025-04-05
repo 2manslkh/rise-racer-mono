@@ -1,10 +1,24 @@
 import Image from "next/image";
 import IconButton from "../Shared/IconButton";
 import { useState } from "react";
+import Settings from "../Settings";
+import { User } from "@/app/page";
 
-const Navigation = ({ gameStarted }: { gameStarted: boolean }) => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
+const Navigation = ({
+  gameStarted,
+  musicPlaying,
+  handleToggleMusicPlaying,
+  toggleSettings,
+  isSettingsOpen,
+  user,
+}: {
+  gameStarted: boolean;
+  musicPlaying: boolean;
+  handleToggleMusicPlaying: () => void;
+  toggleSettings: () => void;
+  isSettingsOpen: boolean;
+  user: User;
+}) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-1">
       <div
@@ -14,28 +28,35 @@ const Navigation = ({ gameStarted }: { gameStarted: boolean }) => {
             "linear-gradient(to bottom, #29004D 35%, rgba(41, 0, 77, 0) 100%)",
         }}
       ></div>
-      <nav className="absolute top-0 left-0 w-full flex items-center justify-between px-5 py-3 z-2">
-        <div className="w-9 h-9"></div>
+      <nav className="absolute top-0 left-0 w-full flex items-center justify-center px-5 py-3 z-2">
         <div className="relative w-[183px] h-[48px]">
           <Image src={"/RiseRacerLogo.png"} alt="Rise Racer" fill />
         </div>
-        {gameStarted ? (
-          <IconButton
-            icon={isPlaying ? "/MusicPlaying.svg" : "/MusicMuted.svg"}
-            alt="Music"
-            colorStart={isPlaying ? "#460082" : "#323232"}
-            colorEnd={isPlaying ? "#5700A3" : "#3E3E3E"}
-            handleClick={() => setIsPlaying((prevState) => !prevState)}
-          />
-        ) : (
-          <IconButton
-            icon={"/Gear.svg"}
-            alt="Settings"
-            colorStart={"#460082"}
-            colorEnd={"#5700A3"}
-            handleClick={() => {}}
-          />
-        )}
+
+        <div className="absolute top-[18px] right-5 z-3">
+          {gameStarted ? (
+            <IconButton
+              icon={musicPlaying ? "/MusicPlaying.svg" : "/MusicMuted.svg"}
+              alt="Music"
+              colorStart={musicPlaying ? "#460082" : "#323232"}
+              colorEnd={musicPlaying ? "#5700A3" : "#3E3E3E"}
+              handleClick={handleToggleMusicPlaying}
+            />
+          ) : (
+            <IconButton
+              icon={"/Gear.svg"}
+              alt="Settings"
+              colorStart={"#460082"}
+              colorEnd={"#5700A3"}
+              handleClick={toggleSettings}
+            />
+          )}
+        </div>
+        <Settings
+          user={user}
+          open={isSettingsOpen}
+          toggleSettings={toggleSettings}
+        />
       </nav>
     </div>
   );

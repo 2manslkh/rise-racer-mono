@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Zen_Dots } from "next/font/google";
+import { Geist, Geist_Mono, Zen_Dots, Inter } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
 import ContextProvider from "./context/WagmiContext";
@@ -20,6 +20,11 @@ const zenDots = Zen_Dots({
   weight: "400",
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Rise Racer",
   description: "Rise Racer",
@@ -37,7 +42,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${zenDots.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${zenDots.variable} ${inter.variable} antialiased`}
       >
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
       </body>
