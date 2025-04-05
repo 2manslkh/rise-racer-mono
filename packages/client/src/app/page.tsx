@@ -7,6 +7,7 @@ import Menu, { MenuAction } from "./components/Menu";
 import Login from "./components/Login";
 import { useAppKitAccount } from "@reown/appkit/react";
 import Settings from "./components/Settings";
+import Leaderboard from "./components/Leaderboard";
 
 export type User = {
   profilePicture: string;
@@ -60,10 +61,13 @@ export default function Home() {
         setGameStarted(true);
         break;
       case MenuAction.OPEN_LEADERBOARD:
+        console.log("opening leaderboard");
         setActiveView(Views.LEADERBOARD);
+        setGameStarted(false);
         break;
       case MenuAction.OPEN_SHOP:
         setActiveView(Views.SHOP);
+        setGameStarted(false);
         break;
       default:
         setActiveView(Views.NULL);
@@ -81,16 +85,18 @@ export default function Home() {
       <div className="relative w-full h-full max-w-[414px] max-h-[896px] overflow-hidden">
         {isConnected ? (
           <div className="relative w-full h-full">
-            <Navigation
-              gameStarted={gameStarted}
-              musicPlaying={isMusicPlaying}
-              handleToggleMusicPlaying={() =>
-                setIsMusicPlaying((prevState) => !prevState)
-              }
-              toggleSettings={handleSettingsClick}
-              isSettingsOpen={activeView === Views.SETTINGS}
-              user={user}
-            />
+            {[Views.NULL, Views.SETTINGS].includes(activeView) && (
+              <Navigation
+                gameStarted={gameStarted}
+                musicPlaying={isMusicPlaying}
+                handleToggleMusicPlaying={() =>
+                  setIsMusicPlaying((prevState) => !prevState)
+                }
+                toggleSettings={handleSettingsClick}
+                isSettingsOpen={activeView === Views.SETTINGS}
+                user={user}
+              />
+            )}
             <Menu
               gameStarted={gameStarted}
               handleStart={() => setGameStarted(true)}
@@ -98,9 +104,12 @@ export default function Home() {
                 handleMenuClick(_menuAction)
               }
             />
-            <div className="relative w-full h-full">
-              <Gameplay gameStarted={gameStarted} />
-            </div>
+            {activeView === Views.NULL && (
+              <div className="relative w-full h-full">
+                <Gameplay gameStarted={gameStarted} />
+              </div>
+            )}
+            {activeView === Views.LEADERBOARD && <Leaderboard user={user} />}
           </div>
         ) : (
           <Login />

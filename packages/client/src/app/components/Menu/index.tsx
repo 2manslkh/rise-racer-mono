@@ -24,7 +24,7 @@ const Menu = ({
             "linear-gradient(to top, #29004D 4%, rgba(41, 0, 77, 0) 100%)",
         }}
       >
-        <div className="absolute z-2 top-0 left-4">
+        <div className="absolute z-3 top-0 left-4">
           <IconButtonV2
             icon={"/Shop.svg"}
             alt="Shop"
@@ -34,7 +34,7 @@ const Menu = ({
         </div>
 
         <div
-          className="absolute z-3"
+          className="absolute z-2"
           style={{
             top: gameStarted
               ? BUTTON_STYLES.DISABLED.top
@@ -50,7 +50,7 @@ const Menu = ({
           />
         </div>
 
-        <div className="absolute z-2 top-0 right-4">
+        <div className="absolute z-3 top-0 right-4">
           <IconButtonV2
             icon={"/Leaderboard.svg"}
             alt="Leaderboard"
