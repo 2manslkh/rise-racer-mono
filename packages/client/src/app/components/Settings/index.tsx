@@ -4,6 +4,7 @@ import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useDisconnect } from "@reown/appkit/react";
 import { shortenAddress } from "@/app/lib/address";
 import { User } from "@/app/page";
+import { useEffect, useRef, useState } from "react";
 
 const Settings = ({
   open,
@@ -21,18 +22,29 @@ const Settings = ({
     await disconnect();
   };
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dynamicHeight, setDynamicHeight] = useState<string>("24px");
+
   return (
     <>
       {open && (
         <div
-          className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen"
+          className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen max-h-[896px]"
           onClick={toggleSettings}
-        />
+        >
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-20 z-1 whitespace-nowrap">
+            <p className="text-white font-semibold text-base">
+              Tap anywhere to close this tab
+            </p>
+          </div>
+        </div>
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 ${open ? "h-[510px] opacity-100" : "h-6 opacity-0"}`}
-        style={{ width: open ? "calc(100% - 28px)" : "24px" }}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 ${open ? "h-content opacity-100" : "h-6 opacity-0"}`}
+        style={{
+          width: open ? "calc(100% - 28px)" : "24px",
+        }}
       >
         <div className="relative w-full p-2 flex flex-col gap-3">
           {/* PFP Image */}

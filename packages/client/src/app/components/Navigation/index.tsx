@@ -20,7 +20,7 @@ const Navigation = ({
   user: User;
 }) => {
   return (
-    <div className="absolute top-0 left-0 right-0 z-1">
+    <div className="absolute top-0 left-0 right-0 z-3">
       <div
         className="relative h-[200px] mt-[-54px]"
         style={{
