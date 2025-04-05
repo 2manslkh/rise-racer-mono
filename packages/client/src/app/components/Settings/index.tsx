@@ -43,7 +43,7 @@ const Settings = ({
             </div>
 
             <div className="absolute top-0 right-0 w-11 h-11 z-10">
-              <div className="w-full h-full bg-white backdrop-blur-sm rounded-bl-[24px]" />
+              <div className="w-full h-full bg-white backdrop-blur-sm rounded-bl-2xl" />
             </div>
           </div>
 
