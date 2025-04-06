@@ -1,12 +1,17 @@
+import { GetRoad } from "@/app/lib/gameplaySettings";
+
 export const DrawRoad = (
   ctx: CanvasRenderingContext2D,
   screenWidth: number,
   screenHeight: number,
   roadWidthTop: number,
   roadWidthBottom: number,
-  color: string = "#555"
+  tier: number
 ) => {
-  ctx.fillStyle = color;
+  const gradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
+  GetRoad(gradient, tier);
+
+  ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.moveTo((screenWidth - roadWidthBottom) / 2, screenHeight);
   ctx.lineTo((screenWidth + roadWidthBottom) / 2, screenHeight);
@@ -14,6 +19,25 @@ export const DrawRoad = (
   ctx.lineTo((screenWidth - roadWidthTop) / 2, 0);
   ctx.closePath();
   ctx.fill();
+
+  if (tier === 6) {
+    // To only apply for tier 6
+    const leftBottom = (screenWidth - roadWidthBottom) / 2;
+    const rightBottom = (screenWidth + roadWidthBottom) / 2;
+    const rightTop = (screenWidth + roadWidthTop) / 2;
+    const leftTop = (screenWidth - roadWidthTop) / 2;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+    ctx.beginPath();
+    ctx.moveTo(leftBottom, screenHeight);
+    ctx.lineTo(rightBottom, screenHeight);
+    ctx.lineTo(rightTop, 0);
+    ctx.lineTo(leftTop, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
 };
 
 export const DrawCenterDivider = (
@@ -142,4 +166,12 @@ export const DrawLaneDividers = (
 
   ctx.setLineDash([]);
   ctx.restore();
+};
+
+export const hexToRgba = (hex: string, alpha: number) => {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
