@@ -10,11 +10,11 @@ export const BUTTON_STYLES = {
     left: "37px",
   },
   DISABLED: {
-    width: "195px",
+    width: "194px",
     aspectRatio: "204/54",
     labelTop: "5px",
     labelLeft: "33px",
-    top: "-4px",
+    top: "-3px",
     left: "90px",
   },
 };
@@ -38,13 +38,13 @@ const StartButton = ({
           : BUTTON_STYLES.DEFAULT.aspectRatio,
       }}
     >
-      <div className="relative w-full h-full">
+      <div className={`relative w-full h-full ${disabled ? "hidden" : ""}`}>
+        <Image src={"/StartButtonBackground.svg"} alt="Start Button" fill />
+      </div>
+
+      <div className={`relative w-full h-full ${disabled ? "" : "hidden"}`}>
         <Image
-          src={
-            disabled
-              ? "/StartInactiveButtonBackground.svg"
-              : "/StartButtonBackground.svg"
-          }
+          src={"/StartInactiveButtonBackground.svg"}
           alt="Start Button"
           fill
         />
