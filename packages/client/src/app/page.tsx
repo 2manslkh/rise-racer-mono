@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import { useAppKitAccount } from "@reown/appkit/react";
 import Settings from "./components/Settings";
 import Leaderboard from "./components/Leaderboard";
+import Shop from "./components/Shop";
 
 export type User = {
   profilePicture: string;
@@ -61,10 +62,18 @@ export default function Home() {
         setGameStarted(true);
         break;
       case MenuAction.OPEN_LEADERBOARD:
+        if (activeView === Views.LEADERBOARD) {
+          setActiveView(Views.NULL);
+          return;
+        }
         setActiveView(Views.LEADERBOARD);
         setGameStarted(false);
         break;
       case MenuAction.OPEN_SHOP:
+        if (activeView === Views.SHOP) {
+          setActiveView(Views.NULL);
+          return;
+        }
         setActiveView(Views.SHOP);
         setGameStarted(false);
         break;
@@ -109,6 +118,7 @@ export default function Home() {
               </div>
             )}
             {activeView === Views.LEADERBOARD && <Leaderboard user={user} />}
+            {activeView === Views.SHOP && <Shop />}
           </div>
         ) : (
           <Login />
