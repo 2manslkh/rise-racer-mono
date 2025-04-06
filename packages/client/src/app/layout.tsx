@@ -27,9 +27,46 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Rise Racer",
-  description: "Rise Racer",
+  description:
+    "Race on Rise Chain where every click fuels your vehicle! Speed up, trigger on-chain transactions, and accelerate to victory in this Web3-powered racing game.",
   viewport:
     "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  authors: [{ name: "Rise Racer" }],
+  keywords: [
+    "Rise",
+    "Racer",
+    "Click",
+    "Speed",
+    "DeFi",
+    "Cryptocurrency",
+    "Blockchain",
+    "L2",
+  ],
+  openGraph: {
+    title: "Rise Racer",
+    description:
+      "Race on Rise Chain where every click fuels your vehicle! Speed up, trigger on-chain transactions, and accelerate to victory in this Web3-powered racing game.",
+    url: "https://app.rise-racer.com",
+    siteName: "Rise Racer",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rise Racer",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rise Racer",
+    description:
+      "Race on Rise Chain where every click fuels your vehicle! Speed up, trigger on-chain transactions, and accelerate to victory in this Web3-powered racing game.",
+    images: ["/og-image.png"],
+    creator: "@rise_racer",
+  },
 };
 
 export default async function RootLayout({
