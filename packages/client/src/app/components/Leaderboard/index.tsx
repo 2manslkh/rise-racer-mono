@@ -18,6 +18,7 @@ const RenderLeaderboardRow = (
 ) => {
   return (
     <div
+      key={data.rank}
       className={`relative w-full flex items-center px-4 py-2 ${index !== totalNumber - 1 ? "border-b border-solid border-white" : ""}`}
     >
       <div className="flex flex-1">

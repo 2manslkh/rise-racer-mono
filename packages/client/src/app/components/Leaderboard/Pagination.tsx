@@ -73,7 +73,11 @@ const Pagination = ({
       {totalPages <= 5 ? (
         <>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <PaginationButton selected={currentPage === page} data-id={page}>
+            <PaginationButton
+              key={page}
+              selected={currentPage === page}
+              data-id={page}
+            >
               {page}
             </PaginationButton>
           ))}

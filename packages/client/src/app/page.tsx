@@ -61,7 +61,6 @@ export default function Home() {
         setGameStarted(true);
         break;
       case MenuAction.OPEN_LEADERBOARD:
-        console.log("opening leaderboard");
         setActiveView(Views.LEADERBOARD);
         setGameStarted(false);
         break;
