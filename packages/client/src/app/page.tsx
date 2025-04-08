@@ -93,7 +93,6 @@ export default function Home() {
           return;
         }
         setActiveView(Views.LEADERBOARD);
-        setGameStarted(false);
         break;
       case MenuAction.OPEN_SHOP:
         if (activeView === Views.SHOP) {
@@ -101,7 +100,6 @@ export default function Home() {
           return;
         }
         setActiveView(Views.SHOP);
-        setGameStarted(false);
         break;
       default:
         setActiveView(Views.NULL);
@@ -135,13 +133,19 @@ export default function Home() {
                 handleMenuClick(_menuAction)
               }
             />
-            {activeView === Views.NULL && (
-              <div className="relative w-full h-full">
-                <Gameplay gameStarted={gameStarted} />
+            <div className="relative w-full h-full">
+              <Gameplay gameStarted={gameStarted} />
+            </div>
+            {activeView === Views.LEADERBOARD && (
+              <div className="fixed top-0 left-0 right-0 bottom-0">
+                <Leaderboard user={user} />
               </div>
             )}
-            {activeView === Views.LEADERBOARD && <Leaderboard user={user} />}
-            {activeView === Views.SHOP && <Shop />}
+            {activeView === Views.SHOP && (
+              <div className="fixed top-0 left-0 right-0 bottom-0">
+                <Shop />
+              </div>
+            )}
           </div>
         ) : (
           <Login />
