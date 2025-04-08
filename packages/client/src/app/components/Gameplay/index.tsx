@@ -16,6 +16,7 @@ import {
   LoadSideObjectImages,
   SideObject,
 } from "@/app/lib/gameplaySettings";
+import Speedometer from "../Speedometer";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -44,7 +45,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted) return;
-    roadSpeedRef.current += 0.01;
+    roadSpeedRef.current += incrementalSpeed;
 
     const newClick = {
       id: Date.now(),
@@ -150,7 +151,7 @@ const Gameplay: React.FC<GameplayProps> = ({
           }
 
           sideObjects.forEach((obj) => {
-            obj.y += roadSpeedRef.current;
+            obj.y += roadSpeedRef.current / 10;
             const progress = Math.min(1, (obj.y - obj.spawnY) / height);
             const currentX = obj.startX + (obj.endX - obj.startX) * progress;
             ctx.drawImage(
@@ -167,7 +168,7 @@ const Gameplay: React.FC<GameplayProps> = ({
           );
         }
 
-        roadY += roadSpeedRef.current;
+        roadY += roadSpeedRef.current / 10;
         requestAnimationFrame(draw);
       };
 
@@ -202,8 +203,15 @@ const Gameplay: React.FC<GameplayProps> = ({
         </span>
       ))}
 
-      <div className="absolute bottom-[150px] left-1/2 transform -translate-x-1/2 w-[140px]">
+      <div className="absolute bottom-[145px] left-1/2 transform -translate-x-1/2 w-[140px]">
         <Image src={vehicle} alt="Car" />
+      </div>
+
+      <div className="absolute bottom-[80px] left-0">
+        <Speedometer
+          currentProgress={roadSpeedRef.current}
+          levelRequirement={100}
+        />
       </div>
     </div>
   );
