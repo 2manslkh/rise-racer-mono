@@ -1,5 +1,4 @@
 import { useState } from "react";
-import IconButton from "../Shared/IconButton";
 import Image from "next/image";
 import { ItemType, ShopItem } from "./type";
 import ShopSection from "./section";

@@ -12,7 +12,6 @@ const Menu = ({
   handleClick,
 }: {
   gameStarted: boolean;
-  handleStart: () => void;
   handleClick: (_menuAction: MenuAction) => void;
 }) => {
   return (

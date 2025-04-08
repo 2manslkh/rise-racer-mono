@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Gameplay from "./components/Gameplay";
 import Navigation from "./components/Navigation";
 import Menu, { MenuAction } from "./components/Menu";
@@ -37,6 +37,31 @@ export default function Home() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio("/music/night-racer.mp3");
+    audioRef.current.loop = true;
+
+    return () => {
+      audioRef.current?.pause();
+      audioRef.current = null;
+    };
+  }, []);
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+
+    if (isMusicPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch((err) => {
+        console.warn("Autoplay failed:", err);
+      });
+    }
+
+    setIsMusicPlaying(!isMusicPlaying);
+  };
 
   useEffect(() => {
     if (window) {
@@ -59,6 +84,7 @@ export default function Home() {
     switch (_menuAction) {
       case MenuAction.START_GAME:
         setActiveView(Views.NULL);
+        togglePlayback();
         setGameStarted(true);
         break;
       case MenuAction.OPEN_LEADERBOARD:
@@ -97,9 +123,7 @@ export default function Home() {
               <Navigation
                 gameStarted={gameStarted}
                 musicPlaying={isMusicPlaying}
-                handleToggleMusicPlaying={() =>
-                  setIsMusicPlaying((prevState) => !prevState)
-                }
+                handleToggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
                 user={user}
@@ -107,7 +131,6 @@ export default function Home() {
             )}
             <Menu
               gameStarted={gameStarted}
-              handleStart={() => setGameStarted(true)}
               handleClick={(_menuAction: MenuAction) =>
                 handleMenuClick(_menuAction)
               }
