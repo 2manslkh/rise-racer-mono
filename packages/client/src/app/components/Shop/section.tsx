@@ -1,50 +1,7 @@
 import Image from "next/image";
-import { useState } from "react";
-
-export type ShopItem = {
-  price: number;
-  name: string;
-  description: string;
-  image: string;
-};
-
-const MOCK_DATA: ShopItem[] = [
-  {
-    price: 20.45,
-    name: "Item Number 1",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "./PFP.svg",
-  },
-  {
-    price: 20.45,
-    name: "Item Number 2",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "./PFP.svg",
-  },
-  {
-    price: 20.45,
-    name: "Item Number 3",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "./PFP.svg",
-  },
-  {
-    price: 20.45,
-    name: "Item Number 4",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "./PFP.svg",
-  },
-  {
-    price: 20.45,
-    name: "Item Number 5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    image: "./PFP.svg",
-  },
-];
+import { useEffect, useState } from "react";
+import { ItemType, ShopItem } from "./type";
+import { GetSectionTitle, GetShopData } from "./data";
 
 const RenderShopItem = (item: ShopItem) => {
   return (
@@ -81,13 +38,18 @@ const RenderShopItem = (item: ShopItem) => {
 };
 
 const ShopSection = ({
-  sectionTitle,
+  itemType,
   showItemPreview,
 }: {
-  sectionTitle: string;
+  itemType: ItemType;
   showItemPreview: (item: ShopItem) => void;
 }) => {
   const [showAll, setShowAll] = useState<boolean>(false);
+  const [data, setData] = useState<ShopItem[]>([]);
+
+  useEffect(() => {
+    setData(GetShopData(itemType));
+  }, [itemType]);
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -95,7 +57,7 @@ const ShopSection = ({
     const id = item?.getAttribute("data-id");
 
     if (id) {
-      const shopItem = MOCK_DATA.find((item) => item.name === id);
+      const shopItem = data.find((item) => item.name === id);
       if (shopItem) {
         showItemPreview(shopItem);
       }
@@ -110,24 +72,25 @@ const ShopSection = ({
           onClick={() => setShowAll((prevState) => !prevState)}
         >
           <p className="font-inter font-bold text-xl text-white">
-            {sectionTitle}
+            {GetSectionTitle(itemType)}
           </p>
-          <div className={`${showAll ? "rotate-90" : ""}`}>
-            <svg
-              width="11"
-              height="14"
-              viewBox="0 0 11 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10.5 7.86602C11.1667 7.48112 11.1667 6.51888 10.5 6.13397L1.5 0.937821C0.833333 0.552921 0 1.03405 0 1.80385V12.1962C0 12.966 0.833333 13.4471 1.5 13.0622L10.5 7.86602Z"
-                fill="white"
-              />
-            </svg>
-          </div>
+          {data.length > 4 && (
+            <div className={`${showAll ? "rotate-90" : ""}`}>
+              <svg
+                width="11"
+                height="14"
+                viewBox="0 0 11 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10.5 7.86602C11.1667 7.48112 11.1667 6.51888 10.5 6.13397L1.5 0.937821C0.833333 0.552921 0 1.03405 0 1.80385V12.1962C0 12.966 0.833333 13.4471 1.5 13.0622L10.5 7.86602Z"
+                  fill="white"
+                />
+              </svg>
+            </div>
+          )}
         </div>
-        <p>Filter</p>
       </div>
 
       <div
@@ -135,8 +98,8 @@ const ShopSection = ({
         onClick={handleClick}
       >
         {showAll
-          ? MOCK_DATA.map((item) => RenderShopItem(item))
-          : MOCK_DATA.slice(0, 4).map((item) => RenderShopItem(item))}
+          ? data.map((item) => RenderShopItem(item))
+          : data.slice(0, 4).map((item) => RenderShopItem(item))}
       </div>
     </div>
   );

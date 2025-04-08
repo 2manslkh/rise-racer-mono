@@ -1,7 +1,8 @@
 import { useState } from "react";
 import IconButton from "../Shared/IconButton";
-import ShopSection, { ShopItem } from "./section";
 import Image from "next/image";
+import { ItemType, ShopItem } from "./type";
+import ShopSection from "./section";
 
 const Shop = () => {
   const [selectedItemPreview, setSelectedItemPreview] = useState<ShopItem>();
@@ -22,21 +23,25 @@ const Shop = () => {
         >
           SHOPPING
         </p>
-        <IconButton
-          icon={"./Shop.svg"}
-          alt="Shop"
-          colorStart="#004682"
-          colorEnd="#0057A3"
-          handleClick={() => {}}
-        />
       </div>
       <div
         className="relative w-full bg-[#5700A3] rounded-xl p-4 overflow-y-auto gap-2 flex flex-col"
         style={{ height: `calc(100% - 68px - 50px)` }}
       >
-        <ShopSection sectionTitle="Racer" showItemPreview={handleItemPreview} />
         <ShopSection
-          sectionTitle="Avatar"
+          itemType={ItemType.ENGINE}
+          showItemPreview={handleItemPreview}
+        />
+        <ShopSection
+          itemType={ItemType.TURBO}
+          showItemPreview={handleItemPreview}
+        />
+        <ShopSection
+          itemType={ItemType.CHASSIS}
+          showItemPreview={handleItemPreview}
+        />
+        <ShopSection
+          itemType={ItemType.WHEELS}
           showItemPreview={handleItemPreview}
         />
       </div>
@@ -70,11 +75,9 @@ const Shop = () => {
                   {selectedItemPreview.name}
                 </p>
                 <button className="flex items-center gap-1 bg-[#53AE94] rounded-xl py-2 px-3">
-                  <p className="font-inter font-bold text-lg text-white">
-                    Add to cart
-                  </p>
+                  <p className="font-inter font-bold text-lg text-white">Buy</p>
                   <div className="relative w-6 h-6">
-                    <Image src={"./Shop.svg"} alt="Add to cart" fill />
+                    <Image src={"./Shop.svg"} alt="Buy" fill />
                   </div>
                 </button>
               </div>
