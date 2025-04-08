@@ -76,3 +76,20 @@ body {
   box-shadow: 0 12px 0 0 green;
   transform: rotate(90deg);
 } */
+
+@layer utilities {
+  @keyframes pop {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -80%) scale(1.6);
+    }
+  }
+
+  .animate-pop {
+    animation: pop 0.8s ease-out forwards;
+  }
+}

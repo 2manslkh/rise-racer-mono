@@ -33,14 +33,30 @@ const Gameplay: React.FC<GameplayProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(0);
+  const [clickEffects, setClickEffects] = useState<
+    { id: number; x: number; y: number }[]
+  >([]);
 
   const vehicle = GetVehicle(vehicleTier);
 
-  const handleClick = () => {
+  const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted) return;
-    roadSpeedRef.current += 1;
+    roadSpeedRef.current += 0.01;
+
+    const newClick = {
+      id: Date.now(),
+      x: e.clientX,
+      y: e.clientY,
+    };
+
+    setClickEffects((prev) => [...prev, newClick]);
+
+    setTimeout(() => {
+      setClickEffects((prev) => prev.filter((c) => c.id !== newClick.id));
+    }, 800);
   };
 
   useEffect(() => {
@@ -171,6 +187,21 @@ const Gameplay: React.FC<GameplayProps> = ({
         height={dimensions.height}
         className="absolute left-0 top-0 bottom-0 bg-red"
       />
+
+      {clickEffects.map((click) => (
+        <span
+          key={click.id}
+          className="absolute text-white font-bold text-lg animate-pop pointer-events-none select-none"
+          style={{
+            left: click.x,
+            top: click.y,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          +{incrementalSpeed}
+        </span>
+      ))}
+
       <div className="absolute bottom-[150px] left-1/2 transform -translate-x-1/2 w-[140px]">
         <Image src={vehicle} alt="Car" />
       </div>
