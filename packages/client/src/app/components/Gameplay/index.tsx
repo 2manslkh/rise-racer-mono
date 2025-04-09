@@ -182,7 +182,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
       draw();
     };
-  }, [dimensions]);
+  }, [dimensions, level]);
 
   return (
     <div
