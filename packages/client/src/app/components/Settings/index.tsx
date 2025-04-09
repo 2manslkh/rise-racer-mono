@@ -3,17 +3,16 @@ import Toggle from "../Shared/Toggle";
 import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useDisconnect } from "@reown/appkit/react";
 import { shortenAddress } from "@/app/lib/address";
-import { User } from "@/app/page";
-import { useEffect, useRef, useState } from "react";
+import { copyToClipboard } from "@/app/lib/copy";
 
 const Settings = ({
+  hotWallet,
   open,
   toggleSettings,
-  user,
 }: {
+  hotWallet: string;
   open: boolean;
   toggleSettings: () => void;
-  user: User;
 }) => {
   const { address } = useAppKitAccount();
   const { disconnect } = useDisconnect();
@@ -21,9 +20,6 @@ const Settings = ({
   const handleDisconnect = async () => {
     await disconnect();
   };
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dynamicHeight, setDynamicHeight] = useState<string>("24px");
 
   return (
     <>
@@ -41,52 +37,35 @@ const Settings = ({
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 ${open ? "h-content opacity-100" : "h-6 opacity-0"}`}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[253px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         style={{
-          width: open ? "calc(100% - 28px)" : "24px",
+          width: "calc(100% - 28px)",
         }}
       >
-        <div className="relative w-full p-2 flex flex-col gap-3">
-          {/* PFP Image */}
-          <div className="relative w-full aspect-square rounded-[12px] overflow-hidden pfp">
-            <Image src={user.profilePicture} alt="PFP" fill />
-            <div className="absolute top-2 left-2 w-6 aspect-square [filter:brightness(0)_saturate(100%)_invert(1)]">
-              <Image src={"./Edit.svg"} alt="Edit PFP" fill />
-            </div>
+        <div className="relative w-full h-full py-2 px-3 flex flex-col gap-3">
+          <p
+            className="font-zen text-white text-3xl relative"
+            style={{
+              WebkitTextStroke: "1.5px #74007E",
+            }}
+          >
+            SETTINGS
+          </p>
 
-            <div className="absolute top-0 right-0 w-11 h-11 z-10">
-              <div className="w-full h-full bg-white backdrop-blur-sm rounded-bl-2xl" />
-            </div>
-          </div>
-
-          <div className="relative w-full flex flex-col px-6 gap-2">
-            {/* Name */}
-            <div className="relative flex items-center gap-2">
-              <p className="text-primary text-inter font-bold text-xl">
-                {user.displayName}
-              </p>
-              <div className="relative w-6 aspect-square cursor-pointer">
-                <Image src={"./Edit.svg"} alt="Edit Name" fill />
-              </div>
-            </div>
-
+          <div className="relative w-full flex flex-col gap-2">
             {/* Sound */}
             <div className="relative w-full flex items-center gap-2 justify-between">
               <p className="text-black text-inter font-bold text-lg">Sound</p>
               <Toggle />
             </div>
 
-            {/* Language */}
+            {/* Main Wallet */}
             <div className="relative w-full flex items-center gap-2 justify-between">
               <p className="text-black text-inter font-bold text-lg">
-                Language
-              </p>
-            </div>
-
-            {/* Wallet */}
-            <div className="relative w-full flex items-center gap-2 justify-between">
-              <p className="text-black text-inter">
-                {shortenAddress(address || "")}
+                Main{" "}
+                <span className="font-normal">
+                  {shortenAddress(address || "")}
+                </span>
               </p>
               <button
                 type="button"
@@ -95,6 +74,30 @@ const Settings = ({
               >
                 Disconnect
               </button>
+            </div>
+
+            {/* Hot Wallet */}
+            <div className="relative w-full flex flex-col gap-[0.5px]">
+              <div className="relative w-full flex items-center gap-2 justify-between">
+                <p className="text-black text-inter font-bold text-lg">
+                  Burner{" "}
+                  <span className="font-normal">
+                    {shortenAddress(hotWallet || "")}
+                  </span>
+                </p>
+                <button
+                  className="relative w-6 h-6"
+                  onClick={() => copyToClipboard(hotWallet)}
+                >
+                  <Image src={"./Copy.svg"} alt="Copy" fill />
+                </button>
+              </div>
+
+              <p className="text-black text-inter text-sm">
+                All gas used from interacting with the game will be consumed
+                from this wallet. Please top up with RISE in RISE chain. Any top
+                up in other chains will not be refunded.
+              </p>
             </div>
           </div>
         </div>

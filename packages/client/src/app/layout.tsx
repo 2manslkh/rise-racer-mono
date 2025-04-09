@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Zen_Dots, Inter } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
 import ContextProvider from "./context/WagmiContext";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,6 +82,32 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${zenDots.variable} ${inter.variable} antialiased`}
       >
+        <Toaster
+          position="bottom-center"
+          reverseOrder={false}
+          gutter={8}
+          containerClassName=""
+          containerStyle={{}}
+          toastOptions={{
+            // Define default options
+            className: "",
+            duration: 5000,
+            removeDelay: 1000,
+            style: {
+              background: "#363636",
+              color: "#fff",
+            },
+
+            // Default options for specific types
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: "green",
+                secondary: "black",
+              },
+            },
+          }}
+        />
         <ContextProvider cookies={cookies}>{children}</ContextProvider>
       </body>
     </html>

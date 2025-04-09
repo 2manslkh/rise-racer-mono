@@ -6,24 +6,17 @@ import Navigation from "./components/Navigation";
 import Menu, { MenuAction } from "./components/Menu";
 import Login from "./components/Login";
 import { useAppKitAccount } from "@reown/appkit/react";
-import Settings from "./components/Settings";
 import Leaderboard from "./components/Leaderboard";
 import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 
 export type User = {
-  profilePicture: string;
-  displayName: string;
-  language: string;
   vehicle: number;
   currentLevel: number;
   currentProgress: number;
 };
 
 const user: User = {
-  profilePicture: "./PFP.svg",
-  displayName: "Anthony Mega Storm",
-  language: "EN",
   vehicle: 1,
   currentLevel: 1,
   currentProgress: 1,
@@ -48,7 +41,8 @@ export default function Home() {
   // THIS WHOLE SECTION IS JUST DUMMY FOR HOT WALLET
   const [hotWallet, setHotWallet] = useState<string>("");
 
-  const handleHotWallet = () => setHotWallet("OK");
+  const handleHotWallet = () =>
+    setHotWallet("0x0000000000000000000000000000000000000000");
   // END
 
   useEffect(() => {
@@ -140,7 +134,7 @@ export default function Home() {
                 handleToggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
-                user={user}
+                hotWallet={hotWallet}
               />
             )}
             <Menu

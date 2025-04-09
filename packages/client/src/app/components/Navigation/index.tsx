@@ -1,8 +1,6 @@
 import Image from "next/image";
 import IconButton from "../Shared/IconButton";
-import { useState } from "react";
 import Settings from "../Settings";
-import { User } from "@/app/page";
 
 const Navigation = ({
   gameStarted,
@@ -10,14 +8,14 @@ const Navigation = ({
   handleToggleMusicPlaying,
   toggleSettings,
   isSettingsOpen,
-  user,
+  hotWallet,
 }: {
   gameStarted: boolean;
   musicPlaying: boolean;
   handleToggleMusicPlaying: () => void;
   toggleSettings: () => void;
   isSettingsOpen: boolean;
-  user: User;
+  hotWallet: string;
 }) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-3">
@@ -53,7 +51,7 @@ const Navigation = ({
           )}
         </div>
         <Settings
-          user={user}
+          hotWallet={hotWallet}
           open={isSettingsOpen}
           toggleSettings={toggleSettings}
         />
