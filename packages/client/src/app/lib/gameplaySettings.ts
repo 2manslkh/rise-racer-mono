@@ -115,11 +115,9 @@ export const GetLevelRequirement = (level: number = 1) => {
     case 1:
       return 50;
     case 2:
-      return 75;
-    // return 343;
+      return 343;
     case 3:
-      return 100;
-    // return 1000;
+      return 1000;
     case 4:
       return 7800;
     case 5:
@@ -171,6 +169,7 @@ export const LoadSideObjectImages = (level: number = 1): HTMLImageElement[] => {
 
   switch (level) {
     case 1:
+    case 2:
       const imgOne = new Image();
       imgOne.src = base + "level1_1.svg";
       const imgTwo = new Image();

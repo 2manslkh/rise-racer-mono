@@ -42,14 +42,16 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const roadSpeedRef = useRef<number>(progress);
+  const roadSpeedRef = useRef<number>(0);
   const [clickEffects, setClickEffects] = useState<
     { id: number; x: number; y: number }[]
   >([]);
   const previousLevelRef = useRef<number>(0);
+  const [showLevelTransition, setShowLevelTransition] = useState(false);
 
   const vehicle = GetVehicle(vehicleTier);
 
+  // Each click will increase the speed
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted) return;
     roadSpeedRef.current += incrementalSpeed;
@@ -71,12 +73,14 @@ const Gameplay: React.FC<GameplayProps> = ({
     }, 800);
   };
 
+  // When user clicks on START button, set the speed
   useEffect(() => {
     if (gameStarted) {
       roadSpeedRef.current = progress;
     }
   }, [gameStarted]);
 
+  // For screen sizing
   useEffect(() => {
     const updateSize = () => {
       if (!containerRef.current) return;
@@ -94,9 +98,15 @@ const Gameplay: React.FC<GameplayProps> = ({
     return () => window.removeEventListener("resize", updateSize);
   }, [heightPercentage]);
 
+  // Drawing of canvas
   useEffect(() => {
     const shouldUpdate = GetShouldUpdate(previousLevelRef.current, level);
     if (!shouldUpdate) return;
+
+    if (previousLevelRef.current !== 0) {
+      setShowLevelTransition(true);
+      setTimeout(() => setShowLevelTransition(false), 1_000);
+    }
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -107,8 +117,6 @@ const Gameplay: React.FC<GameplayProps> = ({
     let roadY = 0;
     const bg: HTMLImageElement = new window.Image();
     bg.src = GetBackground(level);
-
-    if (gameStarted && level === 2) return;
 
     bg.onload = () => {
       const assets = LoadSideObjectImages(level);
@@ -200,6 +208,10 @@ const Gameplay: React.FC<GameplayProps> = ({
       className="relative w-full h-full"
       onPointerDown={handleClick}
     >
+      {showLevelTransition && (
+        <div className="absolute inset-0 bg-white animate-fade-out pointer-events-none z-20" />
+      )}
+
       <canvas
         ref={canvasRef}
         width={dimensions.width}
@@ -227,7 +239,9 @@ const Gameplay: React.FC<GameplayProps> = ({
 
       <div className="absolute bottom-[80px] left-0">
         <Speedometer
-          currentProgress={gameStarted ? roadSpeedRef.current : progress}
+          currentProgress={
+            gameStarted ? roadSpeedRef.current || progress : progress
+          }
           levelRequirement={GetLevelRequirement(level)}
         />
       </div>
