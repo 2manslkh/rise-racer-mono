@@ -12,6 +12,7 @@ import {
   GenerateSideObject,
   GetBackground,
   GetCenterDividerColor,
+  GetLevelRequirement,
   GetVehicle,
   LoadSideObjectImages,
   SideObject,
@@ -22,8 +23,9 @@ interface GameplayProps {
   gameStarted: boolean;
   heightPercentage?: number;
   vehicleTier?: number;
-  level?: number;
+  level: number;
   progress: number;
+  handleNextLevel: () => void;
 }
 
 const Gameplay: React.FC<GameplayProps> = ({
@@ -32,6 +34,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   gameStarted,
   level = 1,
   progress = 1,
+  handleNextLevel,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,6 +51,9 @@ const Gameplay: React.FC<GameplayProps> = ({
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted) return;
     roadSpeedRef.current += incrementalSpeed;
+    if (roadSpeedRef.current === GetLevelRequirement(level)) {
+      handleNextLevel();
+    }
 
     const newClick = {
       id: Date.now(),
@@ -212,7 +218,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       <div className="absolute bottom-[80px] left-0">
         <Speedometer
           currentProgress={gameStarted ? roadSpeedRef.current : progress}
-          levelRequirement={100}
+          levelRequirement={GetLevelRequirement(level)}
         />
       </div>
     </div>

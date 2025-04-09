@@ -15,7 +15,8 @@ export type User = {
   displayName: string;
   language: string;
   vehicle: number;
-  progress: number;
+  currentLevel: number;
+  currentProgress: number;
 };
 
 const user: User = {
@@ -23,7 +24,8 @@ const user: User = {
   displayName: "Anthony Mega Storm",
   language: "EN",
   vehicle: 1,
-  progress: 1,
+  currentLevel: 1,
+  currentProgress: 1,
 };
 
 enum Views {
@@ -40,6 +42,7 @@ export default function Home() {
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -114,6 +117,10 @@ export default function Home() {
     );
   };
 
+  const handleNextLevel = () => {
+    setCurrentLevel((prevState) => prevState + 1);
+  };
+
   return (
     <div className="relative w-screen h-screen flex items-center justify-center">
       <div className="relative w-full h-full max-w-[414px] max-h-[896px] overflow-hidden">
@@ -136,7 +143,13 @@ export default function Home() {
               }
             />
             <div className="relative w-full h-full">
-              <Gameplay progress={user.progress} gameStarted={gameStarted} />
+              <Gameplay
+                level={currentLevel}
+                // TODO: Update currentProgress to be fetched
+                progress={user.currentProgress}
+                gameStarted={gameStarted}
+                handleNextLevel={handleNextLevel}
+              />
             </div>
             {activeView === Views.LEADERBOARD && (
               <div className="fixed top-0 left-0 right-0 bottom-0">
