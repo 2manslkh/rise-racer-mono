@@ -41,6 +41,7 @@ const Menu = ({
             left: gameStarted
               ? `calc(calc(100% - ${BUTTON_STYLES.DISABLED.width})/2)`
               : `calc(calc(100% - ${BUTTON_STYLES.DEFAULT.width})/2)`,
+            display: gameStarted ? "none" : "block",
           }}
         >
           <StartButton

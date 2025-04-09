@@ -115,9 +115,11 @@ export const GetLevelRequirement = (level: number = 1) => {
     case 1:
       return 50;
     case 2:
-      return 343;
+      return 75;
+    // return 343;
     case 3:
-      return 1000;
+      return 100;
+    // return 1000;
     case 4:
       return 7800;
     case 5:
@@ -141,6 +143,16 @@ export const GetLevelRequirement = (level: number = 1) => {
     default:
       return 50;
   }
+};
+
+export const GetShouldUpdate = (current: number, next: number) => {
+  if (current === 1 && next === 2) return false;
+  if (current === 3 && next === 4) return false;
+  if (current === 5 && next === 6) return false;
+  if (current === 7 && next === 8) return false;
+  if (current === 9 && next === 10) return false;
+  if (current === 11 && next === 12) return false;
+  return true;
 };
 
 export type SideObject = {

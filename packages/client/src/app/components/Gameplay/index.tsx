@@ -13,6 +13,7 @@ import {
   GetBackground,
   GetCenterDividerColor,
   GetLevelRequirement,
+  GetShouldUpdate,
   GetVehicle,
   LoadSideObjectImages,
   SideObject,
@@ -45,6 +46,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   const [clickEffects, setClickEffects] = useState<
     { id: number; x: number; y: number }[]
   >([]);
+  const previousLevelRef = useRef<number>(0);
 
   const vehicle = GetVehicle(vehicleTier);
 
@@ -52,6 +54,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (!gameStarted) return;
     roadSpeedRef.current += incrementalSpeed;
     if (roadSpeedRef.current === GetLevelRequirement(level)) {
+      previousLevelRef.current = level;
       handleNextLevel();
     }
 
@@ -92,6 +95,9 @@ const Gameplay: React.FC<GameplayProps> = ({
   }, [heightPercentage]);
 
   useEffect(() => {
+    const shouldUpdate = GetShouldUpdate(previousLevelRef.current, level);
+    if (!shouldUpdate) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -101,6 +107,8 @@ const Gameplay: React.FC<GameplayProps> = ({
     let roadY = 0;
     const bg: HTMLImageElement = new window.Image();
     bg.src = GetBackground(level);
+
+    if (gameStarted && level === 2) return;
 
     bg.onload = () => {
       const assets = LoadSideObjectImages(level);
@@ -139,13 +147,14 @@ const Gameplay: React.FC<GameplayProps> = ({
           "#FFF"
         );
 
-        if (level === 1) {
+        if (level === 1 || level === 2) {
+          const buffer = 20;
+          const topLeft = (width - roadWidthTop) / 2 - buffer;
+          const topRight = (width + roadWidthTop) / 2 + buffer;
+          const bottomLeft = -(buffer + 20);
+          const bottomRight = width + buffer;
+
           if (roadY - lastSpawn > spawnGap) {
-            const buffer = 20;
-            const topLeft = (width - roadWidthTop) / 2 - buffer;
-            const topRight = (width + roadWidthTop) / 2 + buffer;
-            const bottomLeft = -(buffer + 20);
-            const bottomRight = width + buffer;
             sideObjects.push(
               GenerateSideObject(
                 assets,
@@ -160,7 +169,8 @@ const Gameplay: React.FC<GameplayProps> = ({
 
           sideObjects.forEach((obj) => {
             obj.y += roadSpeedRef.current / 10;
-            const progress = Math.min(1, (obj.y - obj.spawnY) / height);
+            // const progress = Math.min(1, (obj.y - obj.spawnY) / height);
+            const progress = (obj.y - obj.spawnY) / height;
             const currentX = obj.startX + (obj.endX - obj.startX) * progress;
             ctx.drawImage(
               obj.img,
