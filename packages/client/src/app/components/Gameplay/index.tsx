@@ -23,6 +23,7 @@ interface GameplayProps {
   heightPercentage?: number;
   vehicleTier?: number;
   level?: number;
+  progress: number;
 }
 
 const Gameplay: React.FC<GameplayProps> = ({
@@ -30,13 +31,14 @@ const Gameplay: React.FC<GameplayProps> = ({
   vehicleTier = 1,
   gameStarted,
   level = 1,
+  progress = 1,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const roadSpeedRef = useRef<number>(0);
+  const roadSpeedRef = useRef<number>(progress);
   const [clickEffects, setClickEffects] = useState<
     { id: number; x: number; y: number }[]
   >([]);
@@ -62,7 +64,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   useEffect(() => {
     if (gameStarted) {
-      roadSpeedRef.current = 1;
+      roadSpeedRef.current = progress;
     }
   }, [gameStarted]);
 
@@ -192,7 +194,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       {clickEffects.map((click) => (
         <span
           key={click.id}
-          className="absolute text-white font-bold text-lg animate-pop pointer-events-none select-none"
+          className="absolute text-white font-bold text-lg animate-pop pointer-events-none select-none z-1"
           style={{
             left: click.x,
             top: click.y,
@@ -209,7 +211,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
       <div className="absolute bottom-[80px] left-0">
         <Speedometer
-          currentProgress={roadSpeedRef.current}
+          currentProgress={gameStarted ? roadSpeedRef.current : progress}
           levelRequirement={100}
         />
       </div>

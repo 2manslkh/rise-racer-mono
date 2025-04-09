@@ -15,6 +15,7 @@ export type User = {
   displayName: string;
   language: string;
   vehicle: number;
+  progress: number;
 };
 
 const user: User = {
@@ -22,6 +23,7 @@ const user: User = {
   displayName: "Anthony Mega Storm",
   language: "EN",
   vehicle: 1,
+  progress: 1,
 };
 
 enum Views {
@@ -134,7 +136,7 @@ export default function Home() {
               }
             />
             <div className="relative w-full h-full">
-              <Gameplay gameStarted={gameStarted} />
+              <Gameplay progress={user.progress} gameStarted={gameStarted} />
             </div>
             {activeView === Views.LEADERBOARD && (
               <div className="fixed top-0 left-0 right-0 bottom-0">
