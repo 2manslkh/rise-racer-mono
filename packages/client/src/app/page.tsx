@@ -129,9 +129,8 @@ export default function Home() {
           <div className="relative w-full h-full">
             {[Views.NULL, Views.SETTINGS].includes(activeView) && (
               <Navigation
-                gameStarted={gameStarted}
                 musicPlaying={isMusicPlaying}
-                handleToggleMusicPlaying={togglePlayback}
+                toggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
                 hotWallet={hotWallet}

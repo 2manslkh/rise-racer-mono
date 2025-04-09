@@ -9,10 +9,14 @@ const Settings = ({
   hotWallet,
   open,
   toggleSettings,
+  musicPlaying,
+  toggleMusicPlaying,
 }: {
   hotWallet: string;
   open: boolean;
   toggleSettings: () => void;
+  musicPlaying: boolean;
+  toggleMusicPlaying: () => void;
 }) => {
   const { address } = useAppKitAccount();
   const { disconnect } = useDisconnect();
@@ -56,7 +60,10 @@ const Settings = ({
             {/* Sound */}
             <div className="relative w-full flex items-center gap-2 justify-between">
               <p className="text-black text-inter font-bold text-lg">Sound</p>
-              <Toggle />
+              <Toggle
+                checked={musicPlaying}
+                handleChange={toggleMusicPlaying}
+              />
             </div>
 
             {/* Main Wallet */}

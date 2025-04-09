@@ -3,16 +3,14 @@ import IconButton from "../Shared/IconButton";
 import Settings from "../Settings";
 
 const Navigation = ({
-  gameStarted,
   musicPlaying,
-  handleToggleMusicPlaying,
+  toggleMusicPlaying,
   toggleSettings,
   isSettingsOpen,
   hotWallet,
 }: {
-  gameStarted: boolean;
   musicPlaying: boolean;
-  handleToggleMusicPlaying: () => void;
+  toggleMusicPlaying: () => void;
   toggleSettings: () => void;
   isSettingsOpen: boolean;
   hotWallet: string;
@@ -32,7 +30,7 @@ const Navigation = ({
         </div>
 
         <div className="absolute top-[18px] right-5 z-3">
-          {gameStarted ? (
+          {/* {gameStarted ? (
             <IconButton
               icon={musicPlaying ? "/MusicPlaying.svg" : "/MusicMuted.svg"}
               alt="Music"
@@ -48,12 +46,21 @@ const Navigation = ({
               colorEnd={"#5700A3"}
               handleClick={toggleSettings}
             />
-          )}
+          )} */}
+          <IconButton
+            icon={"/Gear.svg"}
+            alt="Settings"
+            colorStart={"#460082"}
+            colorEnd={"#5700A3"}
+            handleClick={toggleSettings}
+          />
         </div>
         <Settings
           hotWallet={hotWallet}
           open={isSettingsOpen}
           toggleSettings={toggleSettings}
+          musicPlaying={musicPlaying}
+          toggleMusicPlaying={toggleMusicPlaying}
         />
       </nav>
     </div>
