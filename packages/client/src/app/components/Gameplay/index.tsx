@@ -6,9 +6,9 @@ import {
   DrawSideDivider,
   DrawCenterDivider,
   DrawLaneDividers,
+  DrawAdditionalSideDividers,
 } from "./util";
 import {
-  DrawSideObject,
   GenerateSideObject,
   GetBackground,
   GetCenterDividerColor,
@@ -153,6 +153,14 @@ const Gameplay: React.FC<GameplayProps> = ({
           roadWidthBottom,
           roadY,
           "#FFF"
+        );
+        DrawAdditionalSideDividers(
+          level,
+          ctx,
+          width,
+          height,
+          roadWidthTop,
+          roadWidthBottom
         );
 
         if (level === 1 || level === 2) {

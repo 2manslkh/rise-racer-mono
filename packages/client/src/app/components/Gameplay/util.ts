@@ -6,10 +6,10 @@ export const DrawRoad = (
   screenHeight: number,
   roadWidthTop: number,
   roadWidthBottom: number,
-  tier: number
+  level: number
 ) => {
   const gradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
-  GetRoad(gradient, tier);
+  GetRoad(gradient, level);
 
   ctx.fillStyle = gradient;
   ctx.beginPath();
@@ -20,8 +20,7 @@ export const DrawRoad = (
   ctx.closePath();
   ctx.fill();
 
-  if (tier === 6) {
-    // To only apply for tier 6
+  if (level === 11 || level === 12) {
     const leftBottom = (screenWidth - roadWidthBottom) / 2;
     const rightBottom = (screenWidth + roadWidthBottom) / 2;
     const rightTop = (screenWidth + roadWidthTop) / 2;
@@ -174,4 +173,65 @@ export const hexToRgba = (hex: string, alpha: number) => {
   const g = (bigint >> 8) & 255;
   const b = bigint & 255;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+export const DrawAdditionalSideDividers = (
+  level: number,
+  ctx: CanvasRenderingContext2D,
+  screenWidth: number,
+  screenHeight: number,
+  roadWidthTop: number,
+  roadWidthBottom: number
+) => {
+  if (level === 3 || level === 4) {
+    // Inner Layer - Start
+    ctx.fillStyle = "#4F3F60";
+
+    // Left Side Divider
+    ctx.beginPath();
+    ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
+    ctx.lineTo((screenWidth - roadWidthBottom) / 2, screenHeight);
+    ctx.lineTo((screenWidth - roadWidthTop) / 2, 0);
+    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 10, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Right Side Divier
+    ctx.beginPath();
+    ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
+    ctx.lineTo((screenWidth + roadWidthBottom) / 2, screenHeight);
+    ctx.lineTo((screenWidth + roadWidthTop) / 2, 0);
+    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 10, 0);
+    ctx.closePath();
+    ctx.fill();
+    // Inner Layer - End
+
+    // Outer Layer - Start
+    ctx.fillStyle = "#D7D7D7";
+
+    // Left Side Divider
+    ctx.beginPath();
+    ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 50, screenHeight);
+    ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
+    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 10, 0);
+    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 12, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Right Side Divider
+    ctx.beginPath();
+    ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 50, screenHeight);
+    ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
+    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 10, 0);
+    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 12, 0);
+    ctx.closePath();
+    ctx.fill();
+    // Outer Layer - End
+
+    return;
+  }
+
+  if (level === 5 || level === 6) {
+    return;
+  }
 };
