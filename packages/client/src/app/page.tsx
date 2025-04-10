@@ -18,8 +18,8 @@ export type User = {
 
 const user: User = {
   vehicle: 1,
-  currentLevel: 3,
-  currentProgress: 100,
+  currentLevel: 7,
+  currentProgress: 1_000_000,
 };
 
 enum Views {
