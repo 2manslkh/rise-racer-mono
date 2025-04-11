@@ -38,7 +38,7 @@ export const GetRoad = (gradientCtx: CanvasGradient, level: number = 1) => {
       break;
     case 7:
     case 8:
-      gradientCtx.addColorStop(0, "#41007A");
+      gradientCtx.addColorStop(0, hexToRgba("#41007A", 0.5));
       gradientCtx.addColorStop(1, "#230041");
       break;
     case 9:
@@ -85,6 +85,27 @@ export const GetBackground = (level: number = 1) => {
       return base + "background6.svg";
     default:
       return base + "background1.png";
+  }
+};
+
+export const GetBackgroundObjects = (level: number = 1): BackgroundObject[] => {
+  const base = "./gameplay/background/object/";
+
+  // The sequence of the object in the array determines the z index
+  switch (level) {
+    case 7:
+    case 8:
+      return [
+        // {
+        //   image: base + "World.svg",
+        //   height: 550,
+        //   width: 550,
+        //   x: -100,
+        //   y: -200,
+        // },
+      ];
+    default:
+      return [];
   }
 };
 
@@ -251,4 +272,57 @@ export const DrawSideObject = (
   sideObjects = sideObjects.filter(
     (obj) => obj.y <= height + obj.baseHeight + 50
   );
+};
+
+export type BackgroundObject = {
+  image: string;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+};
+
+export const DrawObjects = (
+  ctx: CanvasRenderingContext2D,
+  objects: BackgroundObject[]
+) => {
+  objects.forEach((obj) => {
+    const image: HTMLImageElement = new window.Image();
+    image.src = obj.image;
+    ctx.drawImage(image, obj.x, obj.y, obj.width, obj.height);
+  });
+};
+
+export type OverlayObject = {
+  image: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  dx: number;
+  dy: number;
+};
+
+export const GenerateOverlayObjects = (
+  image: HTMLImageElement,
+  screenWidth: number,
+  screenHeight: number
+): OverlayObject => {
+  const scale = Math.random() * 0.5 + 0.5;
+  const baseWidth = image.naturalWidth || 100;
+  const baseHeight = image.naturalHeight || 50;
+
+  const startY = Math.random() * (screenHeight * 0.6);
+  // Normalize startY to a 0–1 range relative to max spawn height
+  const verticalSpeedFactor = startY / (screenHeight * 0.6);
+
+  return {
+    image,
+    x: screenWidth + 50,
+    y: Math.random() * (screenHeight * 0.6),
+    width: baseWidth * scale,
+    height: baseHeight * scale,
+    dx: Math.random() * 2 + 3, // 3–5px left
+    dy: 0.5 + verticalSpeedFactor * 1.5, // base 0.5 + increase based on y
+  };
 };

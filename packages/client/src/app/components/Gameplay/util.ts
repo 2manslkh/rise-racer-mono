@@ -1,5 +1,9 @@
 import { GetRoad } from "@/app/lib/gameplaySettings";
 
+const GetHighestPointOfCanvas = (height: number) => {
+  return height * 0.1;
+};
+
 export const DrawRoad = (
   ctx: CanvasRenderingContext2D,
   screenWidth: number,
@@ -15,8 +19,14 @@ export const DrawRoad = (
   ctx.beginPath();
   ctx.moveTo((screenWidth - roadWidthBottom) / 2, screenHeight);
   ctx.lineTo((screenWidth + roadWidthBottom) / 2, screenHeight);
-  ctx.lineTo((screenWidth + roadWidthTop) / 2, 0);
-  ctx.lineTo((screenWidth - roadWidthTop) / 2, 0);
+  ctx.lineTo(
+    (screenWidth + roadWidthTop) / 2,
+    GetHighestPointOfCanvas(screenHeight)
+  );
+  ctx.lineTo(
+    (screenWidth - roadWidthTop) / 2,
+    GetHighestPointOfCanvas(screenHeight)
+  );
   ctx.closePath();
   ctx.fill();
 
@@ -31,8 +41,8 @@ export const DrawRoad = (
     ctx.beginPath();
     ctx.moveTo(leftBottom, screenHeight);
     ctx.lineTo(rightBottom, screenHeight);
-    ctx.lineTo(rightTop, 0);
-    ctx.lineTo(leftTop, 0);
+    ctx.lineTo(rightTop, GetHighestPointOfCanvas(screenHeight));
+    ctx.lineTo(leftTop, GetHighestPointOfCanvas(screenHeight));
     ctx.closePath();
     ctx.fill();
     ctx.restore();
@@ -54,13 +64,13 @@ export const DrawCenterDivider = (
   // First line (slightly left from center)
   ctx.beginPath();
   ctx.moveTo(centerX - 4, screenHeight);
-  ctx.lineTo(centerX - 2, 0);
+  ctx.lineTo(centerX - 2, GetHighestPointOfCanvas(screenHeight));
   ctx.stroke();
 
   // Second line (slightly right from center)
   ctx.beginPath();
   ctx.moveTo(centerX + 4, screenHeight);
-  ctx.lineTo(centerX + 2, 0);
+  ctx.lineTo(centerX + 2, GetHighestPointOfCanvas(screenHeight));
   ctx.stroke();
 
   return ctx;
@@ -81,13 +91,19 @@ export const DrawSideDivider = (
   // Left Side Divider
   ctx.beginPath();
   ctx.moveTo((screenWidth - roadWidthBottom) / 2 + 10, screenHeight);
-  ctx.lineTo((screenWidth - roadWidthTop) / 2 + 10, 0);
+  ctx.lineTo(
+    (screenWidth - roadWidthTop) / 2 + 10,
+    GetHighestPointOfCanvas(screenHeight)
+  );
   ctx.stroke();
 
   // Right Side Divider
   ctx.beginPath();
   ctx.moveTo((screenWidth + roadWidthBottom) / 2 - 10, screenHeight);
-  ctx.lineTo((screenWidth + roadWidthTop) / 2 - 10, 0);
+  ctx.lineTo(
+    (screenWidth + roadWidthTop) / 2 - 10,
+    GetHighestPointOfCanvas(screenHeight)
+  );
   ctx.stroke();
 };
 
@@ -154,13 +170,13 @@ export const DrawLaneDividers = (
   // === Left lane ===
   ctx.beginPath();
   ctx.moveTo(xLeftBottom, screenHeight);
-  ctx.lineTo(xLeftTop, 0);
+  ctx.lineTo(xLeftTop, GetHighestPointOfCanvas(screenHeight));
   ctx.stroke();
 
   // === Right lane ===
   ctx.beginPath();
   ctx.moveTo(xRightBottom, screenHeight);
-  ctx.lineTo(xRightTop, 0);
+  ctx.lineTo(xRightTop, GetHighestPointOfCanvas(screenHeight));
   ctx.stroke();
 
   ctx.setLineDash([]);
@@ -191,8 +207,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
     ctx.lineTo((screenWidth - roadWidthBottom) / 2, screenHeight);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2, 0);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 10, 0);
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
 
@@ -200,8 +222,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
     ctx.lineTo((screenWidth + roadWidthBottom) / 2, screenHeight);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2, 0);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 10, 0);
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
     // Inner Layer - End
@@ -213,8 +241,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 50, screenHeight);
     ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 10, 0);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 12, 0);
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 12,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
 
@@ -222,8 +256,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 50, screenHeight);
     ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 10, 0);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 12, 0);
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 12,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
     // Outer Layer - End
@@ -243,8 +283,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
     ctx.lineTo((screenWidth - roadWidthBottom) / 2, screenHeight);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2, 0);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 10, 0);
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
 
@@ -252,8 +298,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
     ctx.lineTo((screenWidth + roadWidthBottom) / 2, screenHeight);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2, 0);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 10, 0);
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
     // Layer 1 - End
@@ -266,13 +318,19 @@ export const DrawAdditionalSideDividers = (
     // Left Side Divider
     ctx.beginPath();
     ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 10, 0);
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.stroke();
 
     // Right Side Divider
     ctx.beginPath();
     ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 10, 0);
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 10,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.stroke();
     // Layer 2 - End
 
@@ -283,8 +341,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 70, screenHeight);
     ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 42, screenHeight);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 12, 0);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 20, 0);
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 12,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 20,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
 
@@ -292,8 +356,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 70, screenHeight);
     ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 42, screenHeight);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 12, 0);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 20, 0);
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 12,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 20,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
     // Layer 3 - End
@@ -305,8 +375,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 75, screenHeight);
     ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 70, screenHeight);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 20, 0);
-    ctx.lineTo((screenWidth - roadWidthTop) / 2 - 21, 0);
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 20,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth - roadWidthTop) / 2 - 21,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
 
@@ -314,8 +390,14 @@ export const DrawAdditionalSideDividers = (
     ctx.beginPath();
     ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 75, screenHeight);
     ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 70, screenHeight);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 20, 0);
-    ctx.lineTo((screenWidth + roadWidthTop) / 2 + 21, 0);
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 20,
+      GetHighestPointOfCanvas(screenHeight)
+    );
+    ctx.lineTo(
+      (screenWidth + roadWidthTop) / 2 + 21,
+      GetHighestPointOfCanvas(screenHeight)
+    );
     ctx.closePath();
     ctx.fill();
     // Layer 4 - End

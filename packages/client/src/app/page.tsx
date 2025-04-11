@@ -76,7 +76,7 @@ export default function Home() {
         "touchend",
         (event) => {
           const now = new Date().getTime();
-          if (now - lastTouchEnd <= 300) {
+          if (now - lastTouchEnd <= 500) {
             event.preventDefault();
           }
           lastTouchEnd = now;

@@ -18,7 +18,7 @@ const Navigation = ({
   return (
     <div className="absolute top-0 left-0 right-0 z-3">
       <div
-        className="relative h-[200px] mt-[-54px]"
+        className="relative h-[200px]"
         style={{
           background:
             "linear-gradient(to bottom, #29004D 35%, rgba(41, 0, 77, 0) 100%)",

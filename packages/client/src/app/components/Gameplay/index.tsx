@@ -9,13 +9,17 @@ import {
   DrawAdditionalSideDividers,
 } from "./util";
 import {
+  DrawObjects,
+  GenerateOverlayObjects,
   GenerateSideObject,
   GetBackground,
+  GetBackgroundObjects,
   GetCenterDividerColor,
   GetLevelRequirement,
   GetShouldUpdate,
   GetVehicle,
   LoadSideObjectImages,
+  OverlayObject,
   SideObject,
 } from "@/app/lib/gameplaySettings";
 import Speedometer from "../Speedometer";
@@ -119,15 +123,30 @@ const Gameplay: React.FC<GameplayProps> = ({
     bg.src = GetBackground(level);
 
     bg.onload = () => {
+      const { width, height } = dimensions;
       const assets = LoadSideObjectImages(level);
-      let sideObjects: SideObject[] = [];
+
+      let overlayObjects: OverlayObject[] = [];
+      if (level >= 7) {
+        // For Shooting Stars
+        let overlayImage = new window.Image();
+        overlayImage.src = "./gameplay/background/object/ShootingStar.svg";
+
+        setInterval(() => {
+          const count = Math.random() < 0.3 ? 2 : 1; // 30% chance of spawning 2
+
+          for (let i = 0; i < count; i++) {
+            overlayObjects.push(
+              GenerateOverlayObjects(overlayImage, width, height)
+            );
+          }
+        }, 3_000);
+      }
 
       let lastSpawn = 0;
       const spawnGap = 80;
 
       const draw = () => {
-        const { width, height } = dimensions;
-
         ctx.drawImage(bg, 0, 0, width, height);
         // ctx.clearRect(0, 0, width, height);
 
@@ -164,6 +183,8 @@ const Gameplay: React.FC<GameplayProps> = ({
         );
 
         if (level === 1 || level === 2) {
+          let sideObjects: SideObject[] = [];
+
           const buffer = 20;
           const topLeft = (width - roadWidthTop) / 2 - buffer;
           const topRight = (width + roadWidthTop) / 2 + buffer;
@@ -199,6 +220,16 @@ const Gameplay: React.FC<GameplayProps> = ({
 
           sideObjects = sideObjects.filter(
             (obj) => obj.y <= height + obj.baseHeight + 50
+          );
+        } else if (level >= 7) {
+          overlayObjects.forEach((obj) => {
+            obj.x -= obj.dx ?? 5;
+            obj.y += obj.dy ?? 1;
+            ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
+          });
+
+          overlayObjects = overlayObjects.filter(
+            (object) => object.x + object.width > 0
           );
         }
 
