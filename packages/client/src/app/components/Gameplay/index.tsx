@@ -9,11 +9,9 @@ import {
   DrawAdditionalSideDividers,
 } from "./util";
 import {
-  DrawObjects,
   GenerateOverlayObjects,
   GenerateSideObject,
   GetBackground,
-  GetBackgroundObjects,
   GetCenterDividerColor,
   GetLevelRequirement,
   GetShouldUpdate,
