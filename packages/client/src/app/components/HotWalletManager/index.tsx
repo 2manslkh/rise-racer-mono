@@ -7,6 +7,9 @@ import { useAccount, useSendTransaction, useWriteContract } from "wagmi"; // Ass
 import { parseEther } from "ethers";
 import toast from "react-hot-toast";
 
+// Define the target Chain ID
+const RISE_TESTNET_CHAIN_ID = 11155931;
+
 // --- PLACEHOLDER: Replace with actual contract details ---
 const BINDING_CONTRACT_ADDRESS = "0x..."; // Replace with actual address
 const BINDING_CONTRACT_ABI = [
@@ -26,7 +29,7 @@ const HotWalletManager = () => {
     isLoading: isHotWalletLoading,
     createHotWallet,
   } = useHotWallet();
-  const { address: mainWalletAddress, isConnected } = useAccount(); // Get main wallet address
+  const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
 
   const {
@@ -40,6 +43,9 @@ const HotWalletManager = () => {
     error: bindError,
   } = useWriteContract();
 
+  // Check if the connected wallet is on the correct network
+  const isOnCorrectNetwork = isConnected && chainId === RISE_TESTNET_CHAIN_ID;
+
   const handleCopyAddress = () => {
     if (hotWalletAddress) {
       copyToClipboard(hotWalletAddress);
@@ -47,6 +53,11 @@ const HotWalletManager = () => {
   };
 
   const handleTopUp = async () => {
+    // Add network check
+    if (!isOnCorrectNetwork) {
+      toast.error("Please connect to RISE Testnet to top up.");
+      return;
+    }
     if (!sendTransaction || !hotWalletAddress || !topUpAmount) return;
     const amountWei = parseEther(topUpAmount);
     if (amountWei <= BigInt(0)) {
@@ -63,6 +74,11 @@ const HotWalletManager = () => {
   };
 
   const handleBind = async () => {
+    // Add network check
+    if (!isOnCorrectNetwork) {
+      toast.error("Please connect to RISE Testnet to bind.");
+      return;
+    }
     if (!mainWalletAddress || !hotWalletAddress) {
       toast.error("Main wallet or burner wallet not available.");
       return;
@@ -115,7 +131,7 @@ const HotWalletManager = () => {
       {hotWalletAddress ? (
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-black text-inter">
-            Use this address to top up gas (RISE token on RISE Testnet).
+            Use this address to top up gas (ETH on RISE Testnet).
           </p>
           {/* Top Up Section */}
           <div className="flex items-center gap-2 mt-1">
@@ -127,11 +143,16 @@ const HotWalletManager = () => {
               value={topUpAmount}
               onChange={(e) => setTopUpAmount(e.target.value)}
               className="flex-grow px-2 py-1 border border-gray-300 rounded text-black text-sm focus:outline-none focus:ring-1 focus:ring-[#5700A3]"
-              disabled={isTxLoading}
+              disabled={isTxLoading || !isOnCorrectNetwork}
             />
             <button
               onClick={handleTopUp}
-              disabled={isTxLoading || !isConnected || !topUpAmount}
+              disabled={
+                isTxLoading ||
+                !isConnected ||
+                !topUpAmount ||
+                !isOnCorrectNetwork
+              }
               className="bg-[#5700A3] text-white py-1 px-3 rounded hover:bg-[#460082] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isTxLoading ? "Sending..." : "Top Up"}
@@ -141,11 +162,17 @@ const HotWalletManager = () => {
           {isConnected && mainWalletAddress && (
             <button
               onClick={handleBind}
-              disabled={isBindLoading}
-              className="mt-2 w-full bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              disabled={isBindLoading || !isOnCorrectNetwork}
+              className="mt-2 w-full bg-[#5700A3] text-white py-1 px-3 rounded hover:bg-[#460082] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isBindLoading ? "Binding..." : "Bind Wallet to Main"}
             </button>
+          )}
+          {/* Network Warning Message */}
+          {isConnected && !isOnCorrectNetwork && (
+            <p className="text-orange-600 text-xs mt-1">
+              Please switch your wallet to RISE Testnet to proceed.
+            </p>
           )}
           {bindError && (
             <p className="text-red-500 text-xs mt-1">

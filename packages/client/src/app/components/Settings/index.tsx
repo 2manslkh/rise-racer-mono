@@ -44,7 +44,7 @@ const Settings = ({
           width: "calc(100% - 28px)",
         }}
       >
-        <div className="relative w-full h-full py-2 px-3 flex flex-col gap-3">
+        <div className="relative w-full h-full py-2 px-3 flex flex-col gap-3 overflow-y-auto">
           <p
             className="font-zen text-white text-3xl relative"
             style={{
