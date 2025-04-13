@@ -7,13 +7,11 @@ const Navigation = ({
   toggleMusicPlaying,
   toggleSettings,
   isSettingsOpen,
-  hotWallet,
 }: {
   musicPlaying: boolean;
   toggleMusicPlaying: () => void;
   toggleSettings: () => void;
   isSettingsOpen: boolean;
-  hotWallet: string;
 }) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-3">
@@ -56,7 +54,6 @@ const Navigation = ({
           />
         </div>
         <Settings
-          hotWallet={hotWallet}
           open={isSettingsOpen}
           toggleSettings={toggleSettings}
           musicPlaying={musicPlaying}

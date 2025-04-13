@@ -3,16 +3,14 @@ import Toggle from "../Shared/Toggle";
 import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useDisconnect } from "@reown/appkit/react";
 import { shortenAddress } from "@/app/lib/address";
-import { copyToClipboard } from "@/app/lib/copy";
+import HotWalletManager from "../HotWalletManager";
 
 const Settings = ({
-  hotWallet,
   open,
   toggleSettings,
   musicPlaying,
   toggleMusicPlaying,
 }: {
-  hotWallet: string;
   open: boolean;
   toggleSettings: () => void;
   musicPlaying: boolean;
@@ -83,29 +81,8 @@ const Settings = ({
               </button>
             </div>
 
-            {/* Hot Wallet */}
-            <div className="relative w-full flex flex-col gap-[0.5px]">
-              <div className="relative w-full flex items-center gap-2 justify-between">
-                <p className="text-black text-inter font-bold text-lg">
-                  Burner{" "}
-                  <span className="font-normal">
-                    {shortenAddress(hotWallet || "")}
-                  </span>
-                </p>
-                <button
-                  className="relative w-6 h-6"
-                  onClick={() => copyToClipboard(hotWallet)}
-                >
-                  <Image src={"./Copy.svg"} alt="Copy" fill />
-                </button>
-              </div>
-
-              <p className="text-black text-inter text-sm">
-                All gas used from interacting with the game will be consumed
-                from this wallet. Please top up with RISE in RISE chain. Any top
-                up in other chains will not be refunded.
-              </p>
-            </div>
+            {/* Replace Hot Wallet display with the manager component */}
+            <HotWalletManager />
           </div>
         </div>
       </div>
