@@ -31,7 +31,7 @@ const riseTestnet = defineChain({
   },
 });
 
-export const networks = [mainnet] as [AppKitNetwork, ...AppKitNetwork[]];
+export const networks = [riseTestnet] as [AppKitNetwork, ...AppKitNetwork[]];
 
 export const wagmiAdapter = new WagmiAdapter({
   storage: createStorage({
