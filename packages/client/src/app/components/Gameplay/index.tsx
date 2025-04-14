@@ -7,14 +7,15 @@ import {
   DrawCenterDivider,
   DrawLaneDividers,
   DrawAdditionalSideDividers,
-} from "./util";
+} from "./canvas";
 import {
+  GenerateFixedSideObject,
   GenerateOverlayObjects,
-  GenerateSideObject,
+  GenerateRandomSideObject,
   GetBackground,
   GetCenterDividerColor,
   GetLevelRequirement,
-  GetShouldUpdate,
+  GetShouldUpdateCanvas,
   GetVehicle,
   LoadSideObjectImages,
   OverlayObject,
@@ -62,10 +63,11 @@ const Gameplay: React.FC<GameplayProps> = ({
       handleNextLevel();
     }
 
+    const rect = containerRef.current?.getBoundingClientRect();
     const newClick = {
       id: Date.now(),
-      x: e.clientX,
-      y: e.clientY,
+      x: e.clientX - (rect?.left ?? 0),
+      y: e.clientY - (rect?.top ?? 0),
     };
 
     setClickEffects((prev) => [...prev, newClick]);
@@ -102,7 +104,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
-    const shouldUpdate = GetShouldUpdate(previousLevelRef.current, level);
+    const shouldUpdate = GetShouldUpdateCanvas(previousLevelRef.current, level);
     if (!shouldUpdate) return;
 
     if (previousLevelRef.current !== 0) {
@@ -124,18 +126,17 @@ const Gameplay: React.FC<GameplayProps> = ({
       const { width, height } = dimensions;
       const assets = LoadSideObjectImages(level);
 
+      let sideObjects: SideObject[] = [];
       let overlayObjects: OverlayObject[] = [];
+
       if (level >= 7) {
         // For Shooting Stars
-        let overlayImage = new window.Image();
-        overlayImage.src = "./gameplay/background/object/ShootingStar.svg";
-
         setInterval(() => {
           const count = Math.random() < 0.3 ? 2 : 1; // 30% chance of spawning 2
 
           for (let i = 0; i < count; i++) {
             overlayObjects.push(
-              GenerateOverlayObjects(overlayImage, width, height)
+              GenerateOverlayObjects(assets[0], width, height)
             );
           }
         }, 3_000);
@@ -151,38 +152,8 @@ const Gameplay: React.FC<GameplayProps> = ({
         const roadWidthTop = width * 0.3;
         const roadWidthBottom = width * 1.1;
 
-        DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, level);
-        DrawSideDivider(
-          ctx,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom,
-          "#FFF"
-        );
-
-        DrawCenterDivider(ctx, width, height, GetCenterDividerColor(level));
-        DrawLaneDividers(
-          ctx,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom,
-          roadY,
-          "#FFF"
-        );
-        DrawAdditionalSideDividers(
-          level,
-          ctx,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom
-        );
-
-        if (level === 1 || level === 2) {
-          let sideObjects: SideObject[] = [];
-
+        if ([1, 2].includes(level)) {
+          // TODO: May consider using interval instead of using spawn gap
           const buffer = 20;
           const topLeft = (width - roadWidthTop) / 2 - buffer;
           const topRight = (width + roadWidthTop) / 2 + buffer;
@@ -191,7 +162,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
           if (roadY - lastSpawn > spawnGap) {
             sideObjects.push(
-              GenerateSideObject(
+              GenerateRandomSideObject(
                 assets,
                 topLeft,
                 topRight,
@@ -203,17 +174,34 @@ const Gameplay: React.FC<GameplayProps> = ({
           }
 
           sideObjects.forEach((obj) => {
+            // Old code with no scaling - archived it first
+            // obj.y += roadSpeedRef.current / 10;
+            // const progress = (obj.y - obj.spawnY) / height;
+            // const currentX = obj.startX + (obj.endX - obj.startX) * progress;
+            // ctx.drawImage(
+            //   obj.img,
+            //   currentX,
+            //   obj.y,
+            //   obj.baseWidth,
+            //   obj.baseHeight
+            // );
+
             obj.y += roadSpeedRef.current / 10;
-            // const progress = Math.min(1, (obj.y - obj.spawnY) / height);
-            const progress = (obj.y - obj.spawnY) / height;
+
+            const distanceFromTop = obj.y - obj.spawnY;
+            const maxDistance = height - obj.spawnY;
+            const progress = distanceFromTop / maxDistance;
+
+            const minScale = 0.4;
+            const maxScale = 1;
+            const scale = minScale + (maxScale - minScale) * progress;
+
+            const scaledWidth = obj.baseWidth * scale;
+            const scaledHeight = obj.baseHeight * scale;
+
             const currentX = obj.startX + (obj.endX - obj.startX) * progress;
-            ctx.drawImage(
-              obj.img,
-              currentX,
-              obj.y,
-              obj.baseWidth,
-              obj.baseHeight
-            );
+
+            ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
           });
 
           sideObjects = sideObjects.filter(
@@ -228,6 +216,77 @@ const Gameplay: React.FC<GameplayProps> = ({
 
           overlayObjects = overlayObjects.filter(
             (object) => object.x + object.width > 0
+          );
+        }
+
+        DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, level);
+        DrawSideDivider(
+          ctx,
+          width,
+          height,
+          roadWidthTop,
+          roadWidthBottom,
+          "#FFF"
+        );
+        DrawCenterDivider(ctx, width, height, GetCenterDividerColor(level));
+        DrawLaneDividers(
+          ctx,
+          width,
+          height,
+          roadWidthTop,
+          roadWidthBottom,
+          roadY,
+          "#FFF"
+        );
+        DrawAdditionalSideDividers(
+          ctx,
+          width,
+          height,
+          roadWidthTop,
+          roadWidthBottom,
+          level
+        );
+
+        if ([3, 4].includes(level)) {
+          const topLeft = (width - roadWidthTop) / 2 + 27;
+          const topRight = (width + roadWidthTop) / 2 - 47;
+          const bottomLeft = -103;
+          const bottomRight = width + 50;
+
+          if (roadY - lastSpawn > spawnGap * 1.5) {
+            sideObjects.push(
+              ...GenerateFixedSideObject(
+                assets,
+                topLeft,
+                topRight,
+                bottomLeft,
+                bottomRight
+              )
+            );
+            lastSpawn = roadY;
+          }
+
+          sideObjects.forEach((obj) => {
+            obj.y += roadSpeedRef.current / 10;
+
+            const distanceFromTop = obj.y - obj.spawnY;
+            const maxDistance = height - obj.spawnY;
+            const progress = distanceFromTop / maxDistance;
+
+            const minScale = 0.4;
+            const maxScale = 1;
+            const scale = minScale + (maxScale - minScale) * progress;
+
+            const scaledWidth = obj.baseWidth * scale;
+            const scaledHeight = obj.baseHeight * scale;
+
+            const currentX = obj.startX + (obj.endX - obj.startX) * progress;
+
+            ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
+          });
+
+          sideObjects = sideObjects.filter(
+            (obj) => obj.y <= height + obj.baseHeight + 50
           );
         }
 
@@ -259,7 +318,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       {clickEffects.map((click) => (
         <span
           key={click.id}
-          className="absolute text-white font-bold text-lg animate-pop pointer-events-none select-none z-1"
+          className="absolute text-white font-bold text-2xl animate-pop pointer-events-none select-none z-1"
           style={{
             left: click.x,
             top: click.y,

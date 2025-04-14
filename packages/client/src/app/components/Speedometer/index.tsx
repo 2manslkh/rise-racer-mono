@@ -1,3 +1,4 @@
+import { formatToScientific } from "@/app/lib/speed";
 import Image from "next/image";
 
 const Speedometer = ({
@@ -13,7 +14,7 @@ const Speedometer = ({
         <Image src={"./Speedometer.svg"} alt="Speedometer" fill />
       </div>
       <div className="absolute left-3 top-[2px] text-white font-zen flex items-center justify-between w-[85px]">
-        <p className="text-[17px]">{currentProgress}</p>
+        <p className="text-[17px]">{formatToScientific(currentProgress)}</p>
         <p className="text-[7px]">m/s</p>
       </div>
 

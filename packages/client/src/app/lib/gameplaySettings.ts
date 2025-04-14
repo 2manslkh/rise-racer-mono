@@ -3,7 +3,7 @@ import Tier2 from "../assets/vehicle/tier2.svg";
 import Tier3 from "../assets/vehicle/tier3.svg";
 import Tier4 from "../assets/vehicle/tier4.svg";
 import Tier5 from "../assets/vehicle/tier5.svg";
-import { hexToRgba } from "../components/Gameplay/util";
+import { hexToRgba } from "../components/Gameplay/canvas/util";
 
 export const GetVehicle = (tier: number = 1) => {
   switch (tier) {
@@ -79,7 +79,7 @@ export const GetBackground = (level: number = 1) => {
       return base + "background4.svg";
     case 9:
     case 10:
-      return base + "background5.svg";
+      return base + "background5.png";
     case 11:
     case 12:
       return base + "background6.svg";
@@ -164,7 +164,7 @@ export const GetLevelRequirement = (level: number = 1) => {
   }
 };
 
-export const GetShouldUpdate = (current: number, next: number) => {
+export const GetShouldUpdateCanvas = (current: number, next: number) => {
   if (current === 1 && next === 2) return false;
   if (current === 3 && next === 4) return false;
   if (current === 5 && next === 6) return false;
@@ -180,7 +180,6 @@ export type SideObject = {
   startX: number;
   endX: number;
   img: HTMLImageElement;
-  depth: number;
   baseWidth: number;
   baseHeight: number;
 };
@@ -205,12 +204,28 @@ export const LoadSideObjectImages = (level: number = 1): HTMLImageElement[] => {
       imgSix.src = base + "level1_6.svg";
 
       return [imgOne, imgTwo, imgThree, imgFour, imgFive, imgSix];
+    case 3:
+    case 4:
+      const imgLampPostLeft = new Image();
+      imgLampPostLeft.src = base + "LamppostLeft.svg";
+      const imgLampPostRight = new Image();
+      imgLampPostRight.src = base + "LamppostRight.svg";
+      return [imgLampPostLeft, imgLampPostRight];
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+      const imgShootingStar = new Image();
+      imgShootingStar.src = base + "ShootingStar.svg";
+      return [imgShootingStar];
     default:
       return [];
   }
 };
 
-export const GenerateSideObject = (
+export const GenerateRandomSideObject = (
   assets: HTMLImageElement[],
   roadTopLeft: number,
   roadTopRight: number,
@@ -219,9 +234,8 @@ export const GenerateSideObject = (
 ): SideObject => {
   const img = assets[Math.floor(Math.random() * assets.length)];
   const side = Math.random() < 0.5 ? "left" : "right";
-  const depth = Math.ceil(Math.random() * 3);
-  const objWidth = img.naturalWidth * 0.6 || 40;
-  const objHeight = img.naturalHeight * 0.6 || 40;
+  const objWidth = img.naturalWidth || 40;
+  const objHeight = img.naturalHeight || 40;
 
   const startX = side === "left" ? roadTopLeft - 40 : roadTopRight + 10;
   const endX = side === "left" ? roadBottomLeft - 40 : roadBottomRight + 10;
@@ -232,10 +246,51 @@ export const GenerateSideObject = (
     startX,
     endX,
     img,
-    depth,
     baseWidth: objWidth,
     baseHeight: objHeight,
   };
+};
+
+export const GenerateFixedSideObject = (
+  assets: HTMLImageElement[],
+  roadTopLeft: number,
+  roadTopRight: number,
+  roadBottomLeft: number,
+  roadBottomRight: number
+): SideObject[] => {
+  // Left Object
+  const imgLeft = assets[0];
+  const objWidth = imgLeft.naturalWidth || 50;
+  const objHeight = imgLeft.naturalHeight || 136;
+  const leftStartX = roadTopLeft;
+  const leftEndX = roadBottomLeft;
+  const leftObject: SideObject = {
+    img: imgLeft,
+    y: -objHeight,
+    spawnY: -objHeight,
+    startX: leftStartX,
+    endX: leftEndX,
+    baseWidth: objWidth,
+    baseHeight: objHeight,
+  };
+
+  // Right Object
+  const imgRight = assets[1];
+  const rightStartX = roadTopRight;
+  const rightEndX = roadBottomRight;
+  const rightObject: SideObject = {
+    img: imgRight,
+    y: -objHeight,
+    spawnY: -objHeight,
+    startX: rightStartX,
+    endX: rightEndX,
+    baseWidth: objWidth,
+    baseHeight: objHeight,
+  };
+
+  // Not sure what is this bug that is appearing
+  if (objHeight > 200) return [];
+  return [leftObject, rightObject];
 };
 
 export type BackgroundObject = {
@@ -261,7 +316,7 @@ export const GenerateOverlayObjects = (
   screenWidth: number,
   screenHeight: number
 ): OverlayObject => {
-  const scale = Math.random() * 0.5 + 0.5;
+  const scale = Math.random() * 0.5;
   const baseWidth = image.naturalWidth || 100;
   const baseHeight = image.naturalHeight || 50;
 
