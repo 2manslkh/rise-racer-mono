@@ -1,6 +1,6 @@
 import {
   BackgroundObject,
-  GenerateSideObject,
+  GenerateRandomSideObject,
   GetRoad,
   SideObject,
 } from "@/app/lib/gameplaySettings";
@@ -60,7 +60,13 @@ export const DrawSideObject = (
     const bottomLeft = -(buffer + 20);
     const bottomRight = width + buffer;
     sideObjects.push(
-      GenerateSideObject(assets, topLeft, topRight, bottomLeft, bottomRight)
+      GenerateRandomSideObject(
+        assets,
+        topLeft,
+        topRight,
+        bottomLeft,
+        bottomRight
+      )
     );
     lastSpawn = roadY;
   }

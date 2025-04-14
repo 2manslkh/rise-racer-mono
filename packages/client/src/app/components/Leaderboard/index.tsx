@@ -25,9 +25,6 @@ const RenderLeaderboardRow = (
         <p className="font-inter font-bold text-base text-white">{data.rank}</p>
       </div>
       <div className="flex flex-1 gap-1 items-center">
-        <div className="relative min-w-[28px] min-h-[28px] rounded-full overflow-hidden border border-solid border-white">
-          <Image src={data.pfp} alt={`${data.player}_PFP`} fill />
-        </div>
         <p className="font-inter font-bold text-base text-white whitespace-nowrap">
           {data.player}
         </p>
@@ -93,10 +90,7 @@ const Leaderboard = ({ user }: { user: User }) => {
 
       {/* Your ranking */}
       <div className="relative w-full rounded-xl p-2 flex items-center gap-4 bg-[#8322F9]">
-        <div className="relative w-[100px] h-[100px] rounded-xl overflow-hidden">
-          <Image src={user.profilePicture} alt="Profile Picture" fill />
-        </div>
-        <div className="relative flex-1 flex flex-col justify-between h-full">
+        <div className="relative flex-1 flex flex-col justify-between h-full gap-2">
           <div className="relative flex items-center py-1 px-2 bg-[#2A004F] rounded-xl h-[45px] gap-1">
             <div className="w-[42px] flex items-center justify-center">
               <div className="relative w-9 h-9">

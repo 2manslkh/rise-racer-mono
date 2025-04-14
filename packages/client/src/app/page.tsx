@@ -150,17 +150,18 @@ export default function Home() {
                 gameStarted={gameStarted}
                 handleNextLevel={handleNextLevel}
               />
+
+              {activeView === Views.LEADERBOARD && (
+                <div className="absolute top-0 left-0 right-0 bottom-0">
+                  <Leaderboard user={user} />
+                </div>
+              )}
+              {activeView === Views.SHOP && (
+                <div className="absolute top-0 left-0 right-0 bottom-0">
+                  <Shop />
+                </div>
+              )}
             </div>
-            {activeView === Views.LEADERBOARD && (
-              <div className="fixed top-0 left-0 right-0 bottom-0">
-                <Leaderboard user={user} />
-              </div>
-            )}
-            {activeView === Views.SHOP && (
-              <div className="fixed top-0 left-0 right-0 bottom-0">
-                <Shop />
-              </div>
-            )}
 
             {!hotWallet && <BindHotWallet handleClick={handleHotWallet} />}
           </div>

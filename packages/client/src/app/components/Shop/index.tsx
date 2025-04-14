@@ -12,8 +12,7 @@ const Shop = () => {
 
   return (
     <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-2 items-center gap-4">
-      <div className="relative w-full flex items-center justify-between px-3">
-        <div className="w-6 h-6"></div>
+      <div className="relative w-full flex items-center justify-center px-3">
         <p
           className="font-zen text-white text-[26px] relative"
           style={{
