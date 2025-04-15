@@ -4,6 +4,7 @@ import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useDisconnect } from "@reown/appkit/react";
 import { shortenAddress } from "@/app/lib/address";
 import HotWalletManager from "../HotWalletManager";
+import { useHotWallet } from "@/app/context/HotWalletContext";
 
 const Settings = ({
   open,
@@ -18,8 +19,10 @@ const Settings = ({
 }) => {
   const { address } = useAppKitAccount();
   const { disconnect } = useDisconnect();
+  const { disconnectHotWallet } = useHotWallet();
 
   const handleDisconnect = async () => {
+    disconnectHotWallet();
     await disconnect();
   };
 

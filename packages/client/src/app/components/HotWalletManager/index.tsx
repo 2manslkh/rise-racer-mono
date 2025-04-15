@@ -3,45 +3,28 @@ import { useHotWallet } from "@/app/context/HotWalletContext";
 import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
-import { useAccount, useSendTransaction, useWriteContract } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
+import { useAccount, useSendTransaction, useSignMessage } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
 import { parseEther } from "ethers";
 import toast from "react-hot-toast";
 
 // Define the target Chain ID
 const RISE_TESTNET_CHAIN_ID = 11155931;
-
-// --- PLACEHOLDER: Replace with actual contract details ---
-const BINDING_CONTRACT_ADDRESS = "0x..."; // Replace with actual address
-const BINDING_CONTRACT_ABI = [
-  {
-    name: "bindHotWallet", // Replace with actual function name if different
-    type: "function",
-    inputs: [{ name: "hotWalletAddress", type: "address" }], // Adjust params if needed
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-];
-// --- END PLACEHOLDER ---
+const message = "Login to Rise Racers"
 
 const HotWalletManager = () => {
   const {
     address: hotWalletAddress,
     isLoading: isHotWalletLoading,
-    createHotWallet,
+    loadHotWallet,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
-
+  const {signMessage} = useSignMessage()
   const {
     data: hash,
     isPending: isTxLoading,
     sendTransaction,
   } = useSendTransaction();
-  const {
-    writeContract,
-    isPending: isBindLoading,
-    error: bindError,
-  } = useWriteContract();
 
   // Check if the connected wallet is on the correct network
   const isOnCorrectNetwork = isConnected && chainId === RISE_TESTNET_CHAIN_ID;
@@ -79,30 +62,20 @@ const HotWalletManager = () => {
       toast.error("Please connect to RISE Testnet to bind.");
       return;
     }
-    if (!mainWalletAddress || !hotWalletAddress) {
-      toast.error("Main wallet or burner wallet not available.");
+    if (!mainWalletAddress) {
+      toast.error("Main wallet not connected.");
       return;
     }
-    if (!BINDING_CONTRACT_ADDRESS || BINDING_CONTRACT_ADDRESS === "0x...") {
-      toast.error("Binding contract details not configured.");
-      console.error(
-        "Placeholder contract details are still being used for binding."
-      );
-      return;
+    signMessage({message: message},{onSuccess: async (data) => {
+      try {
+        await loadHotWallet({address: mainWalletAddress, message, signature: data})
+      } catch (error) {
+        toast.error("Error binding hot wallet");
+      }
     }
-
-    writeContract({
-      address: BINDING_CONTRACT_ADDRESS as `0x${string}`,
-      abi: BINDING_CONTRACT_ABI,
-      functionName: "bindHotWallet", // Make sure this matches ABI
-      args: [hotWalletAddress as `0x${string}`],
-    });
-    // Consider adding toast notifications for pending/success/error based on hook state
+    })
   };
 
-  if (isHotWalletLoading) {
-    return <div>Loading Hot Wallet...</div>;
-  }
 
   return (
     <div className="relative w-full flex flex-col gap-2 border-t border-gray-200 pt-2 mt-2">
@@ -158,34 +131,25 @@ const HotWalletManager = () => {
               {isTxLoading ? "Sending..." : "Top Up"}
             </button>
           </div>
-          {/* Bind Section */}
-          {isConnected && mainWalletAddress && (
-            <button
-              onClick={handleBind}
-              disabled={isBindLoading || !isOnCorrectNetwork}
-              className="mt-2 w-full bg-[#5700A3] text-white py-1 px-3 rounded hover:bg-[#460082] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            >
-              {isBindLoading ? "Binding..." : "Bind Wallet to Main"}
-            </button>
-          )}
           {/* Network Warning Message */}
           {isConnected && !isOnCorrectNetwork && (
             <p className="text-orange-600 text-xs mt-1">
               Please switch your wallet to RISE Testnet to proceed.
             </p>
           )}
-          {bindError && (
+          {/* {bindError && (
             <p className="text-red-500 text-xs mt-1">
               Error binding: {bindError.message}
             </p>
-          )}
+          )} */}
         </div>
       ) : (
+        isHotWalletLoading ? <div>Loading...</div> :
         <button
-          onClick={createHotWallet}
+          onClick={() => handleBind()}
           className="mt-1 w-full bg-[#5700A3] text-white py-1 px-2 rounded hover:bg-[#460082] transition-colors text-sm"
         >
-          Create Burner Wallet
+        Login
         </button>
       )}
     </div>

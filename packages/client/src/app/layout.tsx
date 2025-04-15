@@ -109,9 +109,11 @@ export default async function RootLayout({
             },
           }}
         />
-        <HotWalletProvider>
-          <ContextProvider cookies={cookies}>{children}</ContextProvider>
-        </HotWalletProvider>
+          <ContextProvider cookies={cookies}>
+            <HotWalletProvider>
+              {children}
+            </HotWalletProvider>
+          </ContextProvider>
       </body>
     </html>
   );
