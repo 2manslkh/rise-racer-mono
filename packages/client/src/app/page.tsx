@@ -9,6 +9,9 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import Leaderboard from "./components/Leaderboard";
 import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
+import { useHotWallet } from "./context/HotWalletContext";
+import toast from "react-hot-toast";
+import { useSignMessage } from "wagmi";
 
 export type User = {
   vehicle: number;
@@ -37,13 +40,22 @@ export default function Home() {
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
-
-  // THIS WHOLE SECTION IS JUST DUMMY FOR HOT WALLET
-  const [hotWallet, setHotWallet] = useState<string>("");
-
-  const handleHotWallet = () =>
-    setHotWallet("0x0000000000000000000000000000000000000000");
-  // END
+  const { hotWallet, loadHotWallet } = useHotWallet();
+  const {signMessage} = useSignMessage()
+  const handleHotWallet = async () => {
+    if (!address) {
+      toast.error("Main wallet not connected.");
+      return;
+    }
+    signMessage({message: "Login to Rise Racers"},{onSuccess: async (data) => {
+      try {
+        await loadHotWallet({address: address, message: "Login to Rise Racers", signature: data})
+      } catch (error) {
+        toast.error("Error binding hot wallet");
+      } 
+    }
+    })
+  }
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -133,7 +145,6 @@ export default function Home() {
                 toggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
-                hotWallet={hotWallet}
               />
             )}
             <Menu

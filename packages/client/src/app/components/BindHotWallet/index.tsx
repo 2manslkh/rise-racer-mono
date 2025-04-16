@@ -9,19 +9,19 @@ const BindHotWallet = ({ handleClick }: { handleClick: () => void }) => {
             WebkitTextStroke: "1.5px #74007E",
           }}
         >
-          BIND HOT WALLET
+          Login to Rise Racers
         </p>
-        <p className="font-inter text-black">INSERT HOT WALLET ADDRESS</p>
+        {/* <p className="font-inter text-black">INSERT HOT WALLET ADDRESS</p>
         <p className="font-inter text-black">
           Hot Wallet will allow you to make signless transactions through the
           consumption of gas from this wallet. Do make sure that you top up some
           value here!
-        </p>
+        </p> */}
         <button
           onClick={handleClick}
           className="w-full bg-[#5700A3] py-2 rounded-xl"
         >
-          Bind
+          Login
         </button>
       </div>
     </>
