@@ -10,7 +10,7 @@ if (!projectId) {
   throw new Error("Project ID is not defined");
 }
 
-const riseTestnet = defineChain({
+export const riseTestnet = defineChain({
   id: 11155931,
   caipNetworkId: "eip155:11155931",
   chainNamespace: "eip155",

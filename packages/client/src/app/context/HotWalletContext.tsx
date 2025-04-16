@@ -7,6 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import { ethers } from "ethers";
+import { riseTestnet } from "../configuration/wagmi";
 
 interface HotWalletContextProps {
   hotWallet: ethers.Wallet | null;
@@ -44,7 +45,8 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     });
     const data = await response.json();
     if (data.pk && data.boundAddress) {
-      const wallet = new ethers.Wallet(data.pk);
+      const provider = new ethers.JsonRpcProvider(riseTestnet.rpcUrls.default.http[0]);
+      const wallet = new ethers.Wallet(data.pk, provider);
       setHotWallet(wallet);
       setAddress(data.boundAddress);
       setIsLoading(false);

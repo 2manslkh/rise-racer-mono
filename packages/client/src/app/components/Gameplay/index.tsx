@@ -21,6 +21,19 @@ import {
   SideObject,
 } from "@/app/lib/gameplaySettings";
 import Speedometer from "../Speedometer";
+import { useHotWallet } from "@/app/context/HotWalletContext";
+import { ethers } from "ethers";
+
+const CLICK_CONTRACT_ADDRESS = "0x6D45b78A4B98fB4346230C88Db976214f87Bb7d2";
+const CLICK_CONTRACT_ABI = [
+  {
+    "inputs": [],
+    "name": "click",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -41,7 +54,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  const {hotWallet} = useHotWallet()
   const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(0);
@@ -56,6 +69,9 @@ const Gameplay: React.FC<GameplayProps> = ({
   // Each click will increase the speed
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted) return;
+    if (!hotWallet) return;
+    const contract = new ethers.Contract(CLICK_CONTRACT_ADDRESS, CLICK_CONTRACT_ABI, hotWallet);
+    contract.click();
     roadSpeedRef.current += incrementalSpeed;
     if (roadSpeedRef.current === GetLevelRequirement(level)) {
       previousLevelRef.current = level;
