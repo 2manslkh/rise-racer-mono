@@ -8,7 +8,10 @@ import {
   DrawRoadGradient,
 } from "./level11_12";
 import { GetHighestPointOfCanvas, hexToRgba } from "./util";
-import { DrawAdditionalSideDividersLevel3_4 } from "./level3_4";
+import {
+  DrawAdditionalSideDividersLevel3_4,
+  GenerateDefaultSideObject3_4,
+} from "./level3_4";
 import { DrawAdditionalSideDividersLevel7_8 } from "./level7_8";
 import { DrawAdditionalSideDividersLevel9_10 } from "./level9_10";
 import { DrawAdditionalSideDividersLevel5_6 } from "./level5_6";
@@ -258,6 +261,7 @@ export const GenerateDefaultSideObject = (
   width: number,
   height: number,
   roadWidthTop: number,
+  roadWidthBottom: number,
   sideObjects: SideObject[]
 ) => {
   if ([1, 2].includes(level)) {
@@ -269,6 +273,14 @@ export const GenerateDefaultSideObject = (
       sideObjects
     );
   } else if ([3, 4].includes(level)) {
+    GenerateDefaultSideObject3_4(
+      assets,
+      width,
+      height,
+      roadWidthTop,
+      roadWidthBottom,
+      sideObjects
+    );
   } else if ([5, 6].includes(level)) {
   }
 };

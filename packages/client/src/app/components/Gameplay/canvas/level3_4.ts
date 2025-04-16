@@ -1,3 +1,7 @@
+import {
+  GenerateFixedSideObject,
+  SideObject,
+} from "@/app/lib/gameplaySettings";
 import { GetHighestPointOfCanvas } from "./util";
 
 export const DrawAdditionalSideDividersLevel3_4 = (
@@ -74,4 +78,52 @@ export const DrawAdditionalSideDividersLevel3_4 = (
   ctx.closePath();
   ctx.fill();
   // Outer Layer - End
+};
+
+export const GenerateDefaultSideObject3_4 = (
+  assets: HTMLImageElement[],
+  width: number,
+  height: number,
+  roadWidthTop: number,
+  roadWidthBottom: number,
+  sideObjects: SideObject[]
+) => {
+  const topLeft = (width - roadWidthTop) / 2 + 27;
+  const topRight = (width + roadWidthTop) / 2 - 47;
+  const bottomLeft = -103;
+  const bottomRight = width + 50;
+
+  const prepopulateCount = 6;
+  const spacing = (height * 1.5) / (prepopulateCount + 1);
+
+  for (let i = 0; i < prepopulateCount; i++) {
+    const fixedPair = GenerateFixedSideObject(
+      assets,
+      topLeft,
+      topRight,
+      bottomLeft,
+      bottomRight
+    );
+
+    const yOffset = spacing * (i + 1);
+
+    fixedPair.forEach((obj) => {
+      obj.y = yOffset;
+      obj.spawnY = -obj.baseHeight;
+
+      sideObjects.push(obj);
+    });
+  }
+
+  sideObjects.push(
+    ...GenerateFixedSideObject(
+      assets,
+      topLeft,
+      topRight,
+      bottomLeft,
+      bottomRight
+    )
+  );
+
+  console.log(sideObjects);
 };

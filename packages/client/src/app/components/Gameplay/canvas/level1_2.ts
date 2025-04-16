@@ -28,11 +28,13 @@ export const GenerateDefaultSideObject1_2 = (
       bottomRight
     );
 
-    const yOffset = spacing * (i + 1);
+    if (obj) {
+      const yOffset = spacing * (i + 1);
 
-    obj.y = yOffset;
-    obj.spawnY = 0;
+      obj.y = yOffset;
+      obj.spawnY = 0;
 
-    sideObjects.push(obj);
+      sideObjects.push(obj);
+    }
   }
 };

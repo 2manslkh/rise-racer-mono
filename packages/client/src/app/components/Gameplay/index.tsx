@@ -48,7 +48,6 @@ interface GameplayProps {
 }
 
 const Gameplay: React.FC<GameplayProps> = ({
-  heightPercentage = 1,
   vehicleTier = 1,
   gameStarted,
   level = 1,
@@ -118,7 +117,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
       setDimensions({
         width: clientWidth,
-        height: clientHeight * heightPercentage,
+        height: clientHeight,
       });
     };
 
@@ -126,7 +125,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     window.addEventListener("resize", updateSize);
 
     return () => window.removeEventListener("resize", updateSize);
-  }, [heightPercentage]);
+  }, []);
 
   // Drawing of canvas
   useEffect(() => {
@@ -158,6 +157,9 @@ const Gameplay: React.FC<GameplayProps> = ({
       const roadWidthTop = width * 0.3;
       const roadWidthBottom = width * 1.1;
 
+      let lastSpawn = 0;
+      const spawnGap = 80;
+
       // Init any object ONCE before drawing takes place
       if (roadSpeedRef.current === 0) {
         GenerateDefaultSideObject(
@@ -166,8 +168,16 @@ const Gameplay: React.FC<GameplayProps> = ({
           width,
           height,
           roadWidthTop,
+          roadWidthBottom,
           sideObjects
         );
+
+        if ([1, 2].includes(level)) {
+          lastSpawn = roadY;
+        }
+        if ([3, 4].includes(level)) {
+          lastSpawn = -9999;
+        }
       }
 
       if (level >= 7) {
@@ -184,15 +194,11 @@ const Gameplay: React.FC<GameplayProps> = ({
       }
       // End Init
 
-      let lastSpawn = 0;
-      const spawnGap = 80;
-
       const draw = () => {
         ctx.drawImage(bg, 0, 0, width, height);
         // ctx.clearRect(0, 0, width, height);
 
         if ([1, 2].includes(level)) {
-          // TODO: May consider using interval instead of using spawn gap
           const buffer = 20;
           const topLeft = (width - roadWidthTop) / 2 - buffer;
           const topRight = (width + roadWidthTop) / 2 + buffer;
@@ -200,16 +206,18 @@ const Gameplay: React.FC<GameplayProps> = ({
           const bottomRight = width + buffer;
 
           if (roadY - lastSpawn > spawnGap) {
-            sideObjects.push(
-              GenerateRandomSideObject(
-                assets,
-                topLeft,
-                topRight,
-                bottomLeft,
-                bottomRight
-              )
+            // Problematic object return null
+            const _obj = GenerateRandomSideObject(
+              assets,
+              topLeft,
+              topRight,
+              bottomLeft,
+              bottomRight
             );
-            lastSpawn = roadY;
+            if (_obj) {
+              sideObjects.push(_obj);
+              lastSpawn = roadY;
+            }
           }
 
           sideObjects.forEach((obj) => {
@@ -315,21 +323,30 @@ const Gameplay: React.FC<GameplayProps> = ({
             lastSpawn = roadY;
           }
 
-          sideObjects.forEach((obj) => {
+          sideObjects.forEach((obj, i) => {
             obj.y += roadSpeedRef.current / 10;
 
             const distanceFromTop = obj.y - obj.spawnY;
             const maxDistance = height - obj.spawnY;
             const progress = distanceFromTop / maxDistance;
+            const clampedProgress = Math.min(Math.max(progress, 0), 1);
 
             const minScale = 0.4;
             const maxScale = 1;
-            const scale = minScale + (maxScale - minScale) * progress;
-
+            // const scale = minScale + (maxScale - minScale) * clampedProgress;
+            const scale = Math.min(
+              minScale + (maxScale - minScale) * clampedProgress,
+              1
+            );
             const scaledWidth = obj.baseWidth * scale;
             const scaledHeight = obj.baseHeight * scale;
 
-            const currentX = obj.startX + (obj.endX - obj.startX) * progress;
+            // console.log(
+            //   `Obj[${i}] y=${obj.y}, spawnY=${obj.spawnY}, progress=${(obj.y - obj.spawnY) / (height - obj.spawnY)} , clampedProgress=${clampedProgress}`
+            // );
+
+            const currentX =
+              obj.startX + (obj.endX - obj.startX) * clampedProgress;
 
             ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
           });

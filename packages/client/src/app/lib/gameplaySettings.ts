@@ -249,7 +249,7 @@ export const GenerateRandomSideObject = (
   roadTopRight: number,
   roadBottomLeft: number,
   roadBottomRight: number
-): SideObject => {
+): SideObject | null => {
   const img = assets[Math.floor(Math.random() * assets.length)];
   const side = Math.random() < 0.5 ? "left" : "right";
   const objWidth = img.naturalWidth || 40;
@@ -257,6 +257,10 @@ export const GenerateRandomSideObject = (
 
   const startX = side === "left" ? roadTopLeft - 40 : roadTopRight + 10;
   const endX = side === "left" ? roadBottomLeft - 40 : roadBottomRight + 10;
+
+  if ((startX < 0 && endX < 0) || (startX < 50 && endX < 50)) {
+    return null;
+  }
 
   return {
     y: -objHeight,
@@ -278,37 +282,43 @@ export const GenerateFixedSideObject = (
 ): SideObject[] => {
   // Left Object
   const imgLeft = assets[0];
-  const objWidth = imgLeft.naturalWidth || 50;
-  const objHeight = imgLeft.naturalHeight || 136;
+  const leftWidth = imgLeft.naturalWidth || 50;
+  const leftHeight = imgLeft.naturalHeight || 136;
   const leftStartX = roadTopLeft;
   const leftEndX = roadBottomLeft;
   const leftObject: SideObject = {
     img: imgLeft,
-    y: -objHeight,
-    spawnY: -objHeight,
+    y: -leftHeight,
+    spawnY: -leftHeight,
     startX: leftStartX,
     endX: leftEndX,
-    baseWidth: objWidth,
-    baseHeight: objHeight,
+    baseWidth: leftWidth,
+    baseHeight: leftHeight,
   };
 
   // Right Object
   const imgRight = assets[1];
+  const rightWidth = imgRight.naturalWidth || 50;
+  const rightHeight = imgRight.naturalHeight || 136;
   const rightStartX = roadTopRight;
   const rightEndX = roadBottomRight;
   const rightObject: SideObject = {
     img: imgRight,
-    y: -objHeight,
-    spawnY: -objHeight,
+    y: -rightHeight,
+    spawnY: -rightHeight,
     startX: rightStartX,
     endX: rightEndX,
-    baseWidth: objWidth,
-    baseHeight: objHeight,
+    baseWidth: rightWidth,
+    baseHeight: rightHeight,
   };
 
-  // Not sure what is this bug that is appearing
-  console.log(objHeight);
-  if (objHeight > 200) return [];
+  if (leftObject.startX < 50 || rightObject.startX < 50) {
+    // For Level3,4
+    console.log("May have issue");
+    console.log([leftObject, rightObject]);
+    return [];
+  }
+
   return [leftObject, rightObject];
 };
 
