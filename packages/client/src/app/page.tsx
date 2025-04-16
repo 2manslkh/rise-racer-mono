@@ -8,6 +8,10 @@ import Login from "./components/Login";
 import { useAppKitAccount } from "@reown/appkit/react";
 import Leaderboard from "./components/Leaderboard";
 import Shop from "./components/Shop";
+import BindHotWallet from "./components/BindHotWallet";
+import { useHotWallet } from "./context/HotWalletContext";
+import toast from "react-hot-toast";
+import { useSignMessage } from "wagmi";
 
 export type User = {
   vehicle: number;
@@ -17,8 +21,8 @@ export type User = {
 
 const user: User = {
   vehicle: 1,
-  currentLevel: 7,
-  currentProgress: 1_000_000,
+  currentLevel: 1,
+  currentProgress: 1,
 };
 
 enum Views {
@@ -36,6 +40,22 @@ export default function Home() {
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
+  const { hotWallet, loadHotWallet } = useHotWallet();
+  const {signMessage} = useSignMessage()
+  const handleHotWallet = async () => {
+    if (!address) {
+      toast.error("Main wallet not connected.");
+      return;
+    }
+    signMessage({message: "Login to Rise Racers"},{onSuccess: async (data) => {
+      try {
+        await loadHotWallet({address: address, message: "Login to Rise Racers", signature: data})
+      } catch (error) {
+        toast.error("Error binding hot wallet");
+      } 
+    }
+    })
+  }
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -141,17 +161,20 @@ export default function Home() {
                 gameStarted={gameStarted}
                 handleNextLevel={handleNextLevel}
               />
+
+              {activeView === Views.LEADERBOARD && (
+                <div className="absolute top-0 left-0 right-0 bottom-0">
+                  <Leaderboard user={user} />
+                </div>
+              )}
+              {activeView === Views.SHOP && (
+                <div className="absolute top-0 left-0 right-0 bottom-0">
+                  <Shop />
+                </div>
+              )}
             </div>
-            {activeView === Views.LEADERBOARD && (
-              <div className="fixed top-0 left-0 right-0 bottom-0">
-                <Leaderboard user={user} />
-              </div>
-            )}
-            {activeView === Views.SHOP && (
-              <div className="fixed top-0 left-0 right-0 bottom-0">
-                <Shop />
-              </div>
-            )}
+
+            {!hotWallet && <BindHotWallet handleClick={handleHotWallet} />}
           </div>
         ) : (
           <Login />

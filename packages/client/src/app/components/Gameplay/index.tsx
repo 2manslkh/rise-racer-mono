@@ -71,7 +71,11 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (!gameStarted) return;
     if (!hotWallet) return;
     const contract = new ethers.Contract(CLICK_CONTRACT_ADDRESS, CLICK_CONTRACT_ABI, hotWallet);
-    contract.click();
+    try {
+      contract.click();
+    } catch (error) {
+      // console.error(error);
+    }
     roadSpeedRef.current += incrementalSpeed;
     if (roadSpeedRef.current === GetLevelRequirement(level)) {
       previousLevelRef.current = level;
