@@ -37,6 +37,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  touch-action: none; /* optional, disables gestures like pull-to-refresh */
 }
 
 @keyframes mirror-sweep {

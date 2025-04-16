@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Toggle from "../Shared/Toggle";
 import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useDisconnect } from "@reown/appkit/react";
@@ -30,7 +29,7 @@ const Settings = ({
     <>
       {open && (
         <div
-          className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen max-h-[896px]"
+          className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen md:max-h-[750px]"
           onClick={toggleSettings}
         >
           <div className="absolute left-1/2 -translate-x-1/2 bottom-20 z-1 whitespace-nowrap">
@@ -42,7 +41,7 @@ const Settings = ({
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[253px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[285px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         style={{
           width: "calc(100% - 28px)",
         }}

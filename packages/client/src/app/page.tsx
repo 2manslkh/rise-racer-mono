@@ -12,6 +12,7 @@ import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import toast from "react-hot-toast";
 import { useSignMessage } from "wagmi";
+import useViewportHeight from "./hooks/useViewportHeight";
 
 export type User = {
   vehicle: number;
@@ -33,6 +34,7 @@ enum Views {
 }
 
 export default function Home() {
+  const viewportHeight = useViewportHeight();
   const { address, isConnected, caipAddress, status, embeddedWalletInfo } =
     useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -41,21 +43,29 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
   const { hotWallet, loadHotWallet } = useHotWallet();
-  const {signMessage} = useSignMessage()
+  const { signMessage } = useSignMessage();
   const handleHotWallet = async () => {
     if (!address) {
       toast.error("Main wallet not connected.");
       return;
     }
-    signMessage({message: "Login to Rise Racers"},{onSuccess: async (data) => {
-      try {
-        await loadHotWallet({address: address, message: "Login to Rise Racers", signature: data})
-      } catch (error) {
-        toast.error("Error binding hot wallet");
-      } 
-    }
-    })
-  }
+    signMessage(
+      { message: "Login to Rise Racers" },
+      {
+        onSuccess: async (data) => {
+          try {
+            await loadHotWallet({
+              address: address,
+              message: "Login to Rise Racers",
+              signature: data,
+            });
+          } catch (error) {
+            toast.error("Error binding hot wallet");
+          }
+        },
+      }
+    );
+  };
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -135,8 +145,11 @@ export default function Home() {
   };
 
   return (
-    <div className="relative w-screen h-screen flex items-center justify-center">
-      <div className="relative w-full h-full max-w-[414px] max-h-[896px] overflow-hidden">
+    <div
+      className="relative w-screen flex items-center justify-center bg-[#29004D]"
+      style={{ height: `${viewportHeight}px` }}
+    >
+      <div className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden">
         {isConnected ? (
           <div className="relative w-full h-full">
             {[Views.NULL, Views.SETTINGS].includes(activeView) && (

@@ -47,7 +47,7 @@ const Shop = () => {
       {selectedItemPreview && (
         <>
           <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen max-h-[896px]"
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen md:max-h-[750px]"
             onClick={() => handleItemPreview(undefined)}
           ></div>
 
