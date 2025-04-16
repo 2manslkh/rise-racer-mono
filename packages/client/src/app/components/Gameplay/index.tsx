@@ -7,6 +7,8 @@ import {
   DrawCenterDivider,
   DrawLaneDividers,
   DrawAdditionalSideDividers,
+  DrawBackgroundObjectImage,
+  GenerateDefaultSideObject,
 } from "./canvas";
 import {
   GenerateFixedSideObject,
@@ -129,6 +131,21 @@ const Gameplay: React.FC<GameplayProps> = ({
       let sideObjects: SideObject[] = [];
       let overlayObjects: OverlayObject[] = [];
 
+      const roadWidthTop = width * 0.3;
+      const roadWidthBottom = width * 1.1;
+
+      // Init any object ONCE before drawing takes place
+      if (roadSpeedRef.current === 0) {
+        GenerateDefaultSideObject(
+          level,
+          assets,
+          width,
+          height,
+          roadWidthTop,
+          sideObjects
+        );
+      }
+
       if (level >= 7) {
         // For Shooting Stars
         setInterval(() => {
@@ -141,6 +158,7 @@ const Gameplay: React.FC<GameplayProps> = ({
           }
         }, 3_000);
       }
+      // End Init
 
       let lastSpawn = 0;
       const spawnGap = 80;
@@ -149,15 +167,12 @@ const Gameplay: React.FC<GameplayProps> = ({
         ctx.drawImage(bg, 0, 0, width, height);
         // ctx.clearRect(0, 0, width, height);
 
-        const roadWidthTop = width * 0.3;
-        const roadWidthBottom = width * 1.1;
-
         if ([1, 2].includes(level)) {
           // TODO: May consider using interval instead of using spawn gap
           const buffer = 20;
           const topLeft = (width - roadWidthTop) / 2 - buffer;
           const topRight = (width + roadWidthTop) / 2 + buffer;
-          const bottomLeft = -(buffer + 20);
+          const bottomLeft = -(buffer + 50);
           const bottomRight = width + buffer;
 
           if (roadY - lastSpawn > spawnGap) {
@@ -190,14 +205,23 @@ const Gameplay: React.FC<GameplayProps> = ({
 
             const distanceFromTop = obj.y - obj.spawnY;
             const maxDistance = height - obj.spawnY;
-            const progress = distanceFromTop / maxDistance;
 
             const minScale = 0.4;
             const maxScale = 1;
-            const scale = minScale + (maxScale - minScale) * progress;
 
-            const scaledWidth = obj.baseWidth * scale;
-            const scaledHeight = obj.baseHeight * scale;
+            // Old code
+            // const progress = distanceFromTop / maxDistance;
+            // const scale = minScale + (maxScale - minScale) * progress;
+
+            const progress = Math.min(
+              Math.max(distanceFromTop / maxDistance, 0),
+              1
+            );
+            const scale = minScale + (maxScale - minScale) * progress;
+            const cappedScale = Math.min(scale, 0.8);
+
+            const scaledWidth = obj.baseWidth * cappedScale;
+            const scaledHeight = obj.baseHeight * cappedScale;
 
             const currentX = obj.startX + (obj.endX - obj.startX) * progress;
 
@@ -246,6 +270,7 @@ const Gameplay: React.FC<GameplayProps> = ({
           roadWidthBottom,
           level
         );
+        DrawBackgroundObjectImage(ctx, width, height, level);
 
         if ([3, 4].includes(level)) {
           const topLeft = (width - roadWidthTop) / 2 + 27;
@@ -286,7 +311,48 @@ const Gameplay: React.FC<GameplayProps> = ({
           });
 
           sideObjects = sideObjects.filter(
-            (obj) => obj.y <= height + obj.baseHeight + 50
+            (obj) => obj.y <= height + obj.baseHeight + 10
+          );
+        } else if ([5, 6].includes(level)) {
+          const topLeft = (width - roadWidthTop) / 2 + 7;
+          const topRight = (width + roadWidthTop) / 2 - 22;
+          const bottomLeft = -63;
+          const bottomRight = width + 29;
+
+          if (roadY - lastSpawn > 35) {
+            sideObjects.push(
+              ...GenerateFixedSideObject(
+                assets,
+                topLeft,
+                topRight,
+                bottomLeft,
+                bottomRight
+              )
+            );
+            lastSpawn = roadY;
+          }
+
+          sideObjects.forEach((obj) => {
+            obj.y += roadSpeedRef.current / 10;
+
+            const distanceFromTop = obj.y - obj.spawnY;
+            const maxDistance = height - obj.spawnY;
+            const progress = distanceFromTop / maxDistance;
+
+            const minScale = 0.4;
+            const maxScale = 1;
+            const scale = minScale + (maxScale - minScale) * progress;
+
+            const scaledWidth = obj.baseWidth * scale;
+            const scaledHeight = obj.baseHeight * scale;
+
+            const currentX = obj.startX + (obj.endX - obj.startX) * progress;
+
+            ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
+          });
+
+          sideObjects = sideObjects.filter(
+            (obj) => obj.y <= height + obj.baseHeight + 10
           );
         }
 

@@ -31,6 +31,12 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   roadWidthTop: number,
   roadWidthBottom: number
 ) => {
+  const beamGradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
+  beamGradient.addColorStop(0.25, hexToRgba("#008CFF", 0.8));
+  beamGradient.addColorStop(0.5, hexToRgba("#229BFF", 0.8));
+  beamGradient.addColorStop(0.75, hexToRgba("#44ABFF", 0.8));
+  beamGradient.addColorStop(1, hexToRgba("#66BAFF", 0.8));
+
   // Layer 1 - Start
   ctx.fillStyle = hexToRgba("#130025", 0.5);
 
@@ -66,27 +72,37 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   // Layer 1 - End
 
   // Layer 2 - Start
-  ctx.strokeStyle = "#FFFFFF";
-  ctx.lineWidth = 2;
-  ctx.setLineDash([]);
+  ctx.fillStyle = beamGradient;
 
   // Left Side Divider
   ctx.beginPath();
-  ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
+  ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 50, screenHeight);
+  ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 40, screenHeight);
+  ctx.lineTo(
+    (screenWidth - roadWidthTop) / 2 - 12,
+    GetHighestPointOfCanvas(screenHeight)
+  );
   ctx.lineTo(
     (screenWidth - roadWidthTop) / 2 - 10,
     GetHighestPointOfCanvas(screenHeight)
   );
-  ctx.stroke();
+  ctx.closePath();
+  ctx.fill();
 
   // Right Side Divider
   ctx.beginPath();
-  ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
+  ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 50, screenHeight);
+  ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 40, screenHeight);
+  ctx.lineTo(
+    (screenWidth + roadWidthTop) / 2 + 12,
+    GetHighestPointOfCanvas(screenHeight)
+  );
   ctx.lineTo(
     (screenWidth + roadWidthTop) / 2 + 10,
     GetHighestPointOfCanvas(screenHeight)
   );
-  ctx.stroke();
+  ctx.closePath();
+  ctx.fill();
   // Layer 2 - End
 
   // Layer 3 - Start
@@ -99,7 +115,7 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   // Left Side Divider
   ctx.beginPath();
   ctx.moveTo((screenWidth - roadWidthBottom) / 2 - 70, screenHeight);
-  ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 42, screenHeight);
+  ctx.lineTo((screenWidth - roadWidthBottom) / 2 - 45, screenHeight);
   ctx.lineTo(
     (screenWidth - roadWidthTop) / 2 - 12,
     GetHighestPointOfCanvas(screenHeight)
@@ -114,7 +130,7 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   // Right Side Divier
   ctx.beginPath();
   ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 70, screenHeight);
-  ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 42, screenHeight);
+  ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 45, screenHeight);
   ctx.lineTo(
     (screenWidth + roadWidthTop) / 2 + 12,
     GetHighestPointOfCanvas(screenHeight)
@@ -128,13 +144,7 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   // Layer 3 - End
 
   // Layer 4 - Start
-  gradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
-  gradient.addColorStop(0.25, hexToRgba("#008CFF", 0.8));
-  gradient.addColorStop(0.5, hexToRgba("#229BFF", 0.8));
-  gradient.addColorStop(0.75, hexToRgba("#44ABFF", 0.8));
-  gradient.addColorStop(1, hexToRgba("#66BAFF", 0.8));
-
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = beamGradient;
 
   // Left Side Divider
   ctx.beginPath();
@@ -152,11 +162,6 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   ctx.fill();
 
   // Right Side Divider
-  gradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
-  gradient.addColorStop(0, hexToRgba("#FFFFFF", 0.8));
-  gradient.addColorStop(1, hexToRgba("#C2C2C2", 0.8));
-  ctx.fillStyle = gradient;
-
   ctx.beginPath();
   ctx.moveTo((screenWidth + roadWidthBottom) / 2 + 75, screenHeight);
   ctx.lineTo((screenWidth + roadWidthBottom) / 2 + 70, screenHeight);

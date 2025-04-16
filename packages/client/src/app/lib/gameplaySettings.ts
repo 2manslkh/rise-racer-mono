@@ -93,6 +93,17 @@ export const GetBackgroundObjects = (level: number = 1): BackgroundObject[] => {
 
   // The sequence of the object in the array determines the z index
   switch (level) {
+    case 3:
+    case 4:
+      return [
+        {
+          image: base + "City.svg",
+          width: 414,
+          height: 90,
+          y: 70,
+          x: 0,
+        },
+      ];
     case 7:
     case 8:
       return [
@@ -211,6 +222,13 @@ export const LoadSideObjectImages = (level: number = 1): HTMLImageElement[] => {
       const imgLampPostRight = new Image();
       imgLampPostRight.src = base + "LamppostRight.svg";
       return [imgLampPostLeft, imgLampPostRight];
+    case 5:
+    case 6:
+      const imgLeftMarker = new Image();
+      imgLeftMarker.src = base + "LeftMarker.svg";
+      const imgRightMarker = new Image();
+      imgRightMarker.src = base + "RightMarker.svg";
+      return [imgLeftMarker, imgRightMarker];
     case 7:
     case 8:
     case 9:
@@ -289,6 +307,7 @@ export const GenerateFixedSideObject = (
   };
 
   // Not sure what is this bug that is appearing
+  console.log(objHeight);
   if (objHeight > 200) return [];
   return [leftObject, rightObject];
 };

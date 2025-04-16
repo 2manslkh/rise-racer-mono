@@ -1,12 +1,18 @@
-import { GetRoad } from "@/app/lib/gameplaySettings";
+import {
+  GetBackgroundObjects,
+  GetRoad,
+  SideObject,
+} from "@/app/lib/gameplaySettings";
 import {
   DrawAdditionalSideDividersLevel11_12,
   DrawRoadGradient,
 } from "./level11_12";
-import { GetHighestPointOfCanvas } from "./util";
+import { GetHighestPointOfCanvas, hexToRgba } from "./util";
 import { DrawAdditionalSideDividersLevel3_4 } from "./level3_4";
 import { DrawAdditionalSideDividersLevel7_8 } from "./level7_8";
 import { DrawAdditionalSideDividersLevel9_10 } from "./level9_10";
+import { DrawAdditionalSideDividersLevel5_6 } from "./level5_6";
+import { GenerateDefaultSideObject1_2 } from "./level1_2";
 
 export const DrawRoad = (
   ctx: CanvasRenderingContext2D,
@@ -167,6 +173,13 @@ export const DrawAdditionalSideDividers = (
   }
 
   if ([5, 6].includes(level)) {
+    DrawAdditionalSideDividersLevel5_6(
+      ctx,
+      screenWidth,
+      screenHeight,
+      roadWidthTop,
+      roadWidthBottom
+    );
     return;
   }
 
@@ -201,5 +214,61 @@ export const DrawAdditionalSideDividers = (
       roadWidthBottom
     );
     return;
+  }
+};
+
+// For image that are above the road
+export const DrawBackgroundObjectImage = (
+  ctx: CanvasRenderingContext2D,
+  screenWidth: number,
+  screenHeight: number,
+  level: number
+) => {
+  const objects = GetBackgroundObjects(level);
+
+  if ([3, 4].includes(level)) {
+    const startY = GetHighestPointOfCanvas(screenHeight) - 25;
+    const endY = screenHeight <= 650 ? startY + 125 : startY + 100;
+
+    const gradient = ctx.createLinearGradient(0, startY, 0, endY);
+    gradient.addColorStop(0, "#29004D");
+    gradient.addColorStop(0.7, hexToRgba("#41007A", 0.9));
+    gradient.addColorStop(1, hexToRgba("#41007A", 0.1));
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.moveTo(0, GetHighestPointOfCanvas(screenHeight) - 25);
+    ctx.lineTo(screenWidth, GetHighestPointOfCanvas(screenHeight) - 25);
+    ctx.lineTo(screenWidth, GetHighestPointOfCanvas(screenHeight) + 75);
+    ctx.lineTo(0, GetHighestPointOfCanvas(screenHeight) + 75);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  objects.forEach((obj) => {
+    const image: HTMLImageElement = new window.Image();
+    image.src = obj.image;
+    ctx.drawImage(image, obj.x, obj.y, obj.width, obj.height);
+  });
+};
+
+export const GenerateDefaultSideObject = (
+  level: number,
+  assets: HTMLImageElement[],
+  width: number,
+  height: number,
+  roadWidthTop: number,
+  sideObjects: SideObject[]
+) => {
+  if ([1, 2].includes(level)) {
+    GenerateDefaultSideObject1_2(
+      assets,
+      width,
+      height,
+      roadWidthTop,
+      sideObjects
+    );
+  } else if ([3, 4].includes(level)) {
+  } else if ([5, 6].includes(level)) {
   }
 };

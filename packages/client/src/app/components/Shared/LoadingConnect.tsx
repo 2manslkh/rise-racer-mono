@@ -1,30 +1,21 @@
 import Image from "next/image";
 import { useAppKit } from "@reown/appkit/react";
 
-const WalletConnectButton = () => {
-  const { open } = useAppKit();
-
-  const handleWalletConnect = () => {
-    open({ view: "Connect", namespace: "eip155" });
-  };
-
+const LoadingConnect = () => {
   return (
-    <button
-      className="relative w-[375px] aspect-[391/133]"
-      onClick={handleWalletConnect}
-    >
+    <button className="relative w-[375px] aspect-[391/133]">
       <div className="relative w-full h-full ml-[-20px]">
         <Image src={"/WalletConnectBackground.svg"} alt="Wallet Connect" fill />
       </div>
 
-      <div className="absolute z-1 top-[48px] left-[66px]">
+      <div className="absolute z-1 top-[48px] left-[120px]">
         <p
           className="font-zen text-white text-[28px] relative"
           style={{
             WebkitTextStroke: "1.5px #f037ff",
           }}
         >
-          Wallet connect
+          Loading
         </p>
 
         <p
@@ -39,11 +30,11 @@ const WalletConnectButton = () => {
             animation: "mirror-sweep 1.5s linear infinite",
           }}
         >
-          Wallet connect
+          Loading
         </p>
       </div>
     </button>
   );
 };
 
-export default WalletConnectButton;
+export default LoadingConnect;

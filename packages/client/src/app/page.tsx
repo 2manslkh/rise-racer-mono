@@ -18,7 +18,7 @@ export type User = {
 
 const user: User = {
   vehicle: 1,
-  currentLevel: 3,
+  currentLevel: 1,
   currentProgress: 1,
 };
 
