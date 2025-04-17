@@ -106,7 +106,7 @@ export const DrawAdditionalSideDividersLevel11_12 = (
   // Layer 2 - End
 
   // Layer 3 - Start
-  let gradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
+  const gradient = ctx.createLinearGradient(0, 0, 0, screenHeight);
   gradient.addColorStop(0, hexToRgba("#28024B", 0.8));
   gradient.addColorStop(1, hexToRgba("#ACB7FF", 0.8));
 

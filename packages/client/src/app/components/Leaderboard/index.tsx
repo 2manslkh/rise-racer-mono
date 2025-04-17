@@ -1,4 +1,3 @@
-import { User } from "@/app/page";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { MOCK_DATA } from "./data";
@@ -40,8 +39,8 @@ const RenderLeaderboardRow = (
 
 const ROWS_PER_PAGE = 6;
 
-const Leaderboard = ({ user }: { user: User }) => {
-  const [data, setData] = useState<Position[]>(MOCK_DATA);
+const Leaderboard = () => {
+  const [data, setData] = useState<Position[]>([]);
   const [displayData, setDisplayData] = useState<Position[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -50,6 +49,10 @@ const Leaderboard = ({ user }: { user: User }) => {
       data.slice(ROWS_PER_PAGE * (currentPage - 1), ROWS_PER_PAGE * currentPage)
     );
   }, [currentPage]);
+
+  useEffect(() => {
+    setData(MOCK_DATA);
+  }, []);
 
   return (
     <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-2 items-center gap-4">

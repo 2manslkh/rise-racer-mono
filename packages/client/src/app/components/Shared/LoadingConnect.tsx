@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { useAppKit } from "@reown/appkit/react";
 
 const LoadingConnect = () => {
   return (

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 type PaginationButtonProps = React.HTMLAttributes<HTMLDivElement> & {
   selected?: boolean;

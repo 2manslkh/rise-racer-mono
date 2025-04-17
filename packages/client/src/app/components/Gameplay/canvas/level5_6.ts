@@ -1,4 +1,4 @@
-import { GetHighestPointOfCanvas, hexToRgba } from "./util";
+import { GetHighestPointOfCanvas } from "./util";
 
 export const DrawAdditionalSideDividersLevel5_6 = (
   ctx: CanvasRenderingContext2D,

@@ -329,7 +329,7 @@ const Gameplay: React.FC<GameplayProps> = ({
             lastSpawn = roadY;
           }
 
-          sideObjects.forEach((obj, i) => {
+          sideObjects.forEach((obj) => {
             obj.y += roadSpeedRef.current / 10;
 
             const distanceFromTop = obj.y - obj.spawnY;
