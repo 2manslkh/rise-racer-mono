@@ -19,7 +19,6 @@ const HotWalletManager = () => {
     isLoading: isHotWalletLoading,
     loadHotWallet,
     balance,
-    updateBalance,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -58,7 +57,6 @@ const HotWalletManager = () => {
     });
     // Consider adding toast notifications for pending/success/error based on `hash`, `isTxLoading`, etc.
     setTopUpAmount("");
-    updateBalance(balance + amountWei);
   };
 
   const handleBind = async () => {
@@ -114,7 +112,8 @@ const HotWalletManager = () => {
       </div>
 
       <p className="text-black text-inter text-sm">
-        Current Stored Value: {ethers.formatEther(balance.toString())} ETH
+        Current Stored Value: {Number(ethers.formatEther(balance)).toFixed(8)}{" "}
+        ETH
       </p>
 
       {/* Create or Show Actions */}
@@ -122,7 +121,7 @@ const HotWalletManager = () => {
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-black text-inter">
             Use this address to top up gas (ETH on RISE Testnet). Minimum your
-            wallet should have {ethers.formatEther(MINIMUM_GAS.toString())}
+            wallet should have {ethers.formatEther(MINIMUM_GAS.toString())} ETH
           </p>
           {/* Top Up Section */}
           <div className="flex items-center gap-2 mt-1">
