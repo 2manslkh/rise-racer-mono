@@ -31,8 +31,6 @@ export const metadata: Metadata = {
   title: "Rise Racer",
   description:
     "Race on Rise Chain where every click fuels your vehicle! Speed up, trigger on-chain transactions, and accelerate to victory in this Web3-powered racing game.",
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   authors: [{ name: "Rise Racer" }],
   keywords: [
     "Rise",
@@ -71,6 +69,13 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -95,10 +100,9 @@ export default async function RootLayout({
             duration: 5000,
             removeDelay: 1000,
             style: {
-              background: "#363636",
+              background: "#29004D",
               color: "#fff",
             },
-
             // Default options for specific types
             success: {
               duration: 3000,
@@ -109,11 +113,9 @@ export default async function RootLayout({
             },
           }}
         />
-          <ContextProvider cookies={cookies}>
-            <HotWalletProvider>
-              {children}
-            </HotWalletProvider>
-          </ContextProvider>
+        <ContextProvider cookies={cookies}>
+          <HotWalletProvider>{children}</HotWalletProvider>
+        </ContextProvider>
       </body>
     </html>
   );

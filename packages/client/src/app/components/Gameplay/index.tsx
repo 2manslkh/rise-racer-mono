@@ -24,10 +24,12 @@ import {
   SideObject,
 } from "@/app/lib/gameplaySettings";
 import Speedometer from "../Speedometer";
-import { useHotWallet } from "@/app/context/HotWalletContext";
+import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { ethers } from "ethers";
+import toast from "react-hot-toast";
+import { logError } from "@/app/lib/error";
 
-const CLICK_CONTRACT_ADDRESS = "0xedEEF42a0697FeEEc226048bD5663722C3E30D99";
+const CLICK_CONTRACT_ADDRESS = "0x4f5cB26b05373EeC10702bDe7896317b69BeB29B";
 const CLICK_CONTRACT_ABI = [
   {
     inputs: [],
@@ -56,7 +58,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { hotWallet } = useHotWallet();
+  const { hotWallet, balance } = useHotWallet();
   const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(0);
@@ -70,17 +72,21 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Each click will increase the speed
   const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!gameStarted) return;
-    if (!hotWallet) return;
-    const contract = new ethers.Contract(
+    if (!gameStarted || !hotWallet) return;
+    if (balance < MINIMUM_GAS) {
+      toast.error("Insufficient funds in burner wallet");
+      return;
+    }
+    const clickContract = new ethers.Contract(
       CLICK_CONTRACT_ADDRESS,
       CLICK_CONTRACT_ABI,
       hotWallet
     );
+
     try {
-      contract.click();
+      clickContract.click();
     } catch (error) {
-      // console.error(error);
+      logError(error);
     }
     roadSpeedRef.current += incrementalSpeed;
     if (roadSpeedRef.current === GetLevelRequirement(level)) {

@@ -4,24 +4,27 @@ import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
 import { useAccount, useSendTransaction, useSignMessage } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
-import { parseEther } from "ethers";
+import { ethers, parseEther } from "ethers";
 import toast from "react-hot-toast";
+import { logError } from "@/app/lib/error";
 
 // Define the target Chain ID
 const RISE_TESTNET_CHAIN_ID = 11155931;
-const message = "Login to Rise Racers"
+const message = "Login to Rise Racers";
 
 const HotWalletManager = () => {
   const {
     address: hotWalletAddress,
     isLoading: isHotWalletLoading,
     loadHotWallet,
+    balance,
+    updateBalance,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
-  const {signMessage} = useSignMessage()
+  const { signMessage } = useSignMessage();
   const {
-    data: hash,
+    // data: hash,
     isPending: isTxLoading,
     sendTransaction,
   } = useSendTransaction();
@@ -53,7 +56,8 @@ const HotWalletManager = () => {
       value: amountWei,
     });
     // Consider adding toast notifications for pending/success/error based on `hash`, `isTxLoading`, etc.
-    // Maybe clear input: setTopUpAmount("");
+    setTopUpAmount("");
+    updateBalance(balance + amountWei);
   };
 
   const handleBind = async () => {
@@ -66,16 +70,24 @@ const HotWalletManager = () => {
       toast.error("Main wallet not connected.");
       return;
     }
-    signMessage({message: message},{onSuccess: async (data) => {
-      try {
-        await loadHotWallet({address: mainWalletAddress, message, signature: data})
-      } catch (error) {
-        toast.error("Error binding hot wallet");
+    signMessage(
+      { message: message },
+      {
+        onSuccess: async (data) => {
+          try {
+            await loadHotWallet({
+              address: mainWalletAddress,
+              message,
+              signature: data,
+            });
+          } catch (error) {
+            logError(error);
+            toast.error("Error binding hot wallet");
+          }
+        },
       }
-    }
-    })
+    );
   };
-
 
   return (
     <div className="relative w-full flex flex-col gap-2 border-t border-gray-200 pt-2 mt-2">
@@ -99,6 +111,10 @@ const HotWalletManager = () => {
           </button>
         )}
       </div>
+
+      <p className="text-black text-inter text-sm">
+        Current Stored Value: {ethers.formatEther(balance.toString())} ETH
+      </p>
 
       {/* Create or Show Actions */}
       {hotWalletAddress ? (
@@ -143,13 +159,14 @@ const HotWalletManager = () => {
             </p>
           )} */}
         </div>
+      ) : isHotWalletLoading ? (
+        <div>Loading...</div>
       ) : (
-        isHotWalletLoading ? <div>Loading...</div> :
         <button
           onClick={() => handleBind()}
           className="mt-1 w-full bg-[#5700A3] text-white py-1 px-2 rounded hover:bg-[#460082] transition-colors text-sm"
         >
-        Login
+          Login
         </button>
       )}
     </div>

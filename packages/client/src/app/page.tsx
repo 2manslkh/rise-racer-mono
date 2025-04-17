@@ -13,6 +13,7 @@ import { useHotWallet } from "./context/HotWalletContext";
 import toast from "react-hot-toast";
 import { useSignMessage } from "wagmi";
 import useViewportHeight from "./hooks/useViewportHeight";
+import { logError } from "./lib/error";
 
 export type User = {
   vehicle: number;
@@ -35,8 +36,7 @@ enum Views {
 
 export default function Home() {
   const viewportHeight = useViewportHeight();
-  const { address, isConnected, caipAddress, status, embeddedWalletInfo } =
-    useAppKitAccount();
+  const { address, isConnected } = useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
@@ -60,6 +60,7 @@ export default function Home() {
               signature: data,
             });
           } catch (error) {
+            logError(error);
             toast.error("Error binding hot wallet");
           }
         },
