@@ -26,8 +26,8 @@ import {
 import Speedometer from "../Speedometer";
 import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { ethers } from "ethers";
-import toast from "react-hot-toast";
 import { logError } from "@/app/lib/error";
+import { useToast } from "@/app/hooks/useToast";
 
 const CLICK_CONTRACT_ADDRESS = "0x4f5cB26b05373EeC10702bDe7896317b69BeB29B";
 const CLICK_CONTRACT_ABI = [
@@ -59,6 +59,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { hotWallet, balance } = useHotWallet();
+  const toast = useToast();
   const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(0);

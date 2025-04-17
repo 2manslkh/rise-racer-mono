@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { useHotWallet } from "@/app/context/HotWalletContext";
+import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
 import { useAccount, useSendTransaction, useSignMessage } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
 import { ethers, parseEther } from "ethers";
-import toast from "react-hot-toast";
 import { logError } from "@/app/lib/error";
+import { useToast } from "@/app/hooks/useToast";
 
 // Define the target Chain ID
 const RISE_TESTNET_CHAIN_ID = 11155931;
 const message = "Login to Rise Racers";
 
 const HotWalletManager = () => {
+  const toast = useToast();
   const {
     address: hotWalletAddress,
     isLoading: isHotWalletLoading,
@@ -120,7 +121,8 @@ const HotWalletManager = () => {
       {hotWalletAddress ? (
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-black text-inter">
-            Use this address to top up gas (ETH on RISE Testnet).
+            Use this address to top up gas (ETH on RISE Testnet). Minimum your
+            wallet should have {ethers.formatEther(MINIMUM_GAS.toString())}
           </p>
           {/* Top Up Section */}
           <div className="flex items-center gap-2 mt-1">
