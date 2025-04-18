@@ -15,6 +15,7 @@ const message = "Login to Rise Racers";
 const HotWalletManager = () => {
   const toast = useToast();
   const {
+    // hotWallet, // Removed unused hotWallet
     address: hotWalletAddress,
     isLoading: isHotWalletLoading,
     loadHotWallet,

@@ -1,6 +1,10 @@
 import { ethers } from 'ethers';
 
-// --- Contract ABI ---
+// --- Contract ABI for Click ---
+const riseRacerAddress = "0x4f5cB26b05373EeC10702bDe7896317b69BeB29B"; // Added from Gameplay/index.tsx
+
+
+// --- Contract ABI for Rise Racer (Original - keep for other functions) ---
 const riseRacerAbi = [
     {
         "inputs": [
@@ -395,11 +399,7 @@ const riseRacerAbi = [
     }
 ];
 
-// Placeholder for the contract address
-// Replace with your actual contract address
-const contractAddress = 'YOUR_CONTRACT_ADDRESS';
-
-// --- Helper to get Contract Instance ---
+// --- Helper to get Rise Racer Contract Instance ---
 // Assumes a browser environment with window.ethereum (e.g., MetaMask)
 const getRiseRacerContract = async (signerOrProvider?: ethers.Signer | ethers.Provider): Promise<ethers.Contract> => {
     let provider: ethers.Provider;
@@ -428,7 +428,7 @@ const getRiseRacerContract = async (signerOrProvider?: ethers.Signer | ethers.Pr
     }
 
     // If a signer is available, use it; otherwise, use the provider for read-only access
-    const contract = new ethers.Contract(contractAddress, riseRacerAbi, signer ?? provider);
+    const contract = new ethers.Contract(riseRacerAddress, riseRacerAbi, signer ?? provider); // Use renamed constant
     return contract
 
 };
@@ -452,6 +452,8 @@ export const getVelocityPerClick = async (playerAddress: string, provider?: ethe
  * @returns A promise that resolves with the player's current velocity (as bigint).
  */
 export const getCurrentVelocity = async (playerAddress: string, provider?: ethers.Provider): Promise<bigint> => {
+    console.log("🚀 | getCurrentVelocity | provider:", provider)
+    console.log("🚀 | getCurrentVelocity | playerAddress:", playerAddress)
     // Pass only the provider if available, otherwise let getRiseRacerContract handle default/signer logic
     const contract = await getRiseRacerContract(provider);
     const playerInfo = await contract.getPlayerInfo(playerAddress);
@@ -463,15 +465,24 @@ export const getCurrentVelocity = async (playerAddress: string, provider?: ether
  * Sends a 'click' transaction to the Rise Racer smart contract.
  * Requires a signer to send the transaction.
  * @param signer An ethers Signer instance to sign the transaction.
+ * @param nonce The nonce to use for the transaction.
  * @returns A promise that resolves with the transaction response.
  */
-export const clickRace = async (signer: ethers.Signer): Promise<ethers.ContractTransactionResponse> => {
+export const clickRace = async (
+    signer: ethers.Signer,
+    nonce: number
+): Promise<ethers.ContractTransactionResponse> => { // Removed options, added nonce directly
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
-    // Pass the signer to get a contract instance connected to the signer
-    const contract = await getRiseRacerContract(signer);
-    const tx = await contract.click();
+    // Use specific click contract details
+    const clickContract = new ethers.Contract(
+        riseRacerAddress,
+        riseRacerAbi,
+        signer
+    );
+    // Pass nonce and gasLimit
+    const tx = await clickContract.click({ nonce: nonce, gasLimit: 105000 }); // Added nonce and gasLimit
     return tx;
 };
 

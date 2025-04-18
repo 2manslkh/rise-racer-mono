@@ -24,20 +24,9 @@ import {
 } from "@/app/lib/gameplaySettings";
 import Speedometer from "../Speedometer";
 import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
-import { ethers } from "ethers";
 import { logError } from "@/app/lib/error";
 import { useToast } from "@/app/hooks/useToast";
-
-const CLICK_CONTRACT_ADDRESS = "0x4f5cB26b05373EeC10702bDe7896317b69BeB29B";
-const CLICK_CONTRACT_ABI = [
-  {
-    inputs: [],
-    name: "click",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-];
+import { clickRace } from "@/app/lib/rise-racer";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -63,7 +52,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(100);
   const [clickEffects, setClickEffects] = useState<
-    { id: number; x: number; y: number }[]
+    { id: string; x: number; y: number }[]
   >([]);
   const previousLevelRef = useRef<number>(0);
   const [showLevelTransition, setShowLevelTransition] =
@@ -74,25 +63,20 @@ const Gameplay: React.FC<GameplayProps> = ({
   const vehicle = GetVehicle(vehicleTier);
 
   // Each click will increase the speed
-  const handleClick = (e: React.PointerEvent<HTMLDivElement>) => {
+  const handleClick = async (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted || !hotWallet) return;
     if (balance < MINIMUM_GAS) {
       toast.error("Insufficient funds in burner wallet");
       return;
     }
-    const clickContract = new ethers.Contract(
-      CLICK_CONTRACT_ADDRESS,
-      CLICK_CONTRACT_ABI,
-      hotWallet
-    );
 
     try {
       incrementNonce();
       const currentNonce = getNonce();
-      console.log("🚀 | handleClick | currentNonce:", currentNonce)
-      clickContract.click({ nonce: currentNonce, gasLimit: 105000 });
+      clickRace(hotWallet, currentNonce);
     } catch (error) {
       logError(error);
+      toast.error("Click transaction failed. See console for details.");
     }
 
     roadSpeedRef.current += incrementalSpeed;
@@ -103,7 +87,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
     const rect = containerRef.current?.getBoundingClientRect();
     const newClick = {
-      id: Date.now(),
+      id: `click-${Date.now()}-${Math.random()}`,
       x: e.clientX - (rect?.left ?? 0),
       y: e.clientY - (rect?.top ?? 0),
     };
