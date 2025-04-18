@@ -46,9 +46,10 @@ const Gameplay: React.FC<GameplayProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { hotWallet, balance } = useHotWallet();
+  const { hotWallet, balance, currentVelocity, velocityPerClick } =
+    useHotWallet();
   const toast = useToast();
-  const incrementalSpeed = 1;
+  const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(100);
   const [clickEffects, setClickEffects] = useState<
@@ -79,7 +80,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       toast.error("Click transaction failed. See console for details.");
     }
 
-    roadSpeedRef.current += incrementalSpeed;
+    roadSpeedRef.current += Number(incrementalSpeed);
     if (roadSpeedRef.current === GetLevelRequirement(level)) {
       previousLevelRef.current = level;
       handleNextLevel();

@@ -18,12 +18,6 @@ export type User = {
   currentProgress: number;
 };
 
-const user: User = {
-  vehicle: 1,
-  currentLevel: 1,
-  currentProgress: 1,
-};
-
 enum Views {
   NULL,
   SETTINGS,
@@ -38,6 +32,7 @@ export default function Home() {
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { user } = useHotWallet();
   const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
   const { hotWallet } = useHotWallet();
 

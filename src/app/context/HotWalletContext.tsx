@@ -15,6 +15,12 @@ import { logError } from "../lib/error";
 
 export const MINIMUM_GAS = 1000000000000n;
 
+export type User = {
+  vehicle: number;
+  currentLevel: number;
+  currentProgress: number;
+};
+
 interface HotWalletContextProps {
   hotWallet: ethers.Wallet | null;
   balance: bigint;
@@ -34,6 +40,7 @@ interface HotWalletContextProps {
   velocityPerClick: bigint | null;
   isFetchingVelocity: boolean;
   fetchVelocityData: () => Promise<void>;
+  user: User;
 }
 
 const HotWalletContext = createContext<HotWalletContextProps | undefined>(
@@ -49,6 +56,11 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const [currentVelocity, setCurrentVelocity] = useState<bigint | null>(null);
   const [velocityPerClick, setVelocityPerClick] = useState<bigint | null>(null);
   const [isFetchingVelocity, setIsFetchingVelocity] = useState(false);
+  const [user, setUser] = useState<User>({
+    vehicle: 1,
+    currentLevel: 1,
+    currentProgress: 5,
+  });
 
   const disconnectHotWallet = () => {
     setHotWallet(null);
@@ -85,6 +97,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       setBalance(balance);
       setHotWallet(wallet);
       setAddress(data.boundAddress);
+
       const initialNonce = await wallet.getNonce("pending");
       console.log("🚀 | HotWalletProvider | initialNonce:", initialNonce);
       setNonce(initialNonce);
@@ -115,6 +128,12 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
           getCurrentVelocity(address, hotWallet.provider),
           getVelocityPerClick(address, hotWallet.provider),
         ]);
+
+        setUser({
+          vehicle: 1,
+          currentLevel: 1,
+          currentProgress: Number(fetchedVelocity),
+        });
         setCurrentVelocity(fetchedVelocity);
         setVelocityPerClick(fetchedVpc);
       } catch (error) {
@@ -163,6 +182,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         velocityPerClick,
         isFetchingVelocity,
         fetchVelocityData,
+        user,
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 // --- Contract ABI for Click ---
-const riseRacerAddress = "0x4f5cB26b05373EeC10702bDe7896317b69BeB29B"; // Added from Gameplay/index.tsx
+const riseRacerAddress = "0xcA9Dca22c8528Ff3b8a9F67165fa1F7Cc7ef40d7"
 
 
 // --- Contract ABI for Rise Racer (Original - keep for other functions) ---
@@ -452,11 +452,11 @@ export const getVelocityPerClick = async (playerAddress: string, provider?: ethe
  * @returns A promise that resolves with the player's current velocity (as bigint).
  */
 export const getCurrentVelocity = async (playerAddress: string, provider?: ethers.Provider): Promise<bigint> => {
-    console.log("🚀 | getCurrentVelocity | provider:", provider)
-    console.log("🚀 | getCurrentVelocity | playerAddress:", playerAddress)
+
     // Pass only the provider if available, otherwise let getRiseRacerContract handle default/signer logic
     const contract = await getRiseRacerContract(provider);
     const playerInfo = await contract.getPlayerInfo(playerAddress);
+    console.log("🚀 | getCurrentVelocity | playerInfo:", playerInfo)
     // playerInfo structure: [velocity, currentUniverse, totalClicks, isStaking]
     return playerInfo[0]; // Return the velocity component
 };
@@ -482,7 +482,7 @@ export const clickRace = async (
         signer
     );
     // Pass nonce and gasLimit
-    const tx = await clickContract.click({ nonce: nonce, gasLimit: 105000 }); // Added nonce and gasLimit
+    const tx = await clickContract.click({ nonce: nonce, gasLimit: 200000 }); // Added nonce and gasLimit
     return tx;
 };
 
