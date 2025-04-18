@@ -1,8 +1,36 @@
 {
-  "name": "rise-clicker-monorepo",
-  "version": "1.0.0",
+  "name": "client",
+  "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ]
+  "scripts": {
+    "dev": "next dev",
+    "dev-turbo": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reown/appkit-adapter-wagmi": "^1.7.2",
+    "@tanstack/react-query": "^5.71.10",
+    "ethers": "^6.13.5",
+    "next": "15.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
+    "viem": "^2.25.0",
+    "wagmi": "^2.14.16"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.4",
+    "pino-pretty": "^13.0.0",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
 }
