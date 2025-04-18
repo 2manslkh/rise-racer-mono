@@ -90,7 +90,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       incrementNonce();
       const currentNonce = getNonce();
       console.log("🚀 | handleClick | currentNonce:", currentNonce)
-      clickContract.click({ nonce: currentNonce, gas_limit: 105000 });
+      clickContract.click({ nonce: currentNonce, gasLimit: 105000 });
     } catch (error) {
       logError(error);
     }
