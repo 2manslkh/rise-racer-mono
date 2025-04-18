@@ -1,17 +1,13 @@
 import Image from "next/image";
-import { useAppKit } from "@reown/appkit/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 const WalletConnectButton = () => {
-  const { open } = useAppKit();
-
-  const handleWalletConnect = () => {
-    open({ view: "Connect", namespace: "eip155" });
-  };
+  const { openConnectModal } = useConnectModal();
 
   return (
     <button
       className="relative w-[375px] aspect-[391/133]"
-      onClick={handleWalletConnect}
+      onClick={openConnectModal}
     >
       <div className="relative w-full h-full ml-[-20px]">
         <Image src={"/WalletConnectBackground.svg"} alt="Wallet Connect" fill />

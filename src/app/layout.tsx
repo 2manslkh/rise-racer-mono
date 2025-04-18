@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Zen_Dots, Inter } from "next/font/google";
 import "./globals.css";
-import { headers } from "next/headers";
-import ContextProvider from "./context/WagmiContext";
 import { Toaster } from "react-hot-toast";
 import { HotWalletProvider } from "./context/HotWalletContext";
+import RainbowContextProvider from "./context/RainbowkitContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,7 +80,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookies = (await headers()).get("cookie");
+  // const cookies = (await headers()).get("cookie");
 
   return (
     <html lang="en">
@@ -113,9 +112,9 @@ export default async function RootLayout({
             },
           }}
         />
-        <ContextProvider cookies={cookies}>
+        <RainbowContextProvider>
           <HotWalletProvider>{children}</HotWalletProvider>
-        </ContextProvider>
+        </RainbowContextProvider>
       </body>
     </html>
   );

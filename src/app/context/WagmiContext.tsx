@@ -1,6 +1,11 @@
 "use client";
 
-import { wagmiAdapter, projectId, networks } from "../configuration/wagmi";
+import {
+  wagmiAdapter,
+  projectId,
+  networks,
+  riseTestnet,
+} from "../configuration/wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit } from "@reown/appkit/react";
 import React, { type ReactNode } from "react";
@@ -19,6 +24,7 @@ export const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   networks,
+  defaultNetwork: riseTestnet,
   metadata,
   themeMode: "dark",
   features: {

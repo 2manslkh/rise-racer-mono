@@ -1,11 +1,12 @@
 import Image from "next/image";
 import WalletConnectButton from "../Shared/WalletConnectButton";
-import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useEffect, useState } from "react";
 import LoadingConnect from "../Shared/LoadingConnect";
+import { useAccount } from "wagmi";
 
 function useHasMounted() {
   const [hasMounted, setHasMounted] = useState(false);
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -13,8 +14,8 @@ function useHasMounted() {
 }
 
 const Login = () => {
+  const { isConnected } = useAccount();
   const hasMounted = useHasMounted();
-  const { status } = useAppKitAccount();
 
   return (
     <div className="relative w-full h-full">
@@ -26,13 +27,7 @@ const Login = () => {
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
         {hasMounted ? (
-          <>
-            {status === "disconnected" ? (
-              <WalletConnectButton />
-            ) : (
-              <LoadingConnect />
-            )}
-          </>
+          <>{!isConnected ? <WalletConnectButton /> : <LoadingConnect />}</>
         ) : (
           <LoadingConnect />
         )}

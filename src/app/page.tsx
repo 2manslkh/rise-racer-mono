@@ -5,13 +5,13 @@ import Gameplay from "./components/Gameplay";
 import Navigation from "./components/Navigation";
 import Menu, { MenuAction } from "./components/Menu";
 import Login from "./components/Login";
-import { useAppKitAccount } from "@reown/appkit/react";
 import Leaderboard from "./components/Leaderboard";
 import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
 import { Tutorial } from "./components/Tutorial";
+import { useAccount } from "wagmi";
 
 export type User = {
   vehicle: number;
@@ -28,8 +28,8 @@ enum Views {
 }
 
 export default function Home() {
+  const { address } = useAccount();
   const viewportHeight = useViewportHeight();
-  const { isConnected } = useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
@@ -127,7 +127,7 @@ export default function Home() {
       style={{ height: `${viewportHeight}px` }}
     >
       <div className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden">
-        {isConnected ? (
+        {address ? (
           <div className="relative w-full h-full">
             {[Views.NULL, Views.SETTINGS, Views.TUTORIAL].includes(
               activeView
