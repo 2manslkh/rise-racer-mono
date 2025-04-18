@@ -7,11 +7,13 @@ const Navigation = ({
   toggleMusicPlaying,
   toggleSettings,
   isSettingsOpen,
+  toggleTutorial,
 }: {
   musicPlaying: boolean;
   toggleMusicPlaying: () => void;
   toggleSettings: () => void;
   isSettingsOpen: boolean;
+  toggleTutorial: () => void;
 }) => {
   return (
     <>
@@ -29,24 +31,14 @@ const Navigation = ({
             <Image src={"/RiseRacerLogo.png"} alt="Rise Racer" fill />
           </div>
 
-          <div className="absolute top-[18px] right-5 z-3 pointer-events-auto">
-            {/* {gameStarted ? (
+          <div className="absolute top-[18px] right-5 z-3 pointer-events-auto flex items-center gap-2">
             <IconButton
-              icon={musicPlaying ? "/MusicPlaying.svg" : "/MusicMuted.svg"}
-              alt="Music"
-              colorStart={musicPlaying ? "#460082" : "#323232"}
-              colorEnd={musicPlaying ? "#5700A3" : "#3E3E3E"}
-              handleClick={handleToggleMusicPlaying}
-            />
-          ) : (
-            <IconButton
-              icon={"/Gear.svg"}
-              alt="Settings"
+              icon={"/question_mark.svg"}
+              alt="Tutorial"
               colorStart={"#460082"}
               colorEnd={"#5700A3"}
-              handleClick={toggleSettings}
+              handleClick={toggleTutorial}
             />
-          )} */}
             <IconButton
               icon={"/Gear.svg"}
               alt="Settings"

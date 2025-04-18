@@ -1,10 +1,25 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useCallback,
+} from "react";
 import { ethers } from "ethers";
 import { riseTestnet } from "../configuration/wagmi";
+import { getCurrentVelocity, getVelocityPerClick } from "../lib/rise-racer";
+import { logError } from "../lib/error";
 
 export const MINIMUM_GAS = 1000000000000n;
+
+export type User = {
+  vehicle: number;
+  currentLevel: number;
+  currentProgress: number;
+};
 
 interface HotWalletContextProps {
   hotWallet: ethers.Wallet | null;
@@ -21,6 +36,11 @@ interface HotWalletContextProps {
   nonce: number;
   incrementNonce: () => void;
   getNonce: () => number;
+  currentVelocity: bigint | null;
+  velocityPerClick: bigint | null;
+  isFetchingVelocity: boolean;
+  fetchVelocityData: () => Promise<void>;
+  user: User;
 }
 
 const HotWalletContext = createContext<HotWalletContextProps | undefined>(
@@ -33,10 +53,20 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [balance, setBalance] = useState<bigint>(0n);
   const [nonce, setNonce] = useState<number>(0);
+  const [currentVelocity, setCurrentVelocity] = useState<bigint | null>(null);
+  const [velocityPerClick, setVelocityPerClick] = useState<bigint | null>(null);
+  const [isFetchingVelocity, setIsFetchingVelocity] = useState(false);
+  const [user, setUser] = useState<User>({
+    vehicle: 1,
+    currentLevel: 1,
+    currentProgress: 5,
+  });
 
   const disconnectHotWallet = () => {
     setHotWallet(null);
     setAddress(null);
+    setCurrentVelocity(null);
+    setVelocityPerClick(null);
   };
 
   const loadHotWallet = async ({
@@ -67,8 +97,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       setBalance(balance);
       setHotWallet(wallet);
       setAddress(data.boundAddress);
+
       const initialNonce = await wallet.getNonce("pending");
-      console.log("🚀 | HotWalletProvider | initialNonce:", initialNonce)
+      console.log("🚀 | HotWalletProvider | initialNonce:", initialNonce);
       setNonce(initialNonce);
       setIsLoading(false);
     } else {
@@ -78,14 +109,53 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const refreshBalance = async () => {
-    if (address) {
-      const provider = new ethers.JsonRpcProvider(
-        riseTestnet.rpcUrls.default.http[0]
-      );
-      const balance = await provider.getBalance(address);
-      setBalance(balance);
+    if (address && hotWallet?.provider) {
+      try {
+        const currentBalance = await hotWallet.provider.getBalance(address);
+        setBalance(currentBalance);
+      } catch (error) {
+        logError(error);
+        console.error("Failed to refresh balance:", error);
+      }
     }
   };
+
+  const fetchVelocityData = useCallback(async () => {
+    if (address && hotWallet?.provider) {
+      setIsFetchingVelocity(true);
+      try {
+        const [fetchedVelocity, fetchedVpc] = await Promise.all([
+          getCurrentVelocity(address, hotWallet.provider),
+          getVelocityPerClick(address, hotWallet.provider),
+        ]);
+
+        setUser({
+          vehicle: 1,
+          currentLevel: 1,
+          currentProgress: Number(fetchedVelocity),
+        });
+        setCurrentVelocity(fetchedVelocity);
+        setVelocityPerClick(fetchedVpc);
+      } catch (error) {
+        logError(error);
+        console.error("Failed to fetch velocity data:", error);
+        setCurrentVelocity(null);
+        setVelocityPerClick(null);
+      } finally {
+        setIsFetchingVelocity(false);
+      }
+    } else {
+      setCurrentVelocity(null);
+      setVelocityPerClick(null);
+    }
+  }, [address, hotWallet?.provider]);
+
+  useEffect(() => {
+    if (address) {
+      refreshBalance();
+      fetchVelocityData();
+    }
+  }, [address, fetchVelocityData]);
 
   const incrementNonce = () => {
     setNonce((prevNonce) => prevNonce + 1);
@@ -108,6 +178,11 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         nonce,
         incrementNonce,
         getNonce,
+        currentVelocity,
+        velocityPerClick,
+        isFetchingVelocity,
+        fetchVelocityData,
+        user,
       }}
     >
       {children}
