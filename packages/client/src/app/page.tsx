@@ -10,10 +10,7 @@ import Leaderboard from "./components/Leaderboard";
 import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
-import { useSignMessage } from "wagmi";
 import useViewportHeight from "./hooks/useViewportHeight";
-import { logError } from "./lib/error";
-import { useToast } from "./hooks/useToast";
 
 export type User = {
   vehicle: number;
@@ -35,39 +32,14 @@ enum Views {
 }
 
 export default function Home() {
-  const toast = useToast();
   const viewportHeight = useViewportHeight();
-  const { address, isConnected } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
-  const { hotWallet, loadHotWallet } = useHotWallet();
-  const { signMessage } = useSignMessage();
-  const handleHotWallet = async () => {
-    if (!address) {
-      toast.error("Main wallet not connected.");
-      return;
-    }
-    signMessage(
-      { message: "Login to Rise Racers" },
-      {
-        onSuccess: async (data) => {
-          try {
-            await loadHotWallet({
-              address: address,
-              message: "Login to Rise Racers",
-              signature: data,
-            });
-          } catch (error) {
-            logError(error);
-            toast.error("Error binding hot wallet");
-          }
-        },
-      }
-    );
-  };
+  const { hotWallet } = useHotWallet();
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -189,7 +161,7 @@ export default function Home() {
               )}
             </div>
 
-            {!hotWallet && <BindHotWallet handleClick={handleHotWallet} />}
+            {!hotWallet && <BindHotWallet />}
           </div>
         ) : (
           <Login />

@@ -1,4 +1,44 @@
-const BindHotWallet = ({ handleClick }: { handleClick: () => void }) => {
+import { useHotWallet } from "@/app/context/HotWalletContext";
+import { useToast } from "@/app/hooks/useToast";
+import { logError } from "@/app/lib/error";
+import { useAppKitAccount } from "@reown/appkit-controllers/react";
+import { useState } from "react";
+import { useSignMessage } from "wagmi";
+
+const BindHotWallet = () => {
+  const toast = useToast();
+  const { address } = useAppKitAccount();
+  const { signMessage } = useSignMessage();
+  const { loadHotWallet } = useHotWallet();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleBind = () => {
+    if (loading) return;
+    if (!address) {
+      toast.error("Main wallet not connected.");
+      return;
+    }
+    setLoading(true);
+    signMessage(
+      { message: "Login to Rise Racers" },
+      {
+        onSuccess: async (data) => {
+          try {
+            await loadHotWallet({
+              address: address,
+              message: "Login to Rise Racers",
+              signature: data,
+            });
+            setLoading(false);
+          } catch (error) {
+            logError(error);
+            toast.error("Error binding hot wallet");
+          }
+        },
+      }
+    );
+  };
+
   return (
     <>
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-3 h-screen md:max-h-[750px]"></div>
@@ -16,10 +56,10 @@ const BindHotWallet = ({ handleClick }: { handleClick: () => void }) => {
           Login to get your signature for signless transactions during gameplay
         </p>
         <button
-          onClick={handleClick}
+          onClick={handleBind}
           className="w-full bg-[#5700A3] py-2 rounded-xl"
         >
-          Login
+          {loading ? "Loading..." : "Login"}
         </button>
       </div>
     </>
