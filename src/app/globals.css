@@ -112,3 +112,21 @@ body {
     animation: fade-out 0.3s ease-out forwards;
   }
 }
+
+.rise-list-marker {
+  position: relative;
+  list-style: none;
+  padding-left: 1.25rem; /* same as pl-5 */
+}
+
+.rise-list-marker::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  background-image: url("/rise_crystal.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+}

@@ -40,7 +40,7 @@ const Speedometer = ({
               width={14}
               height={14}
             />
-            <p className="text-[14px]">{formatToScientific(1)}</p>
+            <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
           </div>
           {/* ETH */}
           <div className="gap-2 left-3  text-white font-zen flex h-full  items-center">
@@ -51,7 +51,7 @@ const Speedometer = ({
               width={14}
               height={14}
             />
-            <p className="text-[14px]">{formatToScientific(1)}</p>
+            <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
           </div>
 
           {/* Staked ETH */}
@@ -63,7 +63,7 @@ const Speedometer = ({
               width={14}
               height={14}
             />
-            <p className="text-[14px]">{formatToScientific(1)}</p>
+            <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
           </div>
         </div>
       </div>
