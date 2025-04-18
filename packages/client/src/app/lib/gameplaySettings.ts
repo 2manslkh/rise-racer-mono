@@ -149,11 +149,11 @@ export const GetLevelRequirement = (level: number = 1) => {
     case 2:
       return 343;
     case 3:
-      return 1000;
+      return 1_000;
     case 4:
-      return 7800;
+      return 7_800;
     case 5:
-      return 11200;
+      return 11_200;
     case 6:
       return 300_000;
     case 7:
@@ -312,10 +312,11 @@ export const GenerateFixedSideObject = (
     baseHeight: rightHeight,
   };
 
-  if (leftObject.startX < 50 || rightObject.startX < 50) {
+  if (
+    (leftObject.startX < 0 && leftObject.endX < 0) ||
+    (rightObject.startX < 0 && rightObject.endX <= 50)
+  ) {
     // For Level3,4
-    console.log("May have issue");
-    console.log([leftObject, rightObject]);
     return [];
   }
 

@@ -8,7 +8,6 @@ import {
   DrawLaneDividers,
   DrawAdditionalSideDividers,
   DrawBackgroundObjectImage,
-  GenerateDefaultSideObject,
 } from "./canvas";
 import {
   GenerateFixedSideObject,
@@ -62,12 +61,14 @@ const Gameplay: React.FC<GameplayProps> = ({
   const toast = useToast();
   const incrementalSpeed = 1;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const roadSpeedRef = useRef<number>(0);
+  const roadSpeedRef = useRef<number>(100);
   const [clickEffects, setClickEffects] = useState<
     { id: number; x: number; y: number }[]
   >([]);
   const previousLevelRef = useRef<number>(0);
-  const [showLevelTransition, setShowLevelTransition] = useState(false);
+  const [showLevelTransition, setShowLevelTransition] =
+    useState<boolean>(false);
+  const isPreloadingRef = useRef<boolean>(true);
 
   const vehicle = GetVehicle(vehicleTier);
 
@@ -89,6 +90,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     } catch (error) {
       logError(error);
     }
+
     roadSpeedRef.current += incrementalSpeed;
     if (roadSpeedRef.current === GetLevelRequirement(level)) {
       previousLevelRef.current = level;
@@ -141,7 +143,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
     if (previousLevelRef.current !== 0) {
       setShowLevelTransition(true);
-      setTimeout(() => setShowLevelTransition(false), 1_000);
+      setTimeout(() => setShowLevelTransition(false), 2_000);
     }
 
     const canvas = canvasRef.current;
@@ -154,262 +156,229 @@ const Gameplay: React.FC<GameplayProps> = ({
     const bg: HTMLImageElement = new window.Image();
     bg.src = GetBackground(level);
 
-    bg.onload = () => {
-      const { width, height } = dimensions;
-      const assets = LoadSideObjectImages(level);
+    const { width, height } = dimensions;
+    const assets = LoadSideObjectImages(level);
 
-      let sideObjects: SideObject[] = [];
-      let overlayObjects: OverlayObject[] = [];
+    let sideObjects: SideObject[] = [];
+    let overlayObjects: OverlayObject[] = [];
 
-      const roadWidthTop = width * 0.3;
-      const roadWidthBottom = width * 1.1;
+    const roadWidthTop = width * 0.3;
+    const roadWidthBottom = width * 1.1;
 
-      let lastSpawn = 0;
-      const spawnGap = 80;
+    const spawnGap = 80;
+    let lastSpawn = 0;
 
-      // Init any object ONCE before drawing takes place
-      if (roadSpeedRef.current === 0) {
-        GenerateDefaultSideObject(
-          level,
-          assets,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom,
-          sideObjects
-        );
+    if (level >= 7) {
+      // For Shooting Stars
+      setInterval(() => {
+        const count = Math.random() < 0.3 ? 2 : 1; // 30% chance of spawning 2
 
-        if ([1, 2].includes(level)) {
-          lastSpawn = roadY;
+        for (let i = 0; i < count; i++) {
+          overlayObjects.push(GenerateOverlayObjects(assets[0], width, height));
         }
-        if ([3, 4].includes(level)) {
-          lastSpawn = -9999;
-        }
-      }
+      }, 3_000);
+    }
+    // End Init
 
-      if (level >= 7) {
-        // For Shooting Stars
-        setInterval(() => {
-          const count = Math.random() < 0.3 ? 2 : 1; // 30% chance of spawning 2
+    const draw = () => {
+      ctx.drawImage(bg, 0, 0, width, height);
+      // ctx.clearRect(0, 0, width, height);
 
-          for (let i = 0; i < count; i++) {
-            overlayObjects.push(
-              GenerateOverlayObjects(assets[0], width, height)
-            );
+      if ([1, 2].includes(level)) {
+        const buffer = 20;
+        const topLeft = (width - roadWidthTop) / 2 - buffer;
+        const topRight = (width + roadWidthTop) / 2 + buffer;
+        const bottomLeft = -(buffer + 50);
+        const bottomRight = width + buffer;
+
+        if (roadY - lastSpawn > spawnGap) {
+          // Problematic object return null
+          const _obj = GenerateRandomSideObject(
+            assets,
+            topLeft,
+            topRight,
+            bottomLeft,
+            bottomRight
+          );
+          if (_obj) {
+            sideObjects.push(_obj);
+            lastSpawn = roadY;
           }
-        }, 3_000);
+        }
+
+        sideObjects.forEach((obj) => {
+          obj.y += roadSpeedRef.current / 10;
+
+          const distanceFromTop = obj.y - obj.spawnY;
+          const maxDistance = height - obj.spawnY;
+
+          const minScale = 0.4;
+          const maxScale = 1;
+
+          const progress = Math.min(
+            Math.max(distanceFromTop / maxDistance, 0),
+            1
+          );
+          const scale = minScale + (maxScale - minScale) * progress;
+          const cappedScale = Math.min(scale, 0.8);
+
+          const scaledWidth = obj.baseWidth * cappedScale;
+          const scaledHeight = obj.baseHeight * cappedScale;
+
+          const currentX = obj.startX + (obj.endX - obj.startX) * progress;
+
+          ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
+        });
+
+        sideObjects = sideObjects.filter(
+          (obj) => obj.y <= height + obj.baseHeight + 50
+        );
+      } else if (level >= 7) {
+        overlayObjects.forEach((obj) => {
+          obj.x -= obj.dx ?? 5;
+          obj.y += obj.dy ?? 1;
+          ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
+        });
+
+        overlayObjects = overlayObjects.filter(
+          (object) => object.x + object.width > 0
+        );
       }
-      // End Init
 
-      const draw = () => {
-        ctx.drawImage(bg, 0, 0, width, height);
-        // ctx.clearRect(0, 0, width, height);
+      DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, level);
+      DrawSideDivider(
+        ctx,
+        width,
+        height,
+        roadWidthTop,
+        roadWidthBottom,
+        "#FFF"
+      );
+      DrawCenterDivider(ctx, width, height, GetCenterDividerColor(level));
+      DrawLaneDividers(
+        ctx,
+        width,
+        height,
+        roadWidthTop,
+        roadWidthBottom,
+        roadY,
+        "#FFF"
+      );
+      DrawAdditionalSideDividers(
+        ctx,
+        width,
+        height,
+        roadWidthTop,
+        roadWidthBottom,
+        level
+      );
+      DrawBackgroundObjectImage(ctx, width, height, level);
 
-        if ([1, 2].includes(level)) {
-          const buffer = 20;
-          const topLeft = (width - roadWidthTop) / 2 - buffer;
-          const topRight = (width + roadWidthTop) / 2 + buffer;
-          const bottomLeft = -(buffer + 50);
-          const bottomRight = width + buffer;
+      if ([3, 4].includes(level)) {
+        const topLeft = (width - roadWidthTop) / 2 + 27;
+        const topRight = (width + roadWidthTop) / 2 - 47;
+        const bottomLeft = -103;
+        const bottomRight = width + 50;
 
-          if (roadY - lastSpawn > spawnGap) {
-            // Problematic object return null
-            const _obj = GenerateRandomSideObject(
+        if (roadY - lastSpawn > spawnGap * 1.5) {
+          sideObjects.push(
+            ...GenerateFixedSideObject(
               assets,
               topLeft,
               topRight,
               bottomLeft,
               bottomRight
-            );
-            if (_obj) {
-              sideObjects.push(_obj);
-              lastSpawn = roadY;
-            }
-          }
-
-          sideObjects.forEach((obj) => {
-            // Old code with no scaling - archived it first
-            // obj.y += roadSpeedRef.current / 10;
-            // const progress = (obj.y - obj.spawnY) / height;
-            // const currentX = obj.startX + (obj.endX - obj.startX) * progress;
-            // ctx.drawImage(
-            //   obj.img,
-            //   currentX,
-            //   obj.y,
-            //   obj.baseWidth,
-            //   obj.baseHeight
-            // );
-
-            obj.y += roadSpeedRef.current / 10;
-
-            const distanceFromTop = obj.y - obj.spawnY;
-            const maxDistance = height - obj.spawnY;
-
-            const minScale = 0.4;
-            const maxScale = 1;
-
-            // Old code
-            // const progress = distanceFromTop / maxDistance;
-            // const scale = minScale + (maxScale - minScale) * progress;
-
-            const progress = Math.min(
-              Math.max(distanceFromTop / maxDistance, 0),
-              1
-            );
-            const scale = minScale + (maxScale - minScale) * progress;
-            const cappedScale = Math.min(scale, 0.8);
-
-            const scaledWidth = obj.baseWidth * cappedScale;
-            const scaledHeight = obj.baseHeight * cappedScale;
-
-            const currentX = obj.startX + (obj.endX - obj.startX) * progress;
-
-            ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
-          });
-
-          sideObjects = sideObjects.filter(
-            (obj) => obj.y <= height + obj.baseHeight + 50
+            )
           );
-        } else if (level >= 7) {
-          overlayObjects.forEach((obj) => {
-            obj.x -= obj.dx ?? 5;
-            obj.y += obj.dy ?? 1;
-            ctx.drawImage(obj.image, obj.x, obj.y, obj.width, obj.height);
-          });
-
-          overlayObjects = overlayObjects.filter(
-            (object) => object.x + object.width > 0
-          );
+          lastSpawn = roadY;
         }
 
-        DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, level);
-        DrawSideDivider(
-          ctx,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom,
-          "#FFF"
-        );
-        DrawCenterDivider(ctx, width, height, GetCenterDividerColor(level));
-        DrawLaneDividers(
-          ctx,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom,
-          roadY,
-          "#FFF"
-        );
-        DrawAdditionalSideDividers(
-          ctx,
-          width,
-          height,
-          roadWidthTop,
-          roadWidthBottom,
-          level
-        );
-        DrawBackgroundObjectImage(ctx, width, height, level);
+        sideObjects.forEach((obj) => {
+          obj.y += roadSpeedRef.current / 10;
 
-        if ([3, 4].includes(level)) {
-          const topLeft = (width - roadWidthTop) / 2 + 27;
-          const topRight = (width + roadWidthTop) / 2 - 47;
-          const bottomLeft = -103;
-          const bottomRight = width + 50;
+          const distanceFromTop = obj.y - obj.spawnY;
+          const maxDistance = height - obj.spawnY;
+          const progress = distanceFromTop / maxDistance;
+          const clampedProgress = Math.min(Math.max(progress, 0), 1);
 
-          if (roadY - lastSpawn > spawnGap * 1.5) {
-            sideObjects.push(
-              ...GenerateFixedSideObject(
-                assets,
-                topLeft,
-                topRight,
-                bottomLeft,
-                bottomRight
-              )
-            );
-            lastSpawn = roadY;
-          }
-
-          sideObjects.forEach((obj) => {
-            obj.y += roadSpeedRef.current / 10;
-
-            const distanceFromTop = obj.y - obj.spawnY;
-            const maxDistance = height - obj.spawnY;
-            const progress = distanceFromTop / maxDistance;
-            const clampedProgress = Math.min(Math.max(progress, 0), 1);
-
-            const minScale = 0.4;
-            const maxScale = 1;
-            // const scale = minScale + (maxScale - minScale) * clampedProgress;
-            const scale = Math.min(
-              minScale + (maxScale - minScale) * clampedProgress,
-              1
-            );
-            const scaledWidth = obj.baseWidth * scale;
-            const scaledHeight = obj.baseHeight * scale;
-
-            // console.log(
-            //   `Obj[${i}] y=${obj.y}, spawnY=${obj.spawnY}, progress=${(obj.y - obj.spawnY) / (height - obj.spawnY)} , clampedProgress=${clampedProgress}`
-            // );
-
-            const currentX =
-              obj.startX + (obj.endX - obj.startX) * clampedProgress;
-
-            ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
-          });
-
-          sideObjects = sideObjects.filter(
-            (obj) => obj.y <= height + obj.baseHeight + 10
+          const minScale = 0.4;
+          const maxScale = 1;
+          const scale = Math.min(
+            minScale + (maxScale - minScale) * clampedProgress,
+            1
           );
-        } else if ([5, 6].includes(level)) {
-          const topLeft = (width - roadWidthTop) / 2 + 7;
-          const topRight = (width + roadWidthTop) / 2 - 22;
-          const bottomLeft = -63;
-          const bottomRight = width + 29;
+          const scaledWidth = obj.baseWidth * scale;
+          const scaledHeight = obj.baseHeight * scale;
 
-          if (roadY - lastSpawn > 35) {
-            sideObjects.push(
-              ...GenerateFixedSideObject(
-                assets,
-                topLeft,
-                topRight,
-                bottomLeft,
-                bottomRight
-              )
-            );
-            lastSpawn = roadY;
-          }
+          const currentX =
+            obj.startX + (obj.endX - obj.startX) * clampedProgress;
 
-          sideObjects.forEach((obj) => {
-            obj.y += roadSpeedRef.current / 10;
+          ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
+        });
 
-            const distanceFromTop = obj.y - obj.spawnY;
-            const maxDistance = height - obj.spawnY;
-            const progress = distanceFromTop / maxDistance;
+        sideObjects = sideObjects.filter(
+          (obj) => obj.y <= height + obj.baseHeight + 10
+        );
+      } else if ([5, 6].includes(level)) {
+        const topLeft = (width - roadWidthTop) / 2 + 7;
+        const topRight = (width + roadWidthTop) / 2 - 22;
+        const bottomLeft = -62.5;
+        const bottomRight = width + 28.5;
 
-            const minScale = 0.4;
-            const maxScale = 1;
-            const scale = minScale + (maxScale - minScale) * progress;
-
-            const scaledWidth = obj.baseWidth * scale;
-            const scaledHeight = obj.baseHeight * scale;
-
-            const currentX = obj.startX + (obj.endX - obj.startX) * progress;
-
-            ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
-          });
-
-          sideObjects = sideObjects.filter(
-            (obj) => obj.y <= height + obj.baseHeight + 10
+        if (roadY - lastSpawn > 35) {
+          sideObjects.push(
+            ...GenerateFixedSideObject(
+              assets,
+              topLeft,
+              topRight,
+              bottomLeft,
+              bottomRight
+            )
           );
+          lastSpawn = roadY;
         }
 
-        roadY += roadSpeedRef.current / 10;
-        requestAnimationFrame(draw);
-      };
+        sideObjects.forEach((obj) => {
+          obj.y += roadSpeedRef.current / 10;
 
+          const distanceFromTop = obj.y - obj.spawnY;
+          const maxDistance = height - obj.spawnY;
+          const progress = distanceFromTop / maxDistance;
+
+          const minScale = 0.4;
+          const maxScale = 1;
+          const scale = minScale + (maxScale - minScale) * progress;
+
+          const scaledWidth = obj.baseWidth * scale;
+          const scaledHeight = obj.baseHeight * scale;
+
+          const currentX = obj.startX + (obj.endX - obj.startX) * progress;
+
+          ctx.drawImage(obj.img, currentX, obj.y, scaledWidth, scaledHeight);
+        });
+
+        sideObjects = sideObjects.filter(
+          (obj) => obj.y <= height + obj.baseHeight + 10
+        );
+      }
+
+      roadY += roadSpeedRef.current / 10;
+
+      if (isPreloadingRef.current && roadY >= 1_000) {
+        isPreloadingRef.current = false;
+        roadSpeedRef.current = 0;
+      }
+
+      requestAnimationFrame(draw);
+    };
+
+    bg.onload = () => {
       draw();
     };
+
+    if (bg.complete) {
+      draw();
+    }
   }, [dimensions, level]);
 
   return (

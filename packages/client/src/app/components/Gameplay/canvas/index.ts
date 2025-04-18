@@ -14,7 +14,10 @@ import {
 } from "./level3_4";
 import { DrawAdditionalSideDividersLevel7_8 } from "./level7_8";
 import { DrawAdditionalSideDividersLevel9_10 } from "./level9_10";
-import { DrawAdditionalSideDividersLevel5_6 } from "./level5_6";
+import {
+  DrawAdditionalSideDividersLevel5_6,
+  GenerateDefaultSideObject5_6,
+} from "./level5_6";
 import { GenerateDefaultSideObject1_2 } from "./level1_2";
 
 export const DrawRoad = (
@@ -282,5 +285,12 @@ export const GenerateDefaultSideObject = (
       sideObjects
     );
   } else if ([5, 6].includes(level)) {
+    GenerateDefaultSideObject5_6(
+      assets,
+      width,
+      height,
+      roadWidthTop,
+      sideObjects
+    );
   }
 };

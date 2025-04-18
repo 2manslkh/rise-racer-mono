@@ -124,6 +124,4 @@ export const GenerateDefaultSideObject3_4 = (
       bottomRight
     )
   );
-
-  console.log(sideObjects);
 };
