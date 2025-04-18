@@ -1,6 +1,6 @@
 # Rise Clicker Monorepo
 
-This monorepo contains two main packages: `scripts` and `core`. 
+This monorepo contains two main packages: `scripts` and `core`.  
 
 ## Packages
 
