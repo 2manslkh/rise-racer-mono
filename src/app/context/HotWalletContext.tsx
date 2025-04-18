@@ -18,6 +18,9 @@ interface HotWalletContextProps {
   }) => Promise<void>;
   disconnectHotWallet: () => void;
   refreshBalance: () => void;
+  nonce: number;
+  incrementNonce: () => void;
+  getNonce: () => number;
 }
 
 const HotWalletContext = createContext<HotWalletContextProps | undefined>(
@@ -29,6 +32,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [balance, setBalance] = useState<bigint>(0n);
+  const [nonce, setNonce] = useState<number>(0);
 
   const disconnectHotWallet = () => {
     setHotWallet(null);
@@ -63,6 +67,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       setBalance(balance);
       setHotWallet(wallet);
       setAddress(data.boundAddress);
+      const initialNonce = await wallet.getNonce("pending");
+      console.log("🚀 | HotWalletProvider | initialNonce:", initialNonce)
+      setNonce(initialNonce);
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -80,6 +87,14 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const incrementNonce = () => {
+    setNonce((prevNonce) => prevNonce + 1);
+  };
+
+  const getNonce = () => {
+    return nonce;
+  };
+
   return (
     <HotWalletContext.Provider
       value={{
@@ -90,6 +105,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         loadHotWallet,
         disconnectHotWallet,
         refreshBalance,
+        nonce,
+        incrementNonce,
+        getNonce,
       }}
     >
       {children}

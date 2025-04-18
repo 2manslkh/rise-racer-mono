@@ -69,6 +69,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   const [showLevelTransition, setShowLevelTransition] =
     useState<boolean>(false);
   const isPreloadingRef = useRef<boolean>(true);
+  const { getNonce, incrementNonce } = useHotWallet();
 
   const vehicle = GetVehicle(vehicleTier);
 
@@ -86,7 +87,10 @@ const Gameplay: React.FC<GameplayProps> = ({
     );
 
     try {
-      clickContract.click();
+      incrementNonce();
+      const currentNonce = getNonce();
+      console.log("🚀 | handleClick | currentNonce:", currentNonce)
+      clickContract.click({ nonce: currentNonce, gasLimit: 105000 });
     } catch (error) {
       logError(error);
     }
