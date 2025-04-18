@@ -40,8 +40,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { hotWallet, balance, currentVelocity, velocityPerClick, user } =
-    useHotWallet();
+  const { hotWallet, balance, velocityPerClick, user } = useHotWallet();
   const toast = useToast();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -431,6 +430,7 @@ const Gameplay: React.FC<GameplayProps> = ({
               : user.currentProgress
           }
           levelRequirement={GetLevelRequirement(currentLevel)}
+          riseCrystals={1}
         />
       </div>
     </div>
