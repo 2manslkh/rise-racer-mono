@@ -33,8 +33,6 @@ export default function Home() {
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { user } = useHotWallet();
-  const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
   const { hotWallet } = useHotWallet();
 
   useEffect(() => {
@@ -116,10 +114,6 @@ export default function Home() {
     );
   };
 
-  const handleNextLevel = () => {
-    setCurrentLevel((prevState) => prevState + 1);
-  };
-
   return (
     <div
       className="relative w-screen flex items-center justify-center bg-[#29004D]"
@@ -147,13 +141,7 @@ export default function Home() {
               }
             />
             <div className="relative w-full h-full">
-              <Gameplay
-                level={currentLevel}
-                // TODO: Update currentProgress to be fetched
-                progress={user.currentProgress}
-                gameStarted={gameStarted}
-                handleNextLevel={handleNextLevel}
-              />
+              <Gameplay gameStarted={gameStarted} />
 
               {activeView === Views.LEADERBOARD && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
