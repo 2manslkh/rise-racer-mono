@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 import { ethers } from "ethers";
 import { riseTestnet } from "../configuration/wagmi";
 
-export const MINIMUM_GAS = 100000000000000n;
+export const MINIMUM_GAS = 1000000000000n;
 
 interface HotWalletContextProps {
   hotWallet: ethers.Wallet | null;
@@ -17,7 +17,7 @@ interface HotWalletContextProps {
     signature: string;
   }) => Promise<void>;
   disconnectHotWallet: () => void;
-  updateBalance: (_balance: bigint) => void;
+  refreshBalance: () => void;
 }
 
 const HotWalletContext = createContext<HotWalletContextProps | undefined>(
@@ -70,8 +70,14 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateBalance = (_balance: bigint) => {
-    setBalance(_balance);
+  const refreshBalance = async () => {
+    if (address) {
+      const provider = new ethers.JsonRpcProvider(
+        riseTestnet.rpcUrls.default.http[0]
+      );
+      const balance = await provider.getBalance(address);
+      setBalance(balance);
+    }
   };
 
   return (
@@ -83,7 +89,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         loadHotWallet,
         disconnectHotWallet,
-        updateBalance,
+        refreshBalance,
       }}
     >
       {children}

@@ -10,10 +10,10 @@ import Leaderboard from "./components/Leaderboard";
 import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
-import toast from "react-hot-toast";
 import { useSignMessage } from "wagmi";
 import useViewportHeight from "./hooks/useViewportHeight";
 import { logError } from "./lib/error";
+import { useToast } from "./hooks/useToast";
 
 export type User = {
   vehicle: number;
@@ -35,6 +35,7 @@ enum Views {
 }
 
 export default function Home() {
+  const toast = useToast();
   const viewportHeight = useViewportHeight();
   const { address, isConnected } = useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);

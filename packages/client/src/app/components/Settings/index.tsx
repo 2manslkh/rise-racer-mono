@@ -4,6 +4,7 @@ import { useDisconnect } from "@reown/appkit/react";
 import { shortenAddress } from "@/app/lib/address";
 import HotWalletManager from "../HotWalletManager";
 import { useHotWallet } from "@/app/context/HotWalletContext";
+import { useEffect } from "react";
 
 const Settings = ({
   open,
@@ -18,12 +19,16 @@ const Settings = ({
 }) => {
   const { address } = useAppKitAccount();
   const { disconnect } = useDisconnect();
-  const { disconnectHotWallet } = useHotWallet();
+  const { disconnectHotWallet, refreshBalance } = useHotWallet();
 
   const handleDisconnect = async () => {
     disconnectHotWallet();
     await disconnect();
   };
+
+  useEffect(() => {
+    refreshBalance();
+  }, [open]);
 
   return (
     <>
@@ -41,7 +46,7 @@ const Settings = ({
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[310px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[330px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         style={{
           width: "calc(100% - 28px)",
         }}

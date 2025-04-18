@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import { useHotWallet } from "@/app/context/HotWalletContext";
+import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
 import { useAccount, useSendTransaction, useSignMessage } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
 import { ethers, parseEther } from "ethers";
-import toast from "react-hot-toast";
 import { logError } from "@/app/lib/error";
+import { useToast } from "@/app/hooks/useToast";
 
 // Define the target Chain ID
 const RISE_TESTNET_CHAIN_ID = 11155931;
 const message = "Login to Rise Racers";
 
 const HotWalletManager = () => {
+  const toast = useToast();
   const {
     address: hotWalletAddress,
     isLoading: isHotWalletLoading,
     loadHotWallet,
     balance,
-    updateBalance,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -57,7 +57,6 @@ const HotWalletManager = () => {
     });
     // Consider adding toast notifications for pending/success/error based on `hash`, `isTxLoading`, etc.
     setTopUpAmount("");
-    updateBalance(balance + amountWei);
   };
 
   const handleBind = async () => {
@@ -113,14 +112,16 @@ const HotWalletManager = () => {
       </div>
 
       <p className="text-black text-inter text-sm">
-        Current Stored Value: {ethers.formatEther(balance.toString())} ETH
+        Current Stored Value: {Number(ethers.formatEther(balance)).toFixed(8)}{" "}
+        ETH
       </p>
 
       {/* Create or Show Actions */}
       {hotWalletAddress ? (
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-black text-inter">
-            Use this address to top up gas (ETH on RISE Testnet).
+            Use this address to top up gas (ETH on RISE Testnet). Minimum your
+            wallet should have {ethers.formatEther(MINIMUM_GAS.toString())} ETH
           </p>
           {/* Top Up Section */}
           <div className="flex items-center gap-2 mt-1">
