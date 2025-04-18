@@ -53,7 +53,7 @@ const BindHotWallet = () => {
         </p>
         {/* <p className="font-inter text-black">INSERT HOT WALLET ADDRESS</p> */}
         <p className="font-inter text-black text-center">
-          Login to get your signature for signless transactions during gameplay
+          Login to create a hot wallet for signless transactions during gameplay
         </p>
         <button
           onClick={handleBind}

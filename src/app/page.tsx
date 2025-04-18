@@ -11,6 +11,7 @@ import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
+import { Tutorial } from "./components/Tutorial";
 
 export type User = {
   vehicle: number;
@@ -23,6 +24,7 @@ enum Views {
   SETTINGS,
   SHOP,
   LEADERBOARD,
+  TUTORIAL,
 }
 
 export default function Home() {
@@ -109,6 +111,12 @@ export default function Home() {
     );
   };
 
+  const handleTutorialClick = () => {
+    setActiveView((prevState) =>
+      prevState === Views.TUTORIAL ? Views.NULL : Views.TUTORIAL
+    );
+  };
+
   const handleNextLevel = () => {
     setCurrentLevel((prevState) => prevState + 1);
   };
@@ -121,12 +129,15 @@ export default function Home() {
       <div className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden">
         {isConnected ? (
           <div className="relative w-full h-full">
-            {[Views.NULL, Views.SETTINGS].includes(activeView) && (
+            {[Views.NULL, Views.SETTINGS, Views.TUTORIAL].includes(
+              activeView
+            ) && (
               <Navigation
                 musicPlaying={isMusicPlaying}
                 toggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
+                toggleTutorial={handleTutorialClick}
               />
             )}
             <Menu
@@ -152,6 +163,11 @@ export default function Home() {
               {activeView === Views.SHOP && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
                   <Shop />
+                </div>
+              )}
+              {activeView === Views.TUTORIAL && (
+                <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+                  <Tutorial />
                 </div>
               )}
             </div>
