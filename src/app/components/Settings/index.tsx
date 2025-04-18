@@ -37,7 +37,7 @@ const Settings = ({
           className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-1 h-screen md:max-h-[750px]"
           onClick={toggleSettings}
         >
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-20 z-1 whitespace-nowrap">
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-60 z-1 whitespace-nowrap">
             <p className="text-white font-semibold text-base">
               Tap anywhere to close this tab
             </p>

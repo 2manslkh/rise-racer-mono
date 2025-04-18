@@ -11,7 +11,6 @@ import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
-import { Tutorial } from "./components/Tutorial";
 
 export type User = {
   vehicle: number;
@@ -137,6 +136,7 @@ export default function Home() {
                 toggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
+                isTutorialOpen={activeView === Views.TUTORIAL}
                 toggleTutorial={handleTutorialClick}
               />
             )}
@@ -163,11 +163,6 @@ export default function Home() {
               {activeView === Views.SHOP && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
                   <Shop />
-                </div>
-              )}
-              {activeView === Views.TUTORIAL && (
-                <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
-                  <Tutorial />
                 </div>
               )}
             </div>

@@ -14,7 +14,7 @@ function useHasMounted() {
 
 const Login = () => {
   const hasMounted = useHasMounted();
-  const { status } = useAppKitAccount();
+  const { isConnected } = useAppKitAccount();
 
   return (
     <div className="relative w-full h-full">
@@ -26,13 +26,7 @@ const Login = () => {
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
         {hasMounted ? (
-          <>
-            {status === "disconnected" ? (
-              <WalletConnectButton />
-            ) : (
-              <LoadingConnect />
-            )}
-          </>
+          <>{!isConnected ? <WalletConnectButton /> : <LoadingConnect />}</>
         ) : (
           <LoadingConnect />
         )}
