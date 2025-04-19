@@ -32,22 +32,15 @@ interface GameplayProps {
   gameStarted: boolean;
   heightPercentage?: number;
   vehicleTier?: number;
-  level: number;
-  progress: number;
-  handleNextLevel: () => void;
 }
 
 const Gameplay: React.FC<GameplayProps> = ({
   vehicleTier = 1,
   gameStarted,
-  level = 1,
-  progress = 1,
-  handleNextLevel,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { hotWallet, balance, currentVelocity, velocityPerClick } =
-    useHotWallet();
+  const { hotWallet, balance, velocityPerClick, user } = useHotWallet();
   const toast = useToast();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -60,6 +53,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     useState<boolean>(false);
   const isPreloadingRef = useRef<boolean>(true);
   const { getNonce, incrementNonce } = useHotWallet();
+  const [currentLevel, setCurrentLevel] = useState<number>(1);
 
   const vehicle = GetVehicle(vehicleTier);
 
@@ -81,9 +75,9 @@ const Gameplay: React.FC<GameplayProps> = ({
     }
 
     roadSpeedRef.current += Number(incrementalSpeed);
-    if (roadSpeedRef.current === GetLevelRequirement(level)) {
-      previousLevelRef.current = level;
-      handleNextLevel();
+    if (roadSpeedRef.current === GetLevelRequirement(currentLevel)) {
+      previousLevelRef.current = currentLevel;
+      setCurrentLevel((prevState) => prevState + 1);
     }
 
     const rect = containerRef.current?.getBoundingClientRect();
@@ -103,9 +97,13 @@ const Gameplay: React.FC<GameplayProps> = ({
   // When user clicks on START button, set the speed
   useEffect(() => {
     if (gameStarted) {
-      roadSpeedRef.current = progress;
+      roadSpeedRef.current = user.currentProgress;
     }
   }, [gameStarted]);
+
+  useEffect(() => {
+    setCurrentLevel(user.currentLevel);
+  }, [user]);
 
   // For screen sizing
   useEffect(() => {
@@ -127,13 +125,19 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
-    const shouldUpdate = GetShouldUpdateCanvas(previousLevelRef.current, level);
+    const shouldUpdate = GetShouldUpdateCanvas(
+      previousLevelRef.current,
+      currentLevel
+    );
     if (!shouldUpdate) return;
 
     if (previousLevelRef.current !== 0) {
       setShowLevelTransition(true);
       setTimeout(() => setShowLevelTransition(false), 2_000);
     }
+
+    // To avoid having the canvas to render at the speed of 1_000_000
+    const getVisualSpeed = () => Math.min(roadSpeedRef.current, 10);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -143,10 +147,10 @@ const Gameplay: React.FC<GameplayProps> = ({
 
     let roadY = 0;
     const bg: HTMLImageElement = new window.Image();
-    bg.src = GetBackground(level);
+    bg.src = GetBackground(currentLevel);
 
     const { width, height } = dimensions;
-    const assets = LoadSideObjectImages(level);
+    const assets = LoadSideObjectImages(currentLevel);
 
     let sideObjects: SideObject[] = [];
     let overlayObjects: OverlayObject[] = [];
@@ -157,13 +161,17 @@ const Gameplay: React.FC<GameplayProps> = ({
     const spawnGap = 80;
     let lastSpawn = 0;
 
-    if (level >= 7) {
+    if (currentLevel >= 7) {
       // For Shooting Stars
       setInterval(() => {
         const count = Math.random() < 0.3 ? 2 : 1; // 30% chance of spawning 2
 
-        for (let i = 0; i < count; i++) {
-          overlayObjects.push(GenerateOverlayObjects(assets[0], width, height));
+        if (overlayObjects.length < 3) {
+          for (let i = 0; i < count; i++) {
+            overlayObjects.push(
+              GenerateOverlayObjects(assets[0], width, height)
+            );
+          }
         }
       }, 3_000);
     }
@@ -173,7 +181,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       ctx.drawImage(bg, 0, 0, width, height);
       // ctx.clearRect(0, 0, width, height);
 
-      if ([1, 2].includes(level)) {
+      if ([1, 2].includes(currentLevel)) {
         const buffer = 20;
         const topLeft = (width - roadWidthTop) / 2 - buffer;
         const topRight = (width + roadWidthTop) / 2 + buffer;
@@ -196,7 +204,8 @@ const Gameplay: React.FC<GameplayProps> = ({
         }
 
         sideObjects.forEach((obj) => {
-          obj.y += roadSpeedRef.current / 10;
+          // obj.y += roadSpeedRef.current / 10;
+          obj.y += getVisualSpeed() / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -222,7 +231,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         sideObjects = sideObjects.filter(
           (obj) => obj.y <= height + obj.baseHeight + 50
         );
-      } else if (level >= 7) {
+      } else if (currentLevel >= 7) {
         overlayObjects.forEach((obj) => {
           obj.x -= obj.dx ?? 5;
           obj.y += obj.dy ?? 1;
@@ -234,7 +243,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         );
       }
 
-      DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, level);
+      DrawRoad(ctx, width, height, roadWidthTop, roadWidthBottom, currentLevel);
       DrawSideDivider(
         ctx,
         width,
@@ -243,7 +252,12 @@ const Gameplay: React.FC<GameplayProps> = ({
         roadWidthBottom,
         "#FFF"
       );
-      DrawCenterDivider(ctx, width, height, GetCenterDividerColor(level));
+      DrawCenterDivider(
+        ctx,
+        width,
+        height,
+        GetCenterDividerColor(currentLevel)
+      );
       DrawLaneDividers(
         ctx,
         width,
@@ -259,11 +273,11 @@ const Gameplay: React.FC<GameplayProps> = ({
         height,
         roadWidthTop,
         roadWidthBottom,
-        level
+        currentLevel
       );
-      DrawBackgroundObjectImage(ctx, width, height, level);
+      DrawBackgroundObjectImage(ctx, width, height, currentLevel);
 
-      if ([3, 4].includes(level)) {
+      if ([3, 4].includes(currentLevel)) {
         const topLeft = (width - roadWidthTop) / 2 + 27;
         const topRight = (width + roadWidthTop) / 2 - 47;
         const bottomLeft = -103;
@@ -283,7 +297,8 @@ const Gameplay: React.FC<GameplayProps> = ({
         }
 
         sideObjects.forEach((obj) => {
-          obj.y += roadSpeedRef.current / 10;
+          obj.y += getVisualSpeed() / 10;
+          // obj.y += roadSpeedRef.current / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -308,7 +323,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         sideObjects = sideObjects.filter(
           (obj) => obj.y <= height + obj.baseHeight + 10
         );
-      } else if ([5, 6].includes(level)) {
+      } else if ([5, 6].includes(currentLevel)) {
         const topLeft = (width - roadWidthTop) / 2 + 7;
         const topRight = (width + roadWidthTop) / 2 - 22;
         const bottomLeft = -62.5;
@@ -328,7 +343,8 @@ const Gameplay: React.FC<GameplayProps> = ({
         }
 
         sideObjects.forEach((obj) => {
-          obj.y += roadSpeedRef.current / 10;
+          // obj.y += roadSpeedRef.current / 10;
+          obj.y += getVisualSpeed() / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -351,7 +367,8 @@ const Gameplay: React.FC<GameplayProps> = ({
         );
       }
 
-      roadY += roadSpeedRef.current / 10;
+      // roadY += roadSpeedRef.current / 10;
+      roadY += getVisualSpeed() / 10;
 
       if (isPreloadingRef.current && roadY >= 1_000) {
         isPreloadingRef.current = false;
@@ -368,7 +385,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (bg.complete) {
       draw();
     }
-  }, [dimensions, level]);
+  }, [dimensions, currentLevel]);
 
   return (
     <div
@@ -408,9 +425,12 @@ const Gameplay: React.FC<GameplayProps> = ({
       <div className="absolute bottom-[80px] left-0">
         <Speedometer
           currentProgress={
-            gameStarted ? roadSpeedRef.current || progress : progress
+            gameStarted
+              ? roadSpeedRef.current || user.currentProgress
+              : user.currentProgress
           }
-          levelRequirement={GetLevelRequirement(level)}
+          levelRequirement={GetLevelRequirement(currentLevel)}
+          riseCrystals={1}
         />
       </div>
     </div>

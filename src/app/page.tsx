@@ -11,7 +11,6 @@ import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
-import { Tutorial } from "./components/Tutorial";
 import ShopV2 from "./components/ShopV2";
 export type User = {
   vehicle: number;
@@ -34,8 +33,6 @@ export default function Home() {
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { user } = useHotWallet();
-  const [currentLevel, setCurrentLevel] = useState<number>(user.currentLevel);
   const { hotWallet } = useHotWallet();
 
   useEffect(() => {
@@ -117,10 +114,6 @@ export default function Home() {
     );
   };
 
-  const handleNextLevel = () => {
-    setCurrentLevel((prevState) => prevState + 1);
-  };
-
   return (
     <div
       className="relative w-screen flex items-center justify-center bg-[#29004D]"
@@ -137,6 +130,7 @@ export default function Home() {
                 toggleMusicPlaying={togglePlayback}
                 toggleSettings={handleSettingsClick}
                 isSettingsOpen={activeView === Views.SETTINGS}
+                isTutorialOpen={activeView === Views.TUTORIAL}
                 toggleTutorial={handleTutorialClick}
               />
             )}
@@ -147,13 +141,7 @@ export default function Home() {
               }
             />
             <div className="relative w-full h-full">
-              <Gameplay
-                level={currentLevel}
-                // TODO: Update currentProgress to be fetched
-                progress={user.currentProgress}
-                gameStarted={gameStarted}
-                handleNextLevel={handleNextLevel}
-              />
+              <Gameplay gameStarted={gameStarted} />
 
               {activeView === Views.LEADERBOARD && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -163,11 +151,6 @@ export default function Home() {
               {activeView === Views.SHOP && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
                   <ShopV2 />
-                </div>
-              )}
-              {activeView === Views.TUTORIAL && (
-                <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
-                  <Tutorial />
                 </div>
               )}
             </div>
