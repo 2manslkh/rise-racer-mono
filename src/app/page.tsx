@@ -12,7 +12,7 @@ import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
 import { Tutorial } from "./components/Tutorial";
-
+import ShopV2 from "./components/ShopV2";
 export type User = {
   vehicle: number;
   currentLevel: number;
@@ -162,7 +162,7 @@ export default function Home() {
               )}
               {activeView === Views.SHOP && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
-                  <Shop />
+                  <ShopV2 />
                 </div>
               )}
               {activeView === Views.TUTORIAL && (
