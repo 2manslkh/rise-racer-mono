@@ -10,7 +10,7 @@ interface LowBalanceModalProps {
   hotWalletAddress: `0x${string}` | undefined;
 }
 
-const LOW_BALANCE_THRESHOLD = 2.005; // ETH // Reverted to original threshold
+const LOW_BALANCE_THRESHOLD = 0.005; // ETH // Reverted to original threshold
 const RISE_TESTNET_CHAIN_ID = 11155931; // Define target chain ID
 
 const LowBalanceModal: FC<LowBalanceModalProps> = ({
