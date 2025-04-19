@@ -5,6 +5,8 @@ export enum MenuAction {
   OPEN_SHOP,
   START_GAME,
   OPEN_LEADERBOARD,
+  OPEN_STAKING,
+  OPEN_RISE_CRYSTALS,
 }
 
 const Menu = ({
@@ -29,6 +31,24 @@ const Menu = ({
             alt="Shop"
             handleClick={() => handleClick(MenuAction.OPEN_SHOP)}
             highlightPosition="top-left"
+          />
+        </div>
+
+        <div className="absolute z-3 top-0 left-[calc(25%_-_20px)]">
+          <IconButtonV2
+            icon={"/Staking.svg"}
+            alt="Staking"
+            handleClick={() => handleClick(MenuAction.OPEN_STAKING)}
+            highlightPosition="top-left"
+          />
+        </div>
+
+        <div className="absolute z-3 top-0 right-[calc(25%_-_20px)]">
+          <IconButtonV2
+            icon={"/Crystals.svg"}
+            alt="Rise Crystals"
+            handleClick={() => handleClick(MenuAction.OPEN_RISE_CRYSTALS)}
+            highlightPosition="bottom-right"
           />
         </div>
 

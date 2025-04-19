@@ -34,6 +34,9 @@ interface GameplayProps {
   vehicleTier?: number;
 }
 
+// Define a threshold for rapid clicks (in milliseconds)
+const COMBO_THRESHOLD_MS = 1000; // 1 second
+
 const Gameplay: React.FC<GameplayProps> = ({
   vehicleTier = 1,
   gameStarted,
@@ -55,15 +58,57 @@ const Gameplay: React.FC<GameplayProps> = ({
   const { getNonce, incrementNonce } = useHotWallet();
   const [currentLevel, setCurrentLevel] = useState<number>(1);
 
+  // Combo state
+  const [comboCount, setComboCount] = useState<number>(0);
+  const lastClickTimeRef = useRef<number>(0);
+  const comboResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const vehicle = GetVehicle(vehicleTier);
+
+  // Function to reset combo
+  const resetCombo = () => {
+    setComboCount(0);
+    lastClickTimeRef.current = 0;
+    if (comboResetTimeoutRef.current) {
+      clearTimeout(comboResetTimeoutRef.current);
+      comboResetTimeoutRef.current = null;
+    }
+  };
 
   // Each click will increase the speed
   const handleClick = async (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted || !hotWallet) return;
     if (balance < MINIMUM_GAS) {
       toast.error("Insufficient funds in burner wallet");
+      resetCombo(); // Reset combo on error
       return;
     }
+
+    const currentTime = Date.now();
+
+    // Combo logic
+    if (
+      lastClickTimeRef.current &&
+      currentTime - lastClickTimeRef.current <= COMBO_THRESHOLD_MS
+    ) {
+      // It's a combo!
+      setComboCount((prev) => prev + 1);
+    } else {
+      // Not a combo or first click
+      setComboCount(1);
+    }
+
+    // Clear any existing reset timeout
+    if (comboResetTimeoutRef.current) {
+      clearTimeout(comboResetTimeoutRef.current);
+    }
+
+    // Set a new timeout to reset the combo
+    comboResetTimeoutRef.current = setTimeout(() => {
+      resetCombo();
+    }, COMBO_THRESHOLD_MS);
+
+    lastClickTimeRef.current = currentTime;
 
     try {
       incrementNonce();
@@ -72,6 +117,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");
+      resetCombo(); // Reset combo on error
     }
 
     roadSpeedRef.current += Number(incrementalSpeed);
@@ -373,6 +419,17 @@ const Gameplay: React.FC<GameplayProps> = ({
       if (isPreloadingRef.current && roadY >= 1_000) {
         isPreloadingRef.current = false;
         roadSpeedRef.current = 0;
+      }
+
+      // Draw Combo Meter Text if combo > 1
+      if (comboCount > 1) {
+        ctx.font = "bold 30px Arial"; // Adjust font size and style as needed
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // White text with slight transparency
+        ctx.textAlign = "center";
+        ctx.shadowColor = "black";
+        ctx.shadowBlur = 5;
+        ctx.fillText(`Combo: ${comboCount}x`, width / 2, height * 0.15); // Position near top-center
+        ctx.shadowBlur = 0; // Reset shadow blur
       }
 
       requestAnimationFrame(draw);
