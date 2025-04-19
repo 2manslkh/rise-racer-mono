@@ -42,29 +42,6 @@ const Speedometer = ({
             />
             <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
           </div>
-          {/* ETH */}
-          <div className="gap-2 left-3  text-white font-zen flex h-full  items-center">
-            {/* Rise Crystals Icon */}
-            <Image
-              src={"./rise_crystal.svg"}
-              alt="Rise Crystal"
-              width={14}
-              height={14}
-            />
-            <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
-          </div>
-
-          {/* Staked ETH */}
-          <div className="gap-2 left-3  text-white font-zen flex h-full  items-center">
-            {/* Rise Crystals Icon */}
-            <Image
-              src={"./rise_crystal.svg"}
-              alt="Rise Crystal"
-              width={14}
-              height={14}
-            />
-            <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
-          </div>
         </div>
       </div>
     </div>

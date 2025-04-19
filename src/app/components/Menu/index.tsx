@@ -43,15 +43,6 @@ const Menu = ({
           />
         </div>
 
-        <div className="absolute z-3 top-0 right-[calc(25%_-_20px)]">
-          <IconButtonV2
-            icon={"/Crystals.svg"}
-            alt="Rise Crystals"
-            handleClick={() => handleClick(MenuAction.OPEN_RISE_CRYSTALS)}
-            highlightPosition="bottom-right"
-          />
-        </div>
-
         <div
           className="absolute z-2"
           style={{

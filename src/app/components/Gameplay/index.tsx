@@ -27,6 +27,8 @@ import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { logError } from "@/app/lib/error";
 import { useToast } from "@/app/hooks/useToast";
 import { clickRace } from "@/app/lib/rise-racer";
+import { getBalance, getDecimals } from "@/app/lib/rise-crystals";
+import { ethers } from "ethers";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -43,7 +45,8 @@ const Gameplay: React.FC<GameplayProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { hotWallet, balance, velocityPerClick, user } = useHotWallet();
+  const { hotWallet, balance, velocityPerClick, user, address } =
+    useHotWallet();
   const toast = useToast();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -57,6 +60,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   const isPreloadingRef = useRef<boolean>(true);
   const { getNonce, incrementNonce } = useHotWallet();
   const [currentLevel, setCurrentLevel] = useState<number>(1);
+  const [riseCrystalsBalance, setRiseCrystalsBalance] = useState<string>("0");
 
   // Combo state
   const [comboCount, setComboCount] = useState<number>(0);
@@ -64,6 +68,29 @@ const Gameplay: React.FC<GameplayProps> = ({
   const comboResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const vehicle = GetVehicle(vehicleTier);
+
+  // Fetch Rise Crystals balance
+  useEffect(() => {
+    const fetchRiseCrystalsBalance = async () => {
+      if (!hotWallet || !hotWallet.provider) return;
+
+      try {
+        const provider = hotWallet.provider as ethers.Provider;
+        if (!address) return;
+
+        const balance = await getBalance(address, provider);
+        const decimals = await getDecimals(provider);
+
+        // Format the balance
+        const formatted = ethers.formatUnits(balance, decimals);
+        setRiseCrystalsBalance(formatted);
+      } catch (error) {
+        console.error("Failed to fetch Rise Crystals balance:", error);
+      }
+    };
+
+    fetchRiseCrystalsBalance();
+  }, [hotWallet, address]);
 
   // Function to reset combo
   const resetCombo = () => {
@@ -113,7 +140,22 @@ const Gameplay: React.FC<GameplayProps> = ({
     try {
       incrementNonce();
       const currentNonce = getNonce();
-      clickRace(hotWallet, currentNonce);
+      await clickRace(hotWallet, currentNonce);
+
+      // After a successful click, refresh Rise Crystals balance
+      setTimeout(async () => {
+        if (hotWallet && hotWallet.provider && address) {
+          try {
+            const provider = hotWallet.provider as ethers.Provider;
+            const balance = await getBalance(address, provider);
+            const decimals = await getDecimals(provider);
+            const formatted = ethers.formatUnits(balance, decimals);
+            setRiseCrystalsBalance(formatted);
+          } catch (error) {
+            console.error("Failed to refresh Rise Crystals balance:", error);
+          }
+        }
+      }, 3000); // Wait a bit for the transaction to process
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");
@@ -487,7 +529,7 @@ const Gameplay: React.FC<GameplayProps> = ({
               : user.currentProgress
           }
           levelRequirement={GetLevelRequirement(currentLevel)}
-          riseCrystals={1}
+          riseCrystals={parseFloat(riseCrystalsBalance)}
         />
       </div>
     </div>
