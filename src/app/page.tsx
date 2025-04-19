@@ -7,11 +7,12 @@ import Menu, { MenuAction } from "./components/Menu";
 import Login from "./components/Login";
 import { useAppKitAccount } from "@reown/appkit/react";
 import Leaderboard from "./components/Leaderboard";
-import Shop from "./components/Shop";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
 import ShopV2 from "./components/ShopV2";
+import LowBalanceModal from "./components/LowBalanceModal";
+
 export type User = {
   vehicle: number;
   currentLevel: number;
@@ -33,7 +34,7 @@ export default function Home() {
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { hotWallet } = useHotWallet();
+  const { hotWallet, balance, address: hotWalletAddress } = useHotWallet();
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -156,6 +157,10 @@ export default function Home() {
             </div>
 
             {!hotWallet && <BindHotWallet />}
+            <LowBalanceModal
+              balance={balance}
+              hotWalletAddress={hotWalletAddress as `0x${string}` | undefined}
+            />
           </div>
         ) : (
           <Login />
