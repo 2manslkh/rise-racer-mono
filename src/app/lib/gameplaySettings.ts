@@ -182,6 +182,7 @@ export const GetShouldUpdateCanvas = (current: number, next: number) => {
   if (current === 7 && next === 8) return false;
   if (current === 9 && next === 10) return false;
   if (current === 11 && next === 12) return false;
+  if (current === 12 && next === 13) return false;
   return true;
 };
 

@@ -171,7 +171,13 @@ const Gameplay: React.FC<GameplayProps> = ({
     roadSpeedRef.current += Number(incrementalSpeed);
     if (roadSpeedRef.current === GetLevelRequirement(currentLevel)) {
       previousLevelRef.current = currentLevel;
-      setCurrentLevel((prevState) => prevState + 1);
+      if (currentLevel === 13) {
+        // Rebirth scenario
+        // TODO: Maybe need to add a modal say congrats rebirth
+        setCurrentLevel(1);
+      } else {
+        setCurrentLevel((prevState) => prevState + 1);
+      }
     }
 
     const rect = containerRef.current?.getBoundingClientRect();
