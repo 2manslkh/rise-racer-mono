@@ -102,12 +102,12 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-40 h-screen"
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 z-40 h-screen md:max-h-[750px]"
         onClick={handleClose} // Close on backdrop click
       ></div>
 
       {/* Modal Content */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-56px)] max-w-md">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-[350px] h-content">
         <div
           className={`bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out origin-center ${isOpen ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         >

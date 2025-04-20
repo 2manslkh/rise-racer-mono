@@ -180,12 +180,14 @@ export default function Home() {
                   <Staking />
                 </div>
               )}
-            </div>
 
-            <LowBalanceModal
-              balance={balance}
-              hotWalletAddress={hotWalletAddress as `0x${string}` | undefined}
-            />
+
+              {!hotWallet && <BindHotWallet />}
+              <LowBalanceModal
+                balance={balance}
+                hotWalletAddress={hotWalletAddress as `0x${string}` | undefined}
+              />
+            </div>
           </div>
         ) : (
           <Login />
