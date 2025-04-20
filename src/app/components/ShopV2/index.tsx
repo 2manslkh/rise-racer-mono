@@ -288,9 +288,9 @@ const ShopV2 = () => {
   );
 
   return (
-    <div className="relative w-full h-full bg-[#1C0033] flex flex-col py-4 px-2 items-center gap-4 text-white shadow-lg rounded-md">
+    <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-2 items-center gap-4 text-white shadow-lg">
       {/* Header */}
-      <div className="relative w-full flex items-center justify-center px-3 border-b border-purple-600 pb-3 mb-2">
+      <div className="relative w-full flex items-center justify-center px-3">
         <p
           className="font-zen text-white text-[26px] relative"
           style={{
@@ -324,7 +324,7 @@ const ShopV2 = () => {
       ) : (
         /* Upgrade List */
         <div
-          className="relative w-full flex-1 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900"
+          className="relative w-full flex-1 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col"
           style={{ maxHeight: "calc(100% - 80px)" }} // Adjust height as needed
         >
           {parts.map((part) => (

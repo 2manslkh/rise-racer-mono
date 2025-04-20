@@ -30,7 +30,7 @@ const PartItem: React.FC<PartItemProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-3 bg-purple-900/30 border border-purple-800/50 rounded-lg shadow mb-2">
+    <div className="flex items-center justify-between p-3 bg-purple-900/30 border border-purple-800/50 rounded-lg shadow">
       <div className="flex items-center gap-3">
         <div>
           <p className="font-bold text-lg text-white">{part.name}</p>
