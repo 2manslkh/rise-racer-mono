@@ -134,7 +134,7 @@ const Staking = () => {
   };
 
   return (
-    <div className="bg-[#1C0033] w-full h-full flex flex-col p-3 overflow-y-auto">
+    <div className="bg-[#2A004F] w-full h-full flex flex-col p-3 overflow-y-auto">
       <div className="text-white text-center mb-3">
         <p
           className="font-zen text-[26px] relative"
@@ -144,7 +144,7 @@ const Staking = () => {
         >
           STAKING
         </p>
-        <div className="bg-purple-700 bg-opacity-30 rounded-lg py-2 px-3 mt-2 inline-block">
+        <div className="relative w-full bg-purple-900/30 border border-purple-800/50 rounded-lg py-2 px-3 mt-2 inline-block">
           <p className="text-sm font-medium">1 ETH = 1,000,000 Rise Crystals</p>
         </div>
       </div>
@@ -156,7 +156,7 @@ const Staking = () => {
       )}
 
       {/* Current Staking Status */}
-      <div className="bg-[#29004D] rounded-lg p-3 mb-3">
+      <div className="rounded-lg p-3 mb-3 bg-purple-900/30 border border-purple-800/50">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-white">Current Stake</h2>
           <div className="bg-purple-800 rounded-full px-3 py-1 text-xs text-white">
@@ -209,20 +209,20 @@ const Staking = () => {
       </div>
 
       {/* Staking Form */}
-      <div className="bg-[#29004D] rounded-lg p-3 mb-3">
+      <div className="bg-purple-900/30 border border-purple-800/50 rounded-lg p-3 mb-3">
         <h2 className="text-lg font-semibold text-white mb-2">Stake ETH</h2>
         <div className="mb-3">
           <div className="flex items-center">
             <input
               type="number"
-              className="w-full bg-[#3D0066] text-white p-2 rounded-l text-sm"
+              className="w-full bg-[#2A004F] text-white p-2 rounded-l text-sm"
               placeholder="0.0"
               value={stakeAmount}
               onChange={(e) => setStakeAmount(e.target.value)}
               step="0.01"
             />
             <button
-              className="bg-[#3D0066] text-purple-400 font-semibold py-2 px-3 rounded-r text-sm"
+              className="bg-[#2A004F] text-purple-400 font-semibold py-2 px-3 rounded-r text-sm"
               onClick={() => setStakeAmount(ethers.formatEther(balance))}
             >
               MAX
@@ -247,7 +247,7 @@ const Staking = () => {
       </div>
 
       {/* Staking Info */}
-      <div className="bg-[#29004D] rounded-lg p-3 mb-3">
+      <div className="bg-purple-900/30 border border-purple-800/50 rounded-lg p-3 mb-3">
         <h2 className="text-lg font-semibold text-white mb-2">Staking Info</h2>
         <div className="grid grid-cols-2 gap-2 text-white text-xs">
           {/* Conversion Rate */}
@@ -262,7 +262,7 @@ const Staking = () => {
       </div>
 
       {/* How It Works */}
-      <div className="bg-[#29004D] rounded-lg p-3">
+      <div className="bg-purple-900/30 border border-purple-800/50 rounded-lg p-3">
         <h2 className="text-lg font-semibold text-white mb-1">How It Works</h2>
         <ul className="text-white text-xs opacity-70 list-disc pl-4 space-y-1">
           <li>Stake ETH to instantly receive Rise Crystals</li>
