@@ -28,7 +28,7 @@ const ShopV2 = () => {
   // --- State Management (Replace with global state) ---
   const [parts, setParts] = useState<Part[]>(initialPartsData);
   const [riseCrystals, setRiseCrystals] = useState<string>("0"); // Example starting crystals
-  const { hotWallet } = useHotWallet();
+  const { hotWallet, incrementNonce, nonce } = useHotWallet();
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null); // Tracks which part is being upgraded
   const [txError, setTxError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -240,7 +240,8 @@ const ShopV2 = () => {
             });
 
             // Call the contract to upgrade the part
-            const tx = await upgradePart(hotWallet, partIndex);
+            incrementNonce();
+            const tx = await upgradePart(hotWallet, partIndex, nonce);
 
             // Wait for transaction to complete
             const receipt = await tx.wait();

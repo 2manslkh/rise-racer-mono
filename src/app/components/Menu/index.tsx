@@ -1,5 +1,4 @@
 import IconButtonV2 from "../Shared/IconButtonV2";
-import StartButton, { BUTTON_STYLES } from "../Shared/StartButton";
 
 export enum MenuAction {
   OPEN_SHOP,
@@ -10,7 +9,6 @@ export enum MenuAction {
 }
 
 const Menu = ({
-  gameStarted,
   handleClick,
 }: {
   gameStarted: boolean;
@@ -40,24 +38,6 @@ const Menu = ({
             alt="Staking"
             handleClick={() => handleClick(MenuAction.OPEN_STAKING)}
             highlightPosition="top-left"
-          />
-        </div>
-
-        <div
-          className="absolute z-2"
-          style={{
-            top: gameStarted
-              ? BUTTON_STYLES.DISABLED.top
-              : BUTTON_STYLES.DEFAULT.top,
-            left: gameStarted
-              ? `calc(calc(100% - ${BUTTON_STYLES.DISABLED.width})/2)`
-              : `calc(calc(100% - ${BUTTON_STYLES.DEFAULT.width})/2)`,
-            display: gameStarted ? "none" : "block",
-          }}
-        >
-          <StartButton
-            disabled={gameStarted}
-            handleClick={() => handleClick(MenuAction.START_GAME)}
           />
         </div>
 

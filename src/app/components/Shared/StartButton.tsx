@@ -1,4 +1,4 @@
-import Image from "next/image";
+import React from "react";
 
 export const BUTTON_STYLES = {
   DEFAULT: {
@@ -26,60 +26,23 @@ const StartButton = ({
   disabled: boolean;
   handleClick: () => void;
 }) => {
+  // If disabled is true, render nothing
+  if (disabled) {
+    return null;
+  }
+
+  // Otherwise, render the overlay button
   return (
-    <button
-      className="relative"
-      style={{
-        width: disabled
-          ? BUTTON_STYLES.DISABLED.width
-          : BUTTON_STYLES.DEFAULT.width,
-        aspectRatio: disabled
-          ? BUTTON_STYLES.DISABLED.aspectRatio
-          : BUTTON_STYLES.DEFAULT.aspectRatio,
-      }}
+    <div
+      className={`absolute h-screen w-screen z-10 flex justify-center items-center bg-black/20 ${disabled ? "pointer-events-none" : "cursor-pointer"}`}
+      onClick={disabled ? undefined : handleClick}
     >
-      <div className={`relative w-full h-full ${disabled ? "hidden" : ""}`}>
-        <Image src={"/StartButtonBackground.svg"} alt="Start Button" fill />
-      </div>
-
-      <div className={`relative w-full h-full ${disabled ? "" : "hidden"}`}>
-        <Image
-          src={"/StartInactiveButtonBackground.svg"}
-          alt="Start Button"
-          fill
-        />
-      </div>
-
-      <div
-        className="absolute z-1 flex items-center justify-between"
-        onClick={handleClick}
-        style={{
-          top: disabled
-            ? BUTTON_STYLES.DISABLED.labelTop
-            : BUTTON_STYLES.DEFAULT.labelTop,
-          left: disabled
-            ? BUTTON_STYLES.DISABLED.labelLeft
-            : BUTTON_STYLES.DEFAULT.labelLeft,
-        }}
-      >
-        <div className="relative w-7 h-7">
-          <Image
-            src={disabled ? "/StartInactive.svg" : "/StartActive.svg"}
-            alt="Start Arrow"
-            fill
-          />
-        </div>
-
-        <p
-          className="font-zen text-white text-[28px] relative"
-          style={{
-            WebkitTextStroke: disabled ? "0 currentColor" : "1.5px #f037ff",
-          }}
-        >
-          Start
+      <div className="flex items-center justify-center text-center pointer-events-none">
+        <p className="font-zen text-white text-xs animate-blink">
+          Tap anywhere to start
         </p>
       </div>
-    </button>
+    </div>
   );
 };
 

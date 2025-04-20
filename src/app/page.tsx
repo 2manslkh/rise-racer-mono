@@ -13,6 +13,7 @@ import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
 import ShopV2 from "./components/ShopV2";
 import LowBalanceModal from "./components/LowBalanceModal";
+import StartButton from "./components/Shared/StartButton";
 
 export type User = {
   vehicle: number;
@@ -145,12 +146,22 @@ export default function Home() {
                 toggleTutorial={handleTutorialClick}
               />
             )}
+
+            {!hotWallet && <BindHotWallet />}
+
+            {hotWallet && (
+              <StartButton
+                disabled={gameStarted}
+                handleClick={() => handleMenuClick(MenuAction.START_GAME)}
+              />
+            )}
             <Menu
               gameStarted={gameStarted}
               handleClick={(_menuAction: MenuAction) =>
                 handleMenuClick(_menuAction)
               }
             />
+
             <div className="relative w-full h-full">
               <Gameplay gameStarted={gameStarted} />
 
@@ -169,6 +180,7 @@ export default function Home() {
                   <Staking />
                 </div>
               )}
+
 
               {!hotWallet && <BindHotWallet />}
               <LowBalanceModal
