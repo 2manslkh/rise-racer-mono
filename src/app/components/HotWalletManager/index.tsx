@@ -3,16 +3,24 @@ import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
-import { useAccount, useSendTransaction, useSignMessage } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
+import {
+  useAccount,
+  usePublicClient,
+  useSendTransaction,
+  useSignMessage,
+} from "wagmi"; // Assuming wagmi hooks are available via AppKit context
 import { ethers, parseEther } from "ethers";
 import { logError } from "@/app/lib/error";
 import { useToast } from "@/app/hooks/useToast";
+import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
+import { riseTestnet } from "@/app/configuration/wagmi";
 
 // Define the target Chain ID
 const RISE_TESTNET_CHAIN_ID = 11155931;
 const message = "Login to Rise Racers";
 
 const HotWalletManager = () => {
+  const publicClient = usePublicClient();
   const toast = useToast();
   const {
     // hotWallet, // Removed unused hotWallet
@@ -20,6 +28,7 @@ const HotWalletManager = () => {
     isLoading: isHotWalletLoading,
     loadHotWallet,
     balance,
+    refreshBalance,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -33,9 +42,12 @@ const HotWalletManager = () => {
   // Check if the connected wallet is on the correct network
   const isOnCorrectNetwork = isConnected && chainId === RISE_TESTNET_CHAIN_ID;
 
-  const handleCopyAddress = () => {
+  const handleCopyAddress = async () => {
     if (hotWalletAddress) {
-      copyToClipboard(hotWalletAddress);
+      const ok = await copyToClipboard(hotWalletAddress);
+      if (ok) {
+        toast.success("Copied");
+      }
     }
   };
 
@@ -52,11 +64,37 @@ const HotWalletManager = () => {
       return;
     }
 
-    sendTransaction({
-      to: hotWalletAddress as `0x${string}`,
-      value: amountWei,
-    });
-    // Consider adding toast notifications for pending/success/error based on `hash`, `isTxLoading`, etc.
+    sendTransaction(
+      {
+        to: hotWalletAddress as `0x${string}`,
+        value: amountWei,
+      },
+      {
+        onSuccess: (txnHash) => {
+          const waitPromise = publicClient!.waitForTransactionReceipt({
+            hash: txnHash,
+          });
+
+          toast.transactionPromise(waitPromise, {
+            loading: "Sending Transaction",
+            success: () => ({
+              message: "Top-up confirmed!",
+              link: getBlockExplorerUrl(
+                txnHash,
+                riseTestnet.id,
+                LOOKUP_ENTITIES.TRANSACTION_HASH
+              ),
+              value: txnHash,
+            }),
+            error: (err) => `Transaction failed: ${err.message}`,
+          });
+          refreshBalance();
+        },
+        onError: (error) => {
+          toast.error(`Transaction failed: ${error.message}`);
+        },
+      }
+    );
     setTopUpAmount("");
   };
 
