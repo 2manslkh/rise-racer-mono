@@ -29,6 +29,8 @@ import { useToast } from "@/app/hooks/useToast";
 import { clickRace } from "@/app/lib/rise-racer";
 import { getBalance, getDecimals } from "@/app/lib/rise-crystals";
 import { ethers } from "ethers";
+import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
+import TransactionLogs from "../TransactionLogs";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -45,9 +47,18 @@ const Gameplay: React.FC<GameplayProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { hotWallet, balance, velocityPerClick, user, address } =
-    useHotWallet();
+  const {
+    hotWallet,
+    balance,
+    velocityPerClick,
+    user,
+    address,
+    getNonce,
+    incrementNonce,
+  } = useHotWallet();
   const toast = useToast();
+  const { initiateTx, updateTx, removeTx, transactions } =
+    useTransactionTracker();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(100);
@@ -58,7 +69,6 @@ const Gameplay: React.FC<GameplayProps> = ({
   const [showLevelTransition, setShowLevelTransition] =
     useState<boolean>(false);
   const isPreloadingRef = useRef<boolean>(true);
-  const { getNonce, incrementNonce } = useHotWallet();
   const [currentLevel, setCurrentLevel] = useState<number>(1);
   const [riseCrystalsBalance, setRiseCrystalsBalance] = useState<string>("0");
 
@@ -107,42 +117,49 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (!gameStarted || !hotWallet) return;
     if (balance < MINIMUM_GAS) {
       toast.error("Insufficient funds in burner wallet");
-      resetCombo(); // Reset combo on error
+      resetCombo();
       return;
     }
 
     const currentTime = Date.now();
+    let placeholderHash: string | null = null; // To store the optimistic hash
 
     // Combo logic
     if (
       lastClickTimeRef.current &&
       currentTime - lastClickTimeRef.current <= COMBO_THRESHOLD_MS
     ) {
-      // It's a combo!
       setComboCount((prev) => prev + 1);
     } else {
-      // Not a combo or first click
       setComboCount(1);
     }
-
-    // Clear any existing reset timeout
     if (comboResetTimeoutRef.current) {
       clearTimeout(comboResetTimeoutRef.current);
     }
-
-    // Set a new timeout to reset the combo
     comboResetTimeoutRef.current = setTimeout(() => {
       resetCombo();
     }, COMBO_THRESHOLD_MS);
-
     lastClickTimeRef.current = currentTime;
 
     try {
       incrementNonce();
       const currentNonce = getNonce();
-      await clickRace(hotWallet, currentNonce);
 
-      // After a successful click, refresh Rise Crystals balance
+      // 1. Initiate optimistic transaction
+      const description = `Race Click #${currentNonce}`;
+      placeholderHash = initiateTx(description);
+
+      // 2. Send the actual transaction
+      clickRace(hotWallet, currentNonce).then(async (txResponse) => {
+        // 3. Update the optimistic transaction with real hash
+        // Note: updateTx handles attaching the .wait() listeners
+        if (placeholderHash) {
+          updateTx(placeholderHash, await txResponse);
+          placeholderHash = null; // Clear placeholder after successful update initiation
+        }
+      });
+
+      // After a successful click, schedule Rise Crystals balance refresh
       setTimeout(async () => {
         if (hotWallet && hotWallet.provider && address) {
           try {
@@ -159,7 +176,12 @@ const Gameplay: React.FC<GameplayProps> = ({
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");
-      resetCombo(); // Reset combo on error
+      resetCombo();
+
+      // 4. Remove the optimistic transaction if it exists and sending failed
+      if (placeholderHash) {
+        removeTx(placeholderHash);
+      }
     }
 
     roadSpeedRef.current += Number(incrementalSpeed);
@@ -520,6 +542,9 @@ const Gameplay: React.FC<GameplayProps> = ({
       <div className="absolute bottom-[145px] left-1/2 transform -translate-x-1/2 w-[140px]">
         <Image src={vehicle} alt="Car" />
       </div>
+
+      {/* Transaction Log Component */}
+      <TransactionLogs transactions={transactions} address={address} />
 
       <div className="absolute bottom-[80px] left-0">
         <Speedometer

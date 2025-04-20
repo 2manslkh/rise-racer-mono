@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { trackTransaction } from "./transaction-tracker";
 
 // --- Staking Contract Address ---
 const stakingContractAddress = "0x6988db999576447101676897E4c211eC49309036";
@@ -110,7 +111,12 @@ export const stakeETH = async (
     }
 
     const contract = await getStakingContract(signer);
-    return contract.stakeETH({ value: amount, gasLimit: 250000 });
+    const tx = await contract.stakeETH({ value: amount, gasLimit: 250000 });
+
+    // Track the transaction
+    trackTransaction(tx, `Stake ${ethers.formatEther(amount)} ETH`);
+
+    return tx;
 };
 
 /**
@@ -126,5 +132,10 @@ export const unstakeETH = async (
     }
 
     const contract = await getStakingContract(signer);
-    return contract.unstakeETH({ gasLimit: 250000 });
+    const tx = await contract.unstakeETH({ gasLimit: 250000 });
+
+    // Track the transaction
+    trackTransaction(tx, "Unstake ETH");
+
+    return tx;
 }; 

@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { trackTransaction } from "./transaction-tracker";
 
 // --- Rise Crystals Contract Address ---
 const riseCrystalsAddress = "0x9F752A4220D041414aa459221D3353840D1c51D2";
@@ -128,19 +129,26 @@ export const getAllowance = async (
  * @param signer The signer to send the transaction with
  * @param to Recipient address
  * @param amount Amount to transfer (as bigint)
+ * @param description Optional description for the transaction
  * @returns A promise that resolves with the transaction response
  */
 export const transfer = async (
     signer: ethers.Signer,
     to: string,
-    amount: bigint
+    amount: bigint,
+    description: string = "Token Transfer"
 ): Promise<ethers.ContractTransactionResponse> => {
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
 
     const contract = await getRiseCrystalsContract(signer);
-    return contract.transfer(to, amount, { gasLimit: 200000 });
+    const tx = await contract.transfer(to, amount, { gasLimit: 200000 });
+
+    // Track the transaction
+    trackTransaction(tx, description);
+
+    return tx;
 };
 
 /**

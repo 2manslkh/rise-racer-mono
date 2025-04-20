@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { ENVIRONMENT } from '../configuration/environment';
+import { trackTransaction } from "./transaction-tracker";
 
 // --- Cosmic Parts Contract Address ---
 const cosmicPartAddress = ENVIRONMENT.COSMIC_PART_ADDRESS;
@@ -225,7 +226,12 @@ export const upgradePart = async (
     }
 
     const contract = await getCosmicPartsContract(signer);
-    return contract.upgradePart(partType, { gasLimit: 300000 });
+    const tx = await contract.upgradePart(partType, { gasLimit: 300000 });
+
+    // Track the transaction with a descriptive name
+    trackTransaction(tx, `Upgrade ${getPartTypeName(partType)}`);
+
+    return tx;
 };
 
 /**
@@ -237,4 +243,24 @@ export const upgradePart = async (
 export const getOwnerOf = async (tokenId: bigint, provider?: ethers.Provider): Promise<string> => {
     const contract = await getCosmicPartsContract(provider);
     return contract.ownerOf(tokenId);
+};
+
+/**
+ * Get a human-readable name for a part type
+ * @param partType The part type
+ * @returns A human-readable name
+ */
+export const getPartTypeName = (partType: PartType): string => {
+    switch (partType) {
+        case PartType.ENGINE:
+            return "Engine";
+        case PartType.CHASSIS:
+            return "Chassis";
+        case PartType.WHEEL:
+            return "Wheel";
+        case PartType.TURBO:
+            return "Turbo";
+        default:
+            return "Part";
+    }
 };

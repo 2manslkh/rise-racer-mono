@@ -471,29 +471,17 @@ export const getCurrentVelocity = async (playerAddress: string, provider?: ether
 export const clickRace = async (
     signer: ethers.Signer,
     nonce: number
-): Promise<ethers.ContractTransactionResponse> => { // Removed options, added nonce directly
+): Promise<ethers.ContractTransactionResponse> => {
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
-    // Use specific click contract details
     const clickContract = new ethers.Contract(
         riseRacerAddress,
         riseRacerAbi,
         signer
     );
     // Pass nonce and gasLimit
-    const tx = await clickContract.click({ nonce: nonce, gasLimit: 200000 }); // Added nonce and gasLimit
-    return tx;
-};
+    const tx = await clickContract.click({ nonce: nonce, gasLimit: 200000 });
 
-// Potential additional functions based on ABI:
-// - getBaseClickPower(playerAddress, provider?)
-// - getPlayerInfo(playerAddress, provider?) // Might return the full struct
-// - bindAddress(boundAddress, signer)
-// - getBinderAddress(boundAddress, provider?)
-// - getBoundAddress(binder, provider?)
-// - pause(signer)
-// - unpause(signer)
-// - owner(provider?)
-// - paused(provider?)
-// - etc.
+    return tx; // Return the transaction response
+};
