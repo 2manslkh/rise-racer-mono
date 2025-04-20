@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import { riseTestnet } from "../configuration/wagmi";
 import { getCurrentVelocity, getVelocityPerClick } from "../lib/rise-racer";
 import { logError } from "../lib/error";
+import { GetCurrentLevel } from "../lib/gameplaySettings";
 
 export const MINIMUM_GAS = 1000000000000n;
 
@@ -139,7 +140,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
 
         setUser({
           vehicle: 1,
-          currentLevel: 1,
+          currentLevel: GetCurrentLevel(Number(fetchedVelocity)),
           currentProgress: Number(fetchedVelocity),
         });
         setCurrentVelocity(fetchedVelocity);

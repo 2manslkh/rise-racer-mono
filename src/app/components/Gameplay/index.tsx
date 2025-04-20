@@ -7,7 +7,6 @@ import {
   DrawCenterDivider,
   DrawLaneDividers,
   DrawAdditionalSideDividers,
-  DrawBackgroundObjectImage,
 } from "./canvas";
 import {
   GenerateFixedSideObject,
@@ -172,7 +171,13 @@ const Gameplay: React.FC<GameplayProps> = ({
     roadSpeedRef.current += Number(incrementalSpeed);
     if (roadSpeedRef.current === GetLevelRequirement(currentLevel)) {
       previousLevelRef.current = currentLevel;
-      setCurrentLevel((prevState) => prevState + 1);
+      if (currentLevel === 13) {
+        // Rebirth scenario
+        // TODO: Maybe need to add a modal say congrats rebirth
+        setCurrentLevel(1);
+      } else {
+        setCurrentLevel((prevState) => prevState + 1);
+      }
     }
 
     const rect = containerRef.current?.getBoundingClientRect();
@@ -220,6 +225,8 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
+    if (!address) return;
+
     const shouldUpdate = GetShouldUpdateCanvas(
       previousLevelRef.current,
       currentLevel
@@ -373,7 +380,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         roadWidthBottom,
         currentLevel
       );
-      DrawBackgroundObjectImage(ctx, width, height, currentLevel);
+      // DrawBackgroundObjectImage(ctx, width, height, currentLevel);
 
       if ([3, 4].includes(currentLevel)) {
         const topLeft = (width - roadWidthTop) / 2 + 27;
@@ -494,7 +501,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (bg.complete) {
       draw();
     }
-  }, [dimensions, currentLevel]);
+  }, [dimensions, currentLevel, address]);
 
   return (
     <div

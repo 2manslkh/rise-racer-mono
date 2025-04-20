@@ -182,6 +182,7 @@ export const GetShouldUpdateCanvas = (current: number, next: number) => {
   if (current === 7 && next === 8) return false;
   if (current === 9 && next === 10) return false;
   if (current === 11 && next === 12) return false;
+  if (current === 12 && next === 13) return false;
   return true;
 };
 
@@ -363,4 +364,13 @@ export const GenerateOverlayObjects = (
     dx: Math.random() * 2 + 3, // 3–5px left
     dy: 0.5 + verticalSpeedFactor * 1.5, // base 0.5 + increase based on y
   };
+};
+
+export const GetCurrentLevel = (velocity: number) => {
+  for (let level = 1; level <= 13; level++) {
+    if (velocity < GetLevelRequirement(level)) {
+      return level;
+    }
+  }
+  return 13;
 };
