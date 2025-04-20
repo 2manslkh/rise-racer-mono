@@ -218,14 +218,15 @@ export const getTurboVelocity = async (level: number, provider?: ethers.Provider
  */
 export const upgradePart = async (
     signer: ethers.Signer,
-    partType: PartType
+    partType: PartType,
+    nonce: number
 ): Promise<ethers.ContractTransactionResponse> => {
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
 
     const contract = await getCosmicPartsContract(signer);
-    const tx = await contract.upgradePart(partType, { gasLimit: 500000 });
+    const tx = await contract.upgradePart(partType, { gasLimit: 500000, nonce: nonce });
 
     return tx;
 };

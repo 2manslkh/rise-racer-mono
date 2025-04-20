@@ -43,24 +43,6 @@ const Menu = ({
           />
         </div>
 
-        <div
-          className="absolute z-2"
-          style={{
-            top: gameStarted
-              ? BUTTON_STYLES.DISABLED.top
-              : BUTTON_STYLES.DEFAULT.top,
-            left: gameStarted
-              ? `calc(calc(100% - ${BUTTON_STYLES.DISABLED.width})/2)`
-              : `calc(calc(100% - ${BUTTON_STYLES.DEFAULT.width})/2)`,
-            display: gameStarted ? "none" : "block",
-          }}
-        >
-          <StartButton
-            disabled={gameStarted}
-            handleClick={() => handleClick(MenuAction.START_GAME)}
-          />
-        </div>
-
         <div className="absolute z-3 top-0 right-4">
           <IconButtonV2
             icon={"/Leaderboard.svg"}
