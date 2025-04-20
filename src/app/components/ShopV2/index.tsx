@@ -14,17 +14,7 @@ import {
 } from "@/app/lib/cosmic-parts";
 import toast from "react-hot-toast";
 
-// TODO: Replace with actual state management (e.g., Zustand, Context API)
-// TODO: Get actual RiseCrystals icon path
 const RISE_CRYSTAL_ICON = "/rise_crystal.svg";
-
-// Map ShopV2 part types to Cosmic Parts contract part types
-const partTypeMap = {
-  Engine: CosmicPartType.ENGINE,
-  Turbo: CosmicPartType.TURBO,
-  Chassis: CosmicPartType.CHASSIS,
-  Wheels: CosmicPartType.WHEEL,
-};
 
 // Map from CosmicPartType to ShopV2 PartType
 const reversePartTypeMap = {

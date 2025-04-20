@@ -6,7 +6,6 @@ import { useHotWallet } from "../../context/HotWalletContext";
 import {
   getLockupDuration,
   getStakeInfo,
-  calculateRiseCrystals,
   stakeETH,
   unstakeETH,
   StakeInfo,
@@ -19,7 +18,6 @@ const Staking = () => {
 
   const [lockupDuration, setLockupDuration] = useState<bigint>(BigInt(0));
   const [stakeInfo, setStakeInfo] = useState<StakeInfo | null>(null);
-  const [unclaimedCrystals, setUnclaimedCrystals] = useState<bigint>(BigInt(0));
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [totalStakedEth, setTotalStakedEth] = useState<string>("0");
