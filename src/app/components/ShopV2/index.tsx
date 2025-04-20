@@ -288,7 +288,7 @@ const ShopV2 = () => {
   );
 
   return (
-    <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-2 items-center gap-4 text-white shadow-lg">
+    <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-4 items-center gap-4 text-white shadow-lg">
       {/* Header */}
       <div className="relative w-full flex items-center justify-center px-3">
         <p
@@ -299,12 +299,12 @@ const ShopV2 = () => {
         >
           SHOP
         </p>
-        {/* Rise Crystal Display (Top Right) */}
-        <div className="absolute top-0 right-2 flex items-center gap-2 bg-black/30 p-2 rounded-lg">
-          <span className="font-semibold text-lg">{riseCrystals}</span>
-          <div className="relative w-6 h-6">
-            <Image src={RISE_CRYSTAL_ICON} alt="Rise Crystals" layout="fill" />
-          </div>
+      </div>
+
+      <div className="relative w-full flex items-center justify-center gap-2 bg-black/30 py-2 rounded-lg">
+        <span className="font-semibold text-lg">{riseCrystals}</span>
+        <div className="relative w-6 h-6">
+          <Image src={RISE_CRYSTAL_ICON} alt="Rise Crystals" layout="fill" />
         </div>
       </div>
 
@@ -324,7 +324,7 @@ const ShopV2 = () => {
       ) : (
         /* Upgrade List */
         <div
-          className="relative w-full flex-1 overflow-y-auto px-2 scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col"
+          className="relative w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col"
           style={{ maxHeight: "calc(100% - 80px)" }} // Adjust height as needed
         >
           {parts.map((part) => (
