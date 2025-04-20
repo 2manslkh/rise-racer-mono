@@ -13,6 +13,7 @@ import { riseTestnet } from "../configuration/wagmi";
 import { getCurrentVelocity, getVelocityPerClick } from "../lib/rise-racer";
 import { logError } from "../lib/error";
 import { GetCurrentLevel } from "../lib/gameplaySettings";
+import { getBalance as getRiseCrystalsBalance } from "../lib/rise-crystals";
 
 export const MINIMUM_GAS = 1000000000000n;
 
@@ -25,6 +26,7 @@ export type User = {
 interface HotWalletContextProps {
   hotWallet: ethers.Wallet | null;
   balance: bigint;
+  riseCrystalsBalance: bigint;
   address: string | null;
   isLoading: boolean;
   loadHotWallet: (args: {
@@ -60,6 +62,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const [wsProvider, setWsProvider] = useState<ethers.WebSocketProvider | null>(
     null
   );
+  const [riseCrystalsBalance, setRiseCrystalsBalance] = useState<bigint>(0n);
   const [isFetchingVelocity, setIsFetchingVelocity] = useState(false);
   const [user, setUser] = useState<User>({
     vehicle: 1,
@@ -102,7 +105,12 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       );
       const wallet = new ethers.Wallet(data.pk, provider);
       const balance = await provider.getBalance(data.boundAddress);
+      const riseCrystalsBalance = await getRiseCrystalsBalance(
+        data.boundAddress,
+        provider
+      );
       setBalance(balance);
+      setRiseCrystalsBalance(riseCrystalsBalance);
       setHotWallet(wallet);
       setWsProvider(wsProvider);
       setAddress(data.boundAddress);
@@ -124,6 +132,12 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       try {
         const currentBalance = await hotWallet.provider.getBalance(address);
         setBalance(currentBalance);
+
+        const riseCrystalsBalance = await getRiseCrystalsBalance(
+          address,
+          hotWallet.provider
+        );
+        setRiseCrystalsBalance(riseCrystalsBalance);
       } catch (error) {
         logError(error);
         console.error("Failed to refresh balance:", error);
@@ -181,6 +195,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       value={{
         hotWallet,
         balance,
+        riseCrystalsBalance,
         address,
         isLoading,
         loadHotWallet,

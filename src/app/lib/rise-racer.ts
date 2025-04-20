@@ -91,7 +91,7 @@ export const clickRace = async (
     );
 
     // Pass nonce and gasLimit
-    const tx = await clickContract.click({ nonce: nonce, gasLimit: 200000 });
+    const tx = await clickContract.click({ nonce: nonce, gasLimit: 400000 });
 
     return tx; // Return the transaction response
 };

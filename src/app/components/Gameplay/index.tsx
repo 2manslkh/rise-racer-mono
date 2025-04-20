@@ -26,10 +26,10 @@ import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { logError } from "@/app/lib/error";
 import { clickRace } from "@/app/lib/rise-racer";
 import { useToast } from "@/app/hooks/useToast";
-import { getBalance, getDecimals } from "@/app/lib/rise-crystals";
-import { ethers } from "ethers";
+
 import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
 import TransactionLogs from "../TransactionLogs";
+import { formatEther } from "ethers";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -54,6 +54,8 @@ const Gameplay: React.FC<GameplayProps> = ({
     address,
     getNonce,
     incrementNonce,
+    refreshBalance,
+    riseCrystalsBalance,
   } = useHotWallet();
   const toast = useToast();
   const { initiateTx, updateTx, removeTx, transactions } =
@@ -69,7 +71,6 @@ const Gameplay: React.FC<GameplayProps> = ({
     useState<boolean>(false);
   const isPreloadingRef = useRef<boolean>(true);
   const [currentLevel, setCurrentLevel] = useState<number>(1);
-  const [riseCrystalsBalance, setRiseCrystalsBalance] = useState<string>("0");
 
   // Combo state
   const [comboCount, setComboCount] = useState<number>(0);
@@ -79,27 +80,6 @@ const Gameplay: React.FC<GameplayProps> = ({
   const vehicle = GetVehicle(vehicleTier);
 
   // Fetch Rise Crystals balance
-  useEffect(() => {
-    const fetchRiseCrystalsBalance = async () => {
-      if (!hotWallet || !hotWallet.provider) return;
-
-      try {
-        const provider = hotWallet.provider as ethers.Provider;
-        if (!address) return;
-
-        const balance = await getBalance(address, provider);
-        const decimals = await getDecimals(provider);
-
-        // Format the balance
-        const formatted = ethers.formatUnits(balance, decimals);
-        setRiseCrystalsBalance(formatted);
-      } catch (error) {
-        console.error("Failed to fetch Rise Crystals balance:", error);
-      }
-    };
-
-    fetchRiseCrystalsBalance();
-  }, [hotWallet, address]);
 
   // Function to reset combo
   const resetCombo = () => {
@@ -157,6 +137,9 @@ const Gameplay: React.FC<GameplayProps> = ({
           placeholderHash = null; // Clear placeholder after successful update initiation
         }
       });
+
+      // 4. Update the balance
+      await refreshBalance();
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");
@@ -549,7 +532,7 @@ const Gameplay: React.FC<GameplayProps> = ({
               : user.currentProgress
           }
           levelRequirement={GetLevelRequirement(currentLevel)}
-          riseCrystals={parseFloat(riseCrystalsBalance)}
+          riseCrystals={Number(formatEther(riseCrystalsBalance))}
         />
       </div>
     </div>
