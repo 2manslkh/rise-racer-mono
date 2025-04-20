@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
 import { trackTransaction } from "./transaction-tracker";
+import { ENVIRONMENT } from '../configuration/environment';
 
 // --- Rise Crystals Contract Address ---
-const riseCrystalsAddress = "0x9F752A4220D041414aa459221D3353840D1c51D2";
+const riseCrystalsAddress = ENVIRONMENT.RISE_CRYSTALS_ADDRESS;
 
 // --- Rise Crystals Contract ABI ---
 const riseCrystalsAbi = [

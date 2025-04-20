@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 import { ENVIRONMENT } from '../configuration/environment';
-import { trackTransaction } from "./transaction-tracker";
 
 // --- Cosmic Parts Contract Address ---
 const cosmicPartAddress = ENVIRONMENT.COSMIC_PART_ADDRESS;

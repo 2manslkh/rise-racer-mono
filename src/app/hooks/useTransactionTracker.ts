@@ -52,7 +52,7 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
         fetchTransactions();
 
         // Set up polling
-        const intervalId = setInterval(fetchTransactions, 3000); // Keep polling interval reasonable
+        const intervalId = setInterval(fetchTransactions, 100); // Keep polling interval reasonable
 
         // Clean up
         return () => clearInterval(intervalId);

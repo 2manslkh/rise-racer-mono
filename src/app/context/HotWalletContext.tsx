@@ -41,6 +41,7 @@ interface HotWalletContextProps {
   isFetchingVelocity: boolean;
   fetchVelocityData: () => Promise<void>;
   user: User;
+  wsProvider: ethers.WebSocketProvider | null;
 }
 
 const HotWalletContext = createContext<HotWalletContextProps | undefined>(
@@ -55,6 +56,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const [nonce, setNonce] = useState<number>(0);
   const [currentVelocity, setCurrentVelocity] = useState<bigint | null>(null);
   const [velocityPerClick, setVelocityPerClick] = useState<bigint | null>(null);
+  const [wsProvider, setWsProvider] = useState<ethers.WebSocketProvider | null>(
+    null
+  );
   const [isFetchingVelocity, setIsFetchingVelocity] = useState(false);
   const [user, setUser] = useState<User>({
     vehicle: 1,
@@ -92,10 +96,14 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       const provider = new ethers.JsonRpcProvider(
         riseTestnet.rpcUrls.default.http[0]
       );
+      const wsProvider = new ethers.WebSocketProvider(
+        riseTestnet.rpcUrls.default.webSocket[0]
+      );
       const wallet = new ethers.Wallet(data.pk, provider);
       const balance = await provider.getBalance(data.boundAddress);
       setBalance(balance);
       setHotWallet(wallet);
+      setWsProvider(wsProvider);
       setAddress(data.boundAddress);
 
       const initialNonce = await wallet.getNonce("pending");
@@ -183,6 +191,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         isFetchingVelocity,
         fetchVelocityData,
         user,
+        wsProvider,
       }}
     >
       {children}

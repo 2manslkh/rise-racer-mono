@@ -223,6 +223,7 @@ const ShopV2 = () => {
 
   const handleUpgrade = useCallback(
     async (partId: string) => {
+      console.log("🚀 | partId:", partId);
       if (!hotWallet || !hotWallet.provider) {
         setTxError("Wallet not connected");
         return;
@@ -231,8 +232,10 @@ const ShopV2 = () => {
       const partIndex = parts.findIndex((p) => p.id === partId);
       if (partIndex === -1) return; // Part not found
 
+      console.log("🚀 | partIndex:", partIndex);
       const partToUpgrade = parts[partIndex];
       const cost = getUpgradeCost(partToUpgrade);
+      console.log("🚀 | partToUpgrade:", partToUpgrade);
 
       if (Number(riseCrystals) >= cost) {
         setIsUpgrading(partId);
@@ -240,7 +243,6 @@ const ShopV2 = () => {
 
         try {
           // Map the shop part type to the contract's part type enum
-          const cosmicPartType = partTypeMap[partToUpgrade.type];
           try {
             // Call the contract upgrade function
             toast.loading(`Upgrading ${partToUpgrade.name}...`, {
@@ -248,7 +250,7 @@ const ShopV2 = () => {
             });
 
             // Call the contract to upgrade the part
-            const tx = await upgradePart(hotWallet, cosmicPartType);
+            const tx = await upgradePart(hotWallet, partIndex);
 
             // Wait for transaction to complete
             const receipt = await tx.wait();
