@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 // --- Contract ABI for Click ---
-const riseRacerAddress = "0xcA9Dca22c8528Ff3b8a9F67165fa1F7Cc7ef40d7"
+const riseRacerAddress = "0xd9efa142e79480cae8f554cb45dd9a4da3c65074"
 
 
 // --- Contract ABI for Rise Racer (Original - keep for other functions) ---

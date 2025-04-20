@@ -10,35 +10,33 @@ interface PartItemProps {
   part: Part;
   onUpgrade: (partId: string) => void;
   currentRiseCrystals: number; // Pass the current balance to disable button if needed
+  isUpgrading?: boolean; // Add loading state
 }
 
 const PartItem: React.FC<PartItemProps> = ({
   part,
   onUpgrade,
   currentRiseCrystals,
+  isUpgrading = false,
 }) => {
   const cost = getUpgradeCost(part);
   const currentVelocity = getCurrentVelocity(part);
   const canAfford = currentRiseCrystals >= cost;
-  const isMaxLevel = part.currentLevel >= part.maxLevel;
 
   const handleUpgradeClick = () => {
-    if (!isMaxLevel && canAfford) {
+    if (canAfford && !isUpgrading) {
       onUpgrade(part.id);
     }
   };
 
   return (
-    <div className="flex items-center justify-between p-3 bg-purple-100 rounded-lg shadow mb-2">
+    <div className="flex items-center justify-between p-3 bg-purple-900/30 border border-purple-800/50 rounded-lg shadow mb-2">
       <div className="flex items-center gap-3">
         <div>
-          <p className="font-bold text-lg text-purple-800">{part.name}</p>
-          <p className="text-sm text-purple-600">Level: {part.currentLevel}</p>
-          <p className="text-xs text-gray-500 mt-1">
-            Base Velocity: {currentVelocity.toFixed(2)}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            Velocity Multiplier: {part.velocityMultiplier.toFixed(2)}
+          <p className="font-bold text-lg text-white">{part.name}</p>
+          <p className="text-sm text-purple-300">Level: {part.currentLevel}</p>
+          <p className="text-xs text-gray-300 mt-1">
+            Velocity: {currentVelocity.toFixed(1)}
           </p>
         </div>
       </div>
@@ -46,17 +44,17 @@ const PartItem: React.FC<PartItemProps> = ({
       <div className="flex flex-col items-end gap-1">
         <button
           onClick={handleUpgradeClick}
-          disabled={isMaxLevel || !canAfford}
+          disabled={!canAfford || isUpgrading}
           className={`flex items-center justify-center gap-2 px-4 py-2 rounded text-white font-semibold transition-colors duration-200 min-w-[120px] ${
-            isMaxLevel
-              ? "bg-gray-500 cursor-not-allowed"
+            isUpgrading
+              ? "bg-purple-500 cursor-wait"
               : canAfford
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "bg-purple-400 opacity-70 cursor-not-allowed"
+                ? "bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900"
+                : "bg-purple-700/50 opacity-70 cursor-not-allowed"
           }`}
         >
-          {isMaxLevel ? (
-            <span>Max Level</span>
+          {isUpgrading ? (
+            <span>Upgrading...</span>
           ) : (
             <>
               <span>Upgrade</span>

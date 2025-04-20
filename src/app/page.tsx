@@ -7,6 +7,7 @@ import Menu, { MenuAction } from "./components/Menu";
 import Login from "./components/Login";
 import { useAppKitAccount } from "@reown/appkit/react";
 import Leaderboard from "./components/Leaderboard";
+import Staking from "./components/Staking";
 import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
@@ -25,6 +26,8 @@ enum Views {
   SHOP,
   LEADERBOARD,
   TUTORIAL,
+  STAKING,
+  RISE_CRYSTALS,
 }
 
 export default function Home() {
@@ -98,6 +101,13 @@ export default function Home() {
         }
         setActiveView(Views.SHOP);
         break;
+      case MenuAction.OPEN_STAKING:
+        if (activeView === Views.STAKING) {
+          setActiveView(Views.NULL);
+          return;
+        }
+        setActiveView(Views.STAKING);
+        break;
       default:
         setActiveView(Views.NULL);
     }
@@ -152,6 +162,11 @@ export default function Home() {
               {activeView === Views.SHOP && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
                   <ShopV2 />
+                </div>
+              )}
+              {activeView === Views.STAKING && (
+                <div className="absolute top-0 left-0 right-0 bottom-0">
+                  <Staking />
                 </div>
               )}
             </div>

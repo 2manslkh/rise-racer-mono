@@ -10,7 +10,6 @@ export interface Part {
     type: PartType;
     name: string;
     currentLevel: number;
-    maxLevel: number;
     upgradeCost: number; // Base cost in RiseCrystals for level 1
     // Add any other relevant properties, e.g., image URL
     imageUrl?: string;
