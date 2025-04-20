@@ -1,13 +1,16 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { MOCK_DATA } from "./data";
 import Pagination from "./Pagination";
+import { shortenAddress } from "@/app/lib/address";
+import { useToast } from "@/app/hooks/useToast";
+
+const LEADERBOARD_URL =
+  "https://xzojvcgeztikkdxqryko.supabase.co/functions/v1/dynamic-action";
 
 export type Position = {
   rank: number;
   player: string;
-  pfp: string;
-  score: number;
+  total_velocity: number;
 };
 
 const RenderLeaderboardRow = (
@@ -17,7 +20,7 @@ const RenderLeaderboardRow = (
 ) => {
   return (
     <div
-      key={data.rank}
+      key={data.player}
       className={`relative w-full flex items-center px-4 py-2 ${index !== totalNumber - 1 ? "border-b border-solid border-white" : ""}`}
     >
       <div className="flex flex-1">
@@ -25,12 +28,12 @@ const RenderLeaderboardRow = (
       </div>
       <div className="flex flex-1 gap-1 items-center">
         <p className="font-inter font-bold text-base text-white whitespace-nowrap">
-          {data.player}
+          {shortenAddress(data.player)}
         </p>
       </div>
       <div className="flex flex-1 justify-end">
         <p className="font-inter font-bold text-base text-white">
-          {data.score}
+          {data.total_velocity}
         </p>
       </div>
     </div>
@@ -40,19 +43,40 @@ const RenderLeaderboardRow = (
 const ROWS_PER_PAGE = 6;
 
 const Leaderboard = () => {
+  const toast = useToast();
   const [data, setData] = useState<Position[]>([]);
-  const [displayData, setDisplayData] = useState<Position[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
-    setDisplayData(
-      data.slice(ROWS_PER_PAGE * (currentPage - 1), ROWS_PER_PAGE * currentPage)
-    );
+    fetchData();
   }, [currentPage]);
 
-  useEffect(() => {
-    setData(MOCK_DATA);
-  }, []);
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${LEADERBOARD_URL}?page=${currentPage}&limit=${ROWS_PER_PAGE}`
+      );
+      const { data: _data } = await response.json();
+
+      const startingRank = (currentPage - 1) * ROWS_PER_PAGE + 1;
+      setData(
+        _data.map(
+          (
+            position: { player: string; total_velocity: number },
+            index: number
+          ) => {
+            return {
+              ...position,
+              rank: startingRank + index,
+            };
+          }
+        )
+      );
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to get rankings");
+    }
+  };
 
   return (
     <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-2 items-center gap-4">
@@ -75,12 +99,14 @@ const Leaderboard = () => {
             <p className="font-inter font-bold text-base text-white">Player</p>
           </div>
           <div className="flex flex-1 justify-end">
-            <p className="font-inter font-bold text-base text-white">Scores</p>
+            <p className="font-inter font-bold text-base text-white">
+              Velocity
+            </p>
           </div>
         </div>
 
-        {displayData.map((_data, index) =>
-          RenderLeaderboardRow(_data, displayData.length, index)
+        {data.map((_data, index) =>
+          RenderLeaderboardRow(_data, data.length, index)
         )}
 
         <Pagination
