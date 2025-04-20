@@ -1,9 +1,10 @@
 import { FC, useState } from "react";
 import { formatEther, parseEther } from "viem";
-import { useAccount, useSendTransaction } from "wagmi";
+import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
 import { useToast } from "@/app/hooks/useToast";
 import Image from "next/image"; // Import Image component
 import { shortenAddress } from "@/app/lib/address"; // Import shortenAddress
+import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
 
 interface LowBalanceModalProps {
   balance: bigint | undefined;
@@ -17,6 +18,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   balance,
   hotWalletAddress,
 }) => {
+  const publicClient = usePublicClient();
   const [isOpen, setIsOpen] = useState(true); // Control visibility
   const [topUpAmount, setTopUpAmount] = useState(""); // State for input
   const toast = useToast(); // Initialize toast
@@ -63,8 +65,24 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
         value: amountWei,
       },
       {
-        onSuccess: () => {
-          toast.success("Top-up transaction sent!");
+        onSuccess: (txnHash) => {
+          const waitPromise = publicClient!.waitForTransactionReceipt({
+            hash: txnHash,
+          });
+
+          toast.transactionPromise(waitPromise, {
+            loading: "Sending Transaction",
+            success: () => ({
+              message: "Top-up confirmed!",
+              link: getBlockExplorerUrl(
+                txnHash,
+                RISE_TESTNET_CHAIN_ID,
+                LOOKUP_ENTITIES.TRANSACTION_HASH
+              ),
+              value: txnHash,
+            }),
+            error: (err) => `Transaction failed: ${err.message}`,
+          });
           setTopUpAmount(""); // Clear input on success
           // Maybe close the modal or refresh balance here?
           // handleClose();
