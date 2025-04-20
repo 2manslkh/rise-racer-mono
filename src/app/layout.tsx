@@ -3,8 +3,8 @@ import { Geist, Geist_Mono, Zen_Dots, Inter } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
 import ContextProvider from "./context/WagmiContext";
-import { Toaster } from "react-hot-toast";
 import { HotWalletProvider } from "./context/HotWalletContext";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -97,7 +97,7 @@ export default async function RootLayout({
           toastOptions={{
             // Define default options
             className: "",
-            duration: 5000,
+            duration: 10_000,
             removeDelay: 1000,
             style: {
               background: "#29004D",
@@ -113,6 +113,7 @@ export default async function RootLayout({
             },
           }}
         />
+
         <ContextProvider cookies={cookies}>
           <HotWalletProvider>{children}</HotWalletProvider>
         </ContextProvider>

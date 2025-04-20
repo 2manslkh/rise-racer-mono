@@ -25,8 +25,8 @@ import {
 import Speedometer from "../Speedometer";
 import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
 import { logError } from "@/app/lib/error";
-import { useToast } from "@/app/hooks/useToast";
 import { clickRace } from "@/app/lib/rise-racer";
+import { useToast } from "@/app/hooks/useToast";
 import { getBalance, getDecimals } from "@/app/lib/rise-crystals";
 import { ethers } from "ethers";
 import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
@@ -187,6 +187,33 @@ const Gameplay: React.FC<GameplayProps> = ({
     setTimeout(() => {
       setClickEffects((prev) => prev.filter((c) => c.id !== newClick.id));
     }, 800);
+
+    try {
+      incrementNonce();
+      const currentNonce = getNonce();
+      clickRace(hotWallet, currentNonce);
+
+      // TODO: Fix post launch
+      // toast.transactionPromise(
+      //   txn.then((tx) => tx.wait()),
+      //   {
+      //     loading: "Sending Transaction",
+      //     success: (res) => ({
+      //       message: "Transaction confirmed!",
+      //       link: getBlockExplorerUrl(
+      //         res!.hash,
+      //         riseTestnet.id,
+      //         LOOKUP_ENTITIES.TRANSACTION_HASH
+      //       ),
+      //       value: res!.hash,
+      //     }),
+      //     error: (err) => `Transaction failed: ${err.message}`,
+      //   }
+      // );
+    } catch (error) {
+      logError(error);
+      toast.error("Click transaction failed. See console for details.");
+    }
   };
 
   // When user clicks on START button, set the speed
@@ -232,7 +259,10 @@ const Gameplay: React.FC<GameplayProps> = ({
     }
 
     // To avoid having the canvas to render at the speed of 1_000_000
-    const getVisualSpeed = () => Math.min(roadSpeedRef.current, 10);
+    const getVisualSpeed = () => {
+      if (isPreloadingRef.current) return 100;
+      return Math.min(roadSpeedRef.current, 10);
+    };
 
     const canvas = canvasRef.current;
     if (!canvas) return;
