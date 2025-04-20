@@ -1,5 +1,4 @@
 import IconButtonV2 from "../Shared/IconButtonV2";
-import StartButton, { BUTTON_STYLES } from "../Shared/StartButton";
 
 export enum MenuAction {
   OPEN_SHOP,
@@ -10,7 +9,6 @@ export enum MenuAction {
 }
 
 const Menu = ({
-  gameStarted,
   handleClick,
 }: {
   gameStarted: boolean;
