@@ -364,3 +364,12 @@ export const GenerateOverlayObjects = (
     dy: 0.5 + verticalSpeedFactor * 1.5, // base 0.5 + increase based on y
   };
 };
+
+export const GetCurrentLevel = (velocity: number) => {
+  for (let level = 1; level <= 13; level++) {
+    if (velocity < GetLevelRequirement(level)) {
+      return level;
+    }
+  }
+  return 13;
+};

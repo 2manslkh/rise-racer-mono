@@ -7,7 +7,6 @@ import {
   DrawCenterDivider,
   DrawLaneDividers,
   DrawAdditionalSideDividers,
-  DrawBackgroundObjectImage,
 } from "./canvas";
 import {
   GenerateFixedSideObject,
@@ -220,6 +219,8 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
+    if (!address) return;
+
     const shouldUpdate = GetShouldUpdateCanvas(
       previousLevelRef.current,
       currentLevel
@@ -373,7 +374,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         roadWidthBottom,
         currentLevel
       );
-      DrawBackgroundObjectImage(ctx, width, height, currentLevel);
+      // DrawBackgroundObjectImage(ctx, width, height, currentLevel);
 
       if ([3, 4].includes(currentLevel)) {
         const topLeft = (width - roadWidthTop) / 2 + 27;
@@ -494,7 +495,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (bg.complete) {
       draw();
     }
-  }, [dimensions, currentLevel]);
+  }, [dimensions, currentLevel, address]);
 
   return (
     <div
