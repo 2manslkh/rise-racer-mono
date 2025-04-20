@@ -107,7 +107,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       setWsProvider(wsProvider);
       setAddress(data.boundAddress);
 
-      const initialNonce = await wallet.getNonce("pending");
+      const initialNonce = await provider.getTransactionCount(wallet.address);
+
+      // const initialNonce = await wallet.provider.getTransactionCount("pending");
       console.log("🚀 | HotWalletProvider | initialNonce:", initialNonce);
       setNonce(initialNonce);
       setIsLoading(false);
