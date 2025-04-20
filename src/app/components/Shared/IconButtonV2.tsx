@@ -13,7 +13,7 @@ const IconButtonV2 = ({
   colorStart?: string;
   colorEnd?: string;
   handleClick: () => void;
-  highlightPosition?: "top-left" | "bottom-right";
+  highlightPosition?: "top-left" | "bottom-right" | "both";
 }) => {
   return (
     <button
@@ -32,6 +32,13 @@ const IconButtonV2 = ({
       )}
       {highlightPosition === "bottom-right" && (
         <div className="absolute bottom-[-2px] right-[-2px] w-0 h-0 border-t-[20px] border-r-[20px] border-t-transparent border-r-[#FFFFBB]"></div>
+      )}
+
+      {highlightPosition === "both" && (
+        <>
+          <div className="absolute top-[-2px] left-[-2px] w-0 h-0 border-b-[20px] border-l-[20px] border-b-transparent border-l-[#FFFFBB]"></div>
+          <div className="absolute bottom-[-2px] right-[-2px] w-0 h-0 border-t-[20px] border-r-[20px] border-t-transparent border-r-[#FFFFBB]"></div>
+        </>
       )}
     </button>
   );

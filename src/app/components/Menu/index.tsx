@@ -17,38 +17,32 @@ const Menu = ({
   return (
     <div className="absolute bottom-0 left-0 z-1 right-0">
       <div
-        className="relative h-[68px] flex items-start justify-between px-4"
+        className="relative h-[68px] flex items-center justify-between px-4"
         style={{
           background:
             "linear-gradient(to top, #29004D 4%, rgba(41, 0, 77, 0) 100%)",
         }}
       >
-        <div className="absolute z-3 top-0 left-4">
-          <IconButtonV2
-            icon={"/Shop.svg"}
-            alt="Shop"
-            handleClick={() => handleClick(MenuAction.OPEN_SHOP)}
-            highlightPosition="top-left"
-          />
-        </div>
+        <IconButtonV2
+          icon={"/Shop.svg"}
+          alt="Shop"
+          handleClick={() => handleClick(MenuAction.OPEN_SHOP)}
+          highlightPosition="top-left"
+        />
 
-        <div className="absolute z-3 top-0 left-[calc(25%_-_20px)]">
-          <IconButtonV2
-            icon={"/Staking.svg"}
-            alt="Staking"
-            handleClick={() => handleClick(MenuAction.OPEN_STAKING)}
-            highlightPosition="top-left"
-          />
-        </div>
+        <IconButtonV2
+          icon={"/Staking.svg"}
+          alt="Staking"
+          handleClick={() => handleClick(MenuAction.OPEN_STAKING)}
+          highlightPosition="both"
+        />
 
-        <div className="absolute z-3 top-0 right-4">
-          <IconButtonV2
-            icon={"/Leaderboard.svg"}
-            alt="Leaderboard"
-            handleClick={() => handleClick(MenuAction.OPEN_LEADERBOARD)}
-            highlightPosition="bottom-right"
-          />
-        </div>
+        <IconButtonV2
+          icon={"/Leaderboard.svg"}
+          alt="Leaderboard"
+          handleClick={() => handleClick(MenuAction.OPEN_LEADERBOARD)}
+          highlightPosition="bottom-right"
+        />
       </div>
     </div>
   );
