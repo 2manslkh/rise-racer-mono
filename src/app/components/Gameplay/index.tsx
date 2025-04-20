@@ -187,33 +187,6 @@ const Gameplay: React.FC<GameplayProps> = ({
     setTimeout(() => {
       setClickEffects((prev) => prev.filter((c) => c.id !== newClick.id));
     }, 800);
-
-    try {
-      incrementNonce();
-      const currentNonce = getNonce();
-      clickRace(hotWallet, currentNonce);
-
-      // TODO: Fix post launch
-      // toast.transactionPromise(
-      //   txn.then((tx) => tx.wait()),
-      //   {
-      //     loading: "Sending Transaction",
-      //     success: (res) => ({
-      //       message: "Transaction confirmed!",
-      //       link: getBlockExplorerUrl(
-      //         res!.hash,
-      //         riseTestnet.id,
-      //         LOOKUP_ENTITIES.TRANSACTION_HASH
-      //       ),
-      //       value: res!.hash,
-      //     }),
-      //     error: (err) => `Transaction failed: ${err.message}`,
-      //   }
-      // );
-    } catch (error) {
-      logError(error);
-      toast.error("Click transaction failed. See console for details.");
-    }
   };
 
   // When user clicks on START button, set the speed

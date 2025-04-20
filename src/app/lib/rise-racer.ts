@@ -82,6 +82,7 @@ export const clickRace = async (
     nonce: number,
     wsProvider?: ethers.WebSocketProvider
 ): Promise<ethers.ContractTransactionResponse> => {
+    console.log("🚀 | nonce:", nonce)
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
