@@ -158,21 +158,6 @@ const Gameplay: React.FC<GameplayProps> = ({
           placeholderHash = null; // Clear placeholder after successful update initiation
         }
       });
-
-      // After a successful click, schedule Rise Crystals balance refresh
-      setTimeout(async () => {
-        if (hotWallet && hotWallet.provider && address) {
-          try {
-            const provider = hotWallet.provider as ethers.Provider;
-            const balance = await getBalance(address, provider);
-            const decimals = await getDecimals(provider);
-            const formatted = ethers.formatUnits(balance, decimals);
-            setRiseCrystalsBalance(formatted);
-          } catch (error) {
-            console.error("Failed to refresh Rise Crystals balance:", error);
-          }
-        }
-      }, 3000); // Wait a bit for the transaction to process
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");

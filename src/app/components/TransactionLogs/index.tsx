@@ -13,7 +13,6 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   // Filter transactions older than 15 seconds and sort
   const recentSortedTransactions = [...transactions]
@@ -24,18 +23,6 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
   const visibleTransactions = expanded
     ? recentSortedTransactions
     : recentSortedTransactions.slice(-5);
-
-  // Auto update the "seconds ago" display for transaction logs
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Force re-render every second to update time displays
-      if (recentSortedTransactions.length > 0) {
-        setForceUpdate((prev) => prev + 1);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [recentSortedTransactions.length]); // Depend on the filtered length
 
   // Scroll transaction log to bottom when new transactions come in or view changes
   useEffect(() => {
@@ -49,30 +36,30 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
     const truncatedHash = `0x${tx.hash.slice(2, 6)}`;
     const blockNumber = tx.receipt?.blockNumber || "---";
 
-    let timeDisplay;
+    let timeDisplay = ""; // Initialize as empty
+    let statusText = "";
+
     if (tx.status === "mined" && tx.minedTimestamp) {
       const confirmationTime = (tx.minedTimestamp - tx.timestamp) / 1000;
-      timeDisplay = `${confirmationTime.toFixed(1)}s confirm`;
-    } else {
-      const timeSinceSent = ((Date.now() - tx.timestamp) / 1000).toFixed(1);
-      timeDisplay = `${timeSinceSent}s`;
+      timeDisplay = `${confirmationTime.toFixed(1)}s confirmed`;
+    } else if (tx.status === "pending") {
+      statusText = "(pending)";
+    } else if (tx.status === "failed") {
+      statusText = "(failed)";
+    } else if (tx.status === "dropped") {
+      statusText = "(dropped)";
     }
-
-    let status = "pending";
-    if (tx.status === "mined") status = "mined";
-    else if (tx.status === "failed") status = "failed";
-    else if (tx.status === "dropped") status = "dropped";
 
     return (
       <div
-        key={`${tx.hash}-${forceUpdate}`} // Include forceUpdate in key for re-render
+        key={tx.hash} // Removed forceUpdate from key
         className="font-mono text-xs leading-tight mb-0 whitespace-nowrap"
       >
         <span className="text-white">
           Tx {truncatedHash} | {blockNumber} | {timeDisplay}
         </span>{" "}
-        {tx.status !== "mined" && (
-          <span className="text-white opacity-80">({status})</span>
+        {statusText && (
+          <span className="text-white opacity-80">{statusText}</span>
         )}
       </div>
     );
@@ -88,7 +75,7 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
   }
 
   return (
-    <div className="absolute bottom-[140px] left-4 z-50">
+    <div className="absolute top-[100px] left-1 z-50">
       <div className="flex flex-col transition-all duration-300 px-2 py-1">
         <div
           ref={logRef}

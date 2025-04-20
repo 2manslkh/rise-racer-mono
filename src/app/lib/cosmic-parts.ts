@@ -226,10 +226,7 @@ export const upgradePart = async (
     }
 
     const contract = await getCosmicPartsContract(signer);
-    const tx = await contract.upgradePart(partType, { gasLimit: 300000 });
-
-    // Track the transaction with a descriptive name
-    trackTransaction(tx, `Upgrade ${getPartTypeName(partType)}`);
+    const tx = await contract.upgradePart(partType, { gasLimit: 500000 });
 
     return tx;
 };

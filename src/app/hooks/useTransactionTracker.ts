@@ -36,32 +36,23 @@ interface UseTransactionTrackerResult {
  * @returns Methods for tracking and querying transactions
  */
 export const useTransactionTracker = (): UseTransactionTrackerResult => {
-    const { hotWallet } = useHotWallet();
     const toast = useToast();
     const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
 
-    // Initialize the tracker with the current provider
-    useEffect(() => {
-        if (hotWallet?.provider) {
-            getTransactionTracker(hotWallet.provider);
-        }
-    }, [hotWallet?.provider]);
-
-    // Poll for transaction updates
+    // Poll for transaction updates (this now just reads from the singleton tracker)
     useEffect(() => {
         const fetchTransactions = () => {
+            // Get tracker instance (implicitly initialized with WS provider elsewhere)
             const tracker = getTransactionTracker();
-            // Get sorted transactions - newest first
-            const allTx = tracker.getAllTransactions().sort((a, b) => b.timestamp - a.timestamp);
-            // Keep only the latest 20 transactions
-            setTransactions(allTx.slice(0, 20));
+            const allTx = tracker.getAllTransactions(); // Already sorted & limited by tracker
+            setTransactions(allTx);
         };
 
         // Initial fetch
         fetchTransactions();
 
         // Set up polling
-        const intervalId = setInterval(fetchTransactions, 3000);
+        const intervalId = setInterval(fetchTransactions, 3000); // Keep polling interval reasonable
 
         // Clean up
         return () => clearInterval(intervalId);
@@ -75,9 +66,6 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
         ): string => {
             // Default callbacks with toast notifications
             const callbacks: TransactionCallback = {
-                onMined: () => {
-                    toast.success(`${description} completed successfully`);
-                },
                 onFailed: (error) => {
                     toast.error(`${description} failed: ${error.message}`);
                 },
@@ -101,7 +89,6 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
         (placeholderHash: string, tx: ethers.ContractTransactionResponse) => {
             const description = transactions.find(t => t.hash === placeholderHash)?.description || 'Transaction';
             const callbacks: TransactionCallback = {
-                onMined: () => toast.success(`${description} completed successfully`),
                 onFailed: (error) => toast.error(`${description} failed: ${error.message}`),
                 onDropped: () => toast.error(`${description} was dropped`),
             };

@@ -21,12 +21,13 @@ interface TransactionCallback {
 class TransactionTracker {
     private transactions: Record<string, TransactionRecord> = {};
     private callbacks: Record<string, TransactionCallback> = {};
-    private provider: ethers.Provider | null = null;
+    private provider: ethers.Provider | ethers.WebSocketProvider | null = null;
     private pollingInterval: number = 5000; // 5 seconds by default
     private storageKey: string = "rise_tx_tracker";
     private pollingTimer: NodeJS.Timeout | null = null;
+    private isWebSocketProvider: boolean = false; // Flag for provider type
 
-    constructor(provider?: ethers.Provider, pollingInterval?: number) {
+    constructor(provider?: ethers.Provider | ethers.WebSocketProvider, pollingInterval?: number) {
         if (provider) {
             this.setProvider(provider);
         }
@@ -41,15 +42,24 @@ class TransactionTracker {
 
     /**
      * Set the provider to use for transaction tracking
-     * @param provider An ethers Provider instance
+     * @param provider An ethers Provider instance (can be WebSocketProvider)
      */
-    public setProvider(provider: ethers.Provider): void {
-        this.provider = provider;
-
-        // Start polling for pending transactions if we have any
-        if (Object.keys(this.transactions).length > 0) {
-            this.startPolling();
+    public setProvider(provider: ethers.Provider | ethers.WebSocketProvider): void {
+        // Disconnect previous provider if it was a WebSocket
+        if (this.provider && this.isWebSocketProvider) {
+            try {
+                (this.provider as ethers.WebSocketProvider).destroy();
+            } catch (e) { console.warn("Error destroying previous WebSocket provider:", e); }
         }
+
+        this.provider = provider;
+        // Check if it's a WebSocketProvider by checking for the destroy method
+        this.isWebSocketProvider = typeof (provider as ethers.WebSocketProvider).destroy === 'function';
+
+        console.log(`TransactionTracker using ${this.isWebSocketProvider ? 'WebSocket' : 'HTTP'} provider.`);
+
+        // Start polling (or re-start if provider changed)
+        this.startPolling();
     }
 
     /**
@@ -175,7 +185,7 @@ class TransactionTracker {
      * Returns the placeholder hash used.
      */
     public initiatePendingTransaction(description: string): string {
-        const placeholderHash = `optimistic-${Date.now()}-${Math.random()}`;
+        const placeholderHash = `-----${Date.now()}-${Math.random()}`;
         const txRecord: TransactionRecord = {
             hash: placeholderHash,
             description,
@@ -288,8 +298,13 @@ class TransactionTracker {
         error?: Error
     ): void {
         const tx = this.transactions[hash];
-        if (!tx) return;
+        // Prevent duplicate updates if status is already terminal
+        if (!tx || (tx.status !== 'pending')) {
+            console.log(`Skipping update for ${hash}: current status ${tx?.status}, new status ${status}`);
+            return;
+        }
 
+        console.log(`Updating transaction ${hash} to status: ${status}`);
         tx.status = status;
 
         if (receipt) {
@@ -429,25 +444,73 @@ class TransactionTracker {
             }
         }
     }
+
+    /** Gets the current provider instance (internal use or for testing) */
+    public getProvider(): ethers.Provider | ethers.WebSocketProvider | null {
+        return this.provider;
+    }
 }
 
 // Create a singleton instance
 let instance: TransactionTracker | null = null;
+let webSocketProviderInstance: ethers.WebSocketProvider | null = null; // Hold the WebSocket provider
 
 /**
- * Get the transaction tracker instance
- * @param provider Optional provider to set when getting the instance
+ * Get the transaction tracker instance.
+ * Initializes with a WebSocketProvider if the URL is available.
+ * @param wsUrl Optional WebSocket URL. If provided, ensures the tracker uses it.
  * @param pollingInterval Optional polling interval in milliseconds
  * @returns The transaction tracker instance
  */
 export const getTransactionTracker = (
-    provider?: ethers.Provider,
+    wsUrl?: string,
     pollingInterval?: number
 ): TransactionTracker => {
+    let webSocketProviderChanged = false;
+    let newWebSocketProvider: ethers.WebSocketProvider | null = null;
+
+    // --- Step 1: Determine if WebSocket provider needs creation/update --- 
+    if (wsUrl && typeof window !== 'undefined') {
+        if (!webSocketProviderInstance || (webSocketProviderInstance.websocket as WebSocket).url !== wsUrl) {
+            try {
+                // Ensure old provider is destroyed if URL changes or it exists
+                if (webSocketProviderInstance) webSocketProviderInstance.destroy();
+
+                newWebSocketProvider = new ethers.WebSocketProvider(wsUrl);
+                console.log("Created/Recreated WebSocketProvider instance.");
+                webSocketProviderChanged = true;
+
+                // Attach listeners (casting internal websocket to standard WebSocket)
+                const ws = newWebSocketProvider.websocket as WebSocket;
+                ws.onopen = () => console.log('WS Opened');
+                ws.onclose = (event: CloseEvent) => console.log('WS Closed:', event.code, event.reason);
+                ws.onerror = (err) => console.error('WS Error:', err);
+
+                webSocketProviderInstance = newWebSocketProvider; // Update the singleton reference
+
+            } catch (e) {
+                console.error("Failed to create/recreate WebSocketProvider:", e);
+                webSocketProviderInstance = null; // Reset on failure
+                newWebSocketProvider = null;
+                webSocketProviderChanged = false; // Failed to change
+            }
+        }
+    }
+
+    // --- Step 2: Manage TransactionTracker instance --- 
     if (!instance) {
-        instance = new TransactionTracker(provider, pollingInterval);
-    } else if (provider) {
-        instance.setProvider(provider);
+        // Create tracker instance, using the new WS provider if available, otherwise undefined
+        instance = new TransactionTracker(newWebSocketProvider ?? undefined, pollingInterval);
+        console.log("Created new TransactionTracker instance.");
+    } else if (webSocketProviderChanged && newWebSocketProvider) {
+        // If tracker instance exists and WS provider was successfully changed, update the tracker's provider
+        instance.setProvider(newWebSocketProvider);
+        console.log("Updated existing TransactionTracker instance with new WebSocketProvider.");
+    } else if (webSocketProviderInstance && !webSocketProviderChanged && !instance.getProvider()) {
+        // Edge case: Instance exists, WS URL matches, but tracker has no provider (e.g. initial load failed?)
+        // Try setting the existing WS provider.
+        instance.setProvider(webSocketProviderInstance);
+        console.log("Set existing WebSocketProvider on TransactionTracker instance that lacked one.")
     }
 
     return instance;
