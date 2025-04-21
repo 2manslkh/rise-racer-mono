@@ -22,6 +22,7 @@ class TransactionTracker {
     private transactions: Record<string, TransactionRecord> = {};
     private callbacks: Record<string, TransactionCallback> = {};
     private provider: ethers.Provider | ethers.WebSocketProvider | null = null;
+    private webSocketProvider: ethers.WebSocketProvider | null = null;
     private pollingInterval: number = 250; // 5 seconds by default
     private storageKey: string = "rise_tx_tracker";
     private pollingTimer: NodeJS.Timeout | null = null;
@@ -248,7 +249,7 @@ class TransactionTracker {
         }
 
         // Set up the listener for the *real* transaction
-        tx.wait().then(
+        tx.wait(0).then(
             (receipt) => {
                 this.updateTransactionStatus(realHash, "mined", receipt || undefined);
             },
@@ -288,6 +289,21 @@ class TransactionTracker {
             this.saveToStorage();
         } else {
             console.warn(`Attempted to remove non-existent pending transaction: ${placeholderHash}`);
+        }
+    }
+
+    /**
+     * Removes a single transaction record by its hash.
+     * @param hash The hash of the transaction to remove.
+     */
+    private removeTransaction(hash: string): void {
+        if (this.transactions[hash]) {
+            delete this.transactions[hash];
+            if (this.callbacks[hash]) {
+                delete this.callbacks[hash];
+            }
+            this.saveToStorage(); // Persist the removal
+            console.log(`Transaction ${hash} automatically removed after completion.`);
         }
     }
 
@@ -332,10 +348,18 @@ class TransactionTracker {
                 callback.onDropped();
             }
         }
+
+        // Schedule removal after 8 seconds for terminal states
+        if (status === "mined" || status === "failed" || status === "dropped") {
+            setTimeout(() => {
+                this.removeTransaction(hash);
+            }, 8000); // 8 seconds
+        }
     }
 
     private async checkPendingTransactions(): Promise<void> {
         if (!this.provider) return;
+        console.log("🚀 | TransactionTracker | checkPendingTransactions | this.provider:", this.provider)
 
         const pendingTxs = this.getPendingTransactions();
 
