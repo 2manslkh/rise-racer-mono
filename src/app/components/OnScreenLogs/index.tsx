@@ -46,7 +46,7 @@ const OnScreenLogs: React.FC = () => {
         display: "flex",
         flexDirection: "column-reverse", // Stack logs upwards from the bottom
         gap: "5px",
-        zIndex: 1000, // Ensure logs are on top
+        zIndex: 1, // Ensure logs are on top
         color: "white", // Example color
         textShadow: "1px 1px 2px black", // Example text shadow for readability
       }}

@@ -133,13 +133,13 @@ const Gameplay: React.FC<GameplayProps> = ({
         // 3. Update the optimistic transaction with real hash
         // Note: updateTx handles attaching the .wait() listeners
         if (placeholderHash) {
-          updateTx(placeholderHash, await txResponse);
+          updateTx(placeholderHash, txResponse);
           placeholderHash = null; // Clear placeholder after successful update initiation
         }
       });
 
       // 4. Update the balance
-      await refreshBalance();
+      refreshBalance();
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");

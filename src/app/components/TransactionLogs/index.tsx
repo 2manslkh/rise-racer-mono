@@ -75,7 +75,7 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
   }
 
   return (
-    <div className="absolute top-[100px] left-1 z-50">
+    <div className="absolute top-[100px] left-1 z-1">
       <div className="flex flex-col transition-all duration-300 px-2 py-1">
         <div
           ref={logRef}
