@@ -23,7 +23,7 @@ class TransactionTracker {
     private callbacks: Record<string, TransactionCallback> = {};
     private provider: ethers.Provider | ethers.WebSocketProvider | null = null;
     private webSocketProvider: ethers.WebSocketProvider | null = null;
-    private pollingInterval: number = 250; // 5 seconds by default
+    private pollingInterval: number = 100; // 5 seconds by default
     private storageKey: string = "rise_tx_tracker";
     private pollingTimer: NodeJS.Timeout | null = null;
     private isWebSocketProvider: boolean = false; // Flag for provider type

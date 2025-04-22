@@ -1,10 +1,10 @@
 import { FC, useState } from "react";
-import { formatEther, parseEther } from "viem";
-import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
+import { formatEther } from "viem";
+import { useAccount } from "wagmi";
 import { useToast } from "@/app/hooks/useToast";
 import Image from "next/image"; // Import Image component
 import { shortenAddress } from "@/app/lib/address"; // Import shortenAddress
-import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 interface LowBalanceModalProps {
   balance: bigint | undefined;
@@ -13,17 +13,18 @@ interface LowBalanceModalProps {
 
 const LOW_BALANCE_THRESHOLD = 0.005; // ETH // Reverted to original threshold
 const RISE_TESTNET_CHAIN_ID = 11155931; // Define target chain ID
+const FAUCET_API_URL = "https://faucet-api.riselabs.xyz/faucet/request";
+const TURNSTILE_SITE_KEY = "0x4AAAAAABDerdTw43kK5pDL";
 
 const LowBalanceModal: FC<LowBalanceModalProps> = ({
   balance,
   hotWalletAddress,
 }) => {
-  const publicClient = usePublicClient();
   const [isOpen, setIsOpen] = useState(true); // Control visibility
-  const [topUpAmount, setTopUpAmount] = useState(""); // State for input
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [isFaucetLoading, setIsFaucetLoading] = useState(false);
   const toast = useToast(); // Initialize toast
-  const { address: mainWalletAddress, chainId, isConnected } = useAccount(); // Get main wallet address and network info
-  const { sendTransaction, isPending: isTxLoading } = useSendTransaction(); // Get transaction function and loading state
+  const { chainId, isConnected } = useAccount(); // Get network info
 
   const isLowBalance =
     balance !== undefined &&
@@ -36,62 +37,49 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
     setIsOpen(false);
   };
 
-  const handleTopUp = () => {
-    if (!isOnCorrectNetwork) {
-      toast.error("Please connect wallet to RISE Testnet to top up.");
+  const handleTopUp = async () => {
+    if (!hotWalletAddress) {
+      toast.error("Hot wallet address is missing.");
       return;
     }
-    if (!sendTransaction || !hotWalletAddress || !topUpAmount) {
-      toast.error("Missing required information for top-up.");
+    if (!turnstileToken) {
+      toast.error("Please complete the CAPTCHA verification.");
       return;
     }
 
-    let amountWei: bigint;
+    setIsFaucetLoading(true);
+    toast.show("Requesting ETH from faucet...");
+
     try {
-      amountWei = parseEther(topUpAmount);
-    } catch {
-      toast.error("Invalid amount entered.");
-      return;
-    }
-
-    if (amountWei <= BigInt(0)) {
-      toast.error("Please enter an amount greater than 0.");
-      return;
-    }
-
-    sendTransaction(
-      {
-        to: hotWalletAddress,
-        value: amountWei,
-      },
-      {
-        onSuccess: (txnHash) => {
-          const waitPromise = publicClient!.waitForTransactionReceipt({
-            hash: txnHash,
-          });
-
-          toast.transactionPromise(waitPromise, {
-            loading: "Sending Transaction",
-            success: () => ({
-              message: "Top-up confirmed!",
-              link: getBlockExplorerUrl(
-                txnHash,
-                RISE_TESTNET_CHAIN_ID,
-                LOOKUP_ENTITIES.TRANSACTION_HASH
-              ),
-              value: txnHash,
-            }),
-            error: (err) => `Transaction failed: ${err.message}`,
-          });
-          setTopUpAmount(""); // Clear input on success
-          // Maybe close the modal or refresh balance here?
-          // handleClose();
+      const response = await fetch(FAUCET_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        onError: (error) => {
-          toast.error(`Transaction failed: ${error.message}`);
-        },
+        body: JSON.stringify({
+          address: hotWalletAddress,
+          turnstileToken: turnstileToken,
+          tokenSymbol: "ETH",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || `Faucet request failed: ${response.statusText}`
+        );
       }
-    );
+
+      toast.success(result.message || "Faucet request successful!");
+    } catch (error: unknown) {
+      console.error("Faucet request error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Faucet request failed: ${errorMessage}`);
+    } finally {
+      setIsFaucetLoading(false);
+    }
   };
 
   if (!isLowBalance || !isOpen || !hotWalletAddress) {
@@ -120,7 +108,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
                   WebkitTextStroke: "1.5px #74007E",
                 }}
               >
-                Top up hot wallet
+                Request Faucet ETH
               </p>
               <button
                 onClick={handleClose}
@@ -130,45 +118,8 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
               </button>
             </div>
 
-            {/* Visual Transfer Section */}
-            <div className="flex items-start justify-center gap-8 mt-2">
-              {/* Main Wallet */}
-              <div className="flex flex-col items-center text-center">
-                <Image
-                  src="/wallet-1.svg"
-                  alt="Main Wallet"
-                  width={40}
-                  height={40}
-                />
-                <p className="text-xs text-black mt-1 font-medium">
-                  Main Wallet
-                </p>
-                <p className="text-xs text-gray-600">
-                  {mainWalletAddress ? shortenAddress(mainWalletAddress) : "-"}
-                </p>
-              </div>
-
-              {/* Arrow */}
-              <div className="flex h-full justify-center items-center my-auto">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M13.293 5.29297L12.586 6.00008L18.586 12.0001L12.586 18.0001L13.293 18.7072L19.293 12.7072C19.683 12.3162 19.683 11.6841 19.293 11.293L13.293 5.29297Z"
-                    fill="#6B7280"
-                  />
-                  <path
-                    d="M5 12.75C4.58579 12.75 4.25 12.4142 4.25 12C4.25 11.5858 4.58579 11.25 5 11.25L19 11.25C19.4142 11.25 19.75 11.5858 19.75 12C19.75 12.4142 19.4142 12.75 19 12.75L5 12.75Z"
-                    fill="#6B7280"
-                  />
-                </svg>
-              </div>
-
-              {/* Hot Wallet */}
+            {/* Hot Wallet Info Section */}
+            <div className="flex items-center justify-center gap-4 mt-2">
               <div className="flex flex-col items-center text-center">
                 <Image
                   src="/wallet-2.svg"
@@ -192,45 +143,28 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
               </div>
             </div>
 
-            {/* Top Up Input and Button */}
-            <div className="flex flex-col gap-2">
-              <label
-                htmlFor="topUpAmountInput"
-                className="text-sm font-medium text-black"
-              >
-                Amount to send (ETH):
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  id="topUpAmountInput"
-                  type="number"
-                  step="0.001"
-                  min="0"
-                  placeholder={`Min ${LOW_BALANCE_THRESHOLD} ETH recommended`}
-                  value={topUpAmount}
-                  onChange={(e) => setTopUpAmount(e.target.value)}
-                  className="flex-grow px-2 py-1 border border-gray-300 rounded text-black text-sm focus:outline-none focus:ring-1 focus:ring-[#5700A3]"
-                  disabled={isTxLoading || !isOnCorrectNetwork}
-                />
-                <button
-                  onClick={handleTopUp}
-                  disabled={
-                    isTxLoading ||
-                    !isConnected ||
-                    !topUpAmount ||
-                    !isOnCorrectNetwork
-                  }
-                  className="bg-[#5700A3] text-white py-1 px-3 rounded hover:bg-[#460082] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap"
-                >
-                  {isTxLoading ? "Sending..." : "Send ETH"}
-                </button>
-              </div>
-              {/* Network Warning Message */}
+            {/* Turnstile and Request Button Section */}
+            <div className="flex flex-col items-center gap-3">
               {isConnected && !isOnCorrectNetwork && (
-                <p className="text-orange-600 text-xs mt-1">
-                  Please switch your main wallet to RISE Testnet to proceed.
+                <p className="text-orange-600 text-xs text-center">
+                  Your main wallet is not on RISE Testnet. This faucet request
+                  will top up your hot wallet (
+                  {shortenAddress(hotWalletAddress)}).
                 </p>
               )}
+              <Turnstile
+                siteKey={TURNSTILE_SITE_KEY}
+                onSuccess={(token: string) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken(null)}
+                onError={() => toast.error("CAPTCHA verification failed.")}
+              />
+              <button
+                onClick={handleTopUp}
+                disabled={isFaucetLoading || !turnstileToken}
+                className="bg-[#5700A3] text-white py-1.5 px-4 rounded hover:bg-[#460082] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm whitespace-nowrap w-full"
+              >
+                {isFaucetLoading ? "Requesting..." : "Request ETH"}
+              </button>
             </div>
           </div>
         </div>
