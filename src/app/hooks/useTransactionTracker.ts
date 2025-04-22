@@ -44,7 +44,6 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
             // Get tracker instance (implicitly initialized with WS provider elsewhere)
             const tracker = getTransactionTracker();
             const allTx = tracker.getAllTransactions(); // Already sorted & limited by tracker
-            console.log("🚀 | fetchTransactions | allTx:", allTx)
             setTransactions(allTx);
         };
 
