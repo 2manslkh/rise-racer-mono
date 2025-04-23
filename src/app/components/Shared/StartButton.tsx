@@ -34,7 +34,7 @@ const StartButton = ({
   // Otherwise, render the overlay button
   return (
     <div
-      className={`absolute h-screen w-screen z-10 flex justify-center items-center bg-black/20 ${disabled ? "pointer-events-none" : "cursor-pointer"}`}
+      className={`absolute top-0 bottom-0 left-0 right-0 z-10 flex justify-center items-center bg-black/20 ${disabled ? "pointer-events-none" : "cursor-pointer"}`}
       onClick={disabled ? undefined : handleClick}
     >
       <div className="flex items-center justify-center text-center pointer-events-none">
