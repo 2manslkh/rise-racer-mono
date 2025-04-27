@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import {
     getTransactionTracker,
     trackTransaction,
+    trackTransactionByHash,
     initiatePendingTransaction,
     updatePendingTransaction,
     removePendingTransaction,
@@ -18,10 +19,14 @@ interface UseTransactionTrackerResult {
         tx: ethers.ContractTransactionResponse,
         description?: string
     ) => string;
+    trackTxByHash: (
+        txHash: string,
+        description?: string
+    ) => string;
     initiateTx: (description: string) => string;
     updateTx: (
         placeholderHash: string,
-        tx: ethers.ContractTransactionResponse
+        txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string
     ) => void;
     removeTx: (placeholderHash: string) => void;
     transactions: TransactionRecord[];
@@ -51,7 +56,7 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
         fetchTransactions();
 
         // Set up polling
-        const intervalId = setInterval(fetchTransactions, 100); // Keep polling interval reasonable
+        const intervalId = setInterval(fetchTransactions, 50); // Keep polling interval reasonable
 
         // Clean up
         return () => clearInterval(intervalId);
@@ -79,19 +84,41 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
         [toast]
     );
 
+    // Track a transaction by hash (for use with sendRawTransactionSync)
+    const trackTxByHash = useCallback(
+        (
+            txHash: string,
+            description: string = "Transaction"
+        ): string => {
+            // Default callbacks with toast notifications
+            const callbacks: TransactionCallback = {
+                onFailed: (error) => {
+                    toast.error(`${description} failed: ${error.message}`);
+                },
+                onDropped: () => {
+                    toast.error(`${description} was dropped from the network`);
+                },
+            };
+
+            // Track the transaction by hash
+            return trackTransactionByHash(txHash, description, callbacks);
+        },
+        [toast]
+    );
+
     // Optimistic Tracking
     const initiateTx = useCallback((description: string): string => {
         return initiatePendingTransaction(description);
     }, []);
 
     const updateTx = useCallback(
-        (placeholderHash: string, tx: ethers.ContractTransactionResponse) => {
+        (placeholderHash: string, txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string) => {
             const description = transactions.find(t => t.hash === placeholderHash)?.description || 'Transaction';
             const callbacks: TransactionCallback = {
                 onFailed: (error) => toast.error(`${description} failed: ${error.message}`),
                 onDropped: () => toast.error(`${description} was dropped`),
             };
-            updatePendingTransaction(placeholderHash, tx, callbacks);
+            updatePendingTransaction(placeholderHash, txOrHash, callbacks);
         },
         [toast, transactions]
     );
@@ -118,6 +145,7 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
 
     return {
         trackTx,
+        trackTxByHash,
         initiateTx,
         updateTx,
         removeTx,

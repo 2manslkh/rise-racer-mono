@@ -126,10 +126,13 @@ const Gameplay: React.FC<GameplayProps> = ({
 
       // 1. Initiate optimistic transaction
       const description = `Race Click #${currentNonce}`;
+
       placeholderHash = initiateTx(description);
 
       // 2. Send the actual transaction
       clickRace(hotWallet, currentNonce).then(async (txResponse) => {
+        // end timer
+
         // 3. Update the optimistic transaction with real hash
         // Note: updateTx handles attaching the .wait() listeners
         if (placeholderHash) {

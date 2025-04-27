@@ -12,8 +12,8 @@ interface LowBalanceModalProps {
   onFaucetSuccess?: () => void;
 }
 
-const LOW_BALANCE_THRESHOLD = 0.005; // ETH // Reverted to original threshold
-const RISE_TESTNET_CHAIN_ID = 11155931; // Define target chain ID
+const LOW_BALANCE_THRESHOLD = 0.001; // ETH // Reverted to original threshold
+const RISE_TESTNET_CHAIN_ID = 11155008; // Define target chain ID
 const FAUCET_API_URL = "https://faucet-api.riselabs.xyz/faucet/request";
 const TURNSTILE_SITE_KEY = "0x4AAAAAABDerdTw43kK5pDL";
 
