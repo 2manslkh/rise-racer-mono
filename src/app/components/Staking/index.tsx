@@ -109,6 +109,7 @@ const Staking = () => {
   const handleUnstake = async () => {
     setIsLoading(true);
     setErrorMessage("");
+    let placeholderHash: string | null = null;
 
     try {
       if (!hotWallet) {
@@ -133,9 +134,20 @@ const Staking = () => {
         return;
       }
 
-      const tx = await unstakeETH(hotWallet);
-      await tx.wait();
-      await refreshBalance();
+      incrementNonce();
+      const currentNonce = getNonce();
+      const description = `Stake ETH #${currentNonce}`;
+      placeholderHash = initiateTx(description);
+
+      const txReceipt = await unstakeETH(hotWallet, currentNonce);
+
+      // Update the optimistic transaction with the receipt and callbacks
+      if (placeholderHash) {
+        updateTx(placeholderHash, txReceipt);
+        placeholderHash = null;
+      }
+
+      refreshBalance();
       await fetchStakingInfo();
     } catch (error) {
       console.error("Unstaking failed:", error);
