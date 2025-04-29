@@ -4,7 +4,7 @@ import { initialPartsData } from "./data";
 import PartItem from "./part";
 import { getBalance, getDecimals } from "@/app/lib/rise-crystals";
 import { useHotWallet } from "@/app/context/HotWalletContext";
-import { ethers } from "ethers";
+import { ethers, parseEther } from "ethers";
 import {
   PartType as CosmicPartType,
   upgradePart,
@@ -194,18 +194,18 @@ const ShopV2 = () => {
         setTxError("Shop data not loaded yet.");
         return;
       }
-      let cost = 0;
+      let cost = 0n;
       if (partId === "0") {
-        cost = Number(ethers.formatUnits(shopData.engineCost, 18));
+        cost = shopData.engineCost;
       } else if (partId === "1") {
-        cost = Number(ethers.formatUnits(shopData.turboCost, 18));
+        cost = shopData.turboCost;
       } else if (partId === "2") {
-        cost = Number(ethers.formatUnits(shopData.chassisCost, 18));
+        cost = shopData.chassisCost;
       } else if (partId === "3") {
-        cost = Number(ethers.formatUnits(shopData.wheelCost, 18));
+        cost = shopData.wheelCost;
       }
 
-      if (Number(riseCrystals) >= cost) {
+      if (parseEther(riseCrystals) >= cost) {
         setIsUpgrading(partId);
         setTxError(null);
 
@@ -273,6 +273,7 @@ const ShopV2 = () => {
           setIsUpgrading(null);
         }
       } else {
+        console.log(cost, parseEther(riseCrystals));
         setTxError("Not enough Rise Crystals");
         toast.error("Not enough Rise Crystals for upgrade");
       }
@@ -338,6 +339,7 @@ const ShopV2 = () => {
               part={part} // Pass the combined part data
               onUpgrade={handleUpgrade}
               currentRiseCrystals={Number(riseCrystals)}
+              cost={part.upgradeCost}
               isUpgrading={isUpgrading === part.id}
             />
           ))}

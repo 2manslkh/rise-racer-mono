@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { Part } from "./type";
-import { getUpgradeCost, getCurrentVelocity } from "./data"; // Import new function
+import { getCurrentVelocity } from "./data"; // Import new function
 
 // TODO: Get actual RiseCrystals icon path
 const RISE_CRYSTAL_ICON = "/rise_crystal.svg";
@@ -10,6 +10,7 @@ interface PartItemProps {
   part: Part;
   onUpgrade: (partId: string) => void;
   currentRiseCrystals: number; // Pass the current balance to disable button if needed
+  cost: number;
   isUpgrading?: boolean; // Add loading state
 }
 
@@ -17,9 +18,9 @@ const PartItem: React.FC<PartItemProps> = ({
   part,
   onUpgrade,
   currentRiseCrystals,
+  cost,
   isUpgrading = false,
 }) => {
-  const cost = getUpgradeCost(part);
   const currentVelocity = getCurrentVelocity(part);
   const canAfford = currentRiseCrystals >= cost;
 
