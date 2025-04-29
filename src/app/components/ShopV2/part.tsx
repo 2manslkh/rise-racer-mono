@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Part } from "./type";
+import { Part, PartType } from "./type";
 import { getCurrentVelocity } from "./data"; // Import new function
 
 // TODO: Get actual RiseCrystals icon path
@@ -39,6 +39,15 @@ const PartItem: React.FC<PartItemProps> = ({
           <p className="text-xs text-gray-300 mt-1">
             Velocity: {currentVelocity.toFixed(1)}
           </p>
+          {part.type === PartType.TURBO && (
+            <div className="flex items-center text-xs text-yellow-300 mt-1 gap-1">
+              <span>+ {part.currentLevel}</span>
+              <div className="relative w-3 h-3">
+                <Image src={RISE_CRYSTAL_ICON} alt="RISE" layout="fill" />
+              </div>
+              <span>/ click</span>
+            </div>
+          )}
         </div>
       </div>
 
