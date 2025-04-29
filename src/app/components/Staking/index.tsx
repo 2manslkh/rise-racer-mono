@@ -10,9 +10,18 @@ import {
   unstakeETH,
   StakeInfo,
 } from "../../lib/staking";
+import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
 
 const Staking = () => {
-  const { hotWallet, address, balance, refreshBalance } = useHotWallet();
+  const {
+    hotWallet,
+    address,
+    balance,
+    refreshBalance,
+    incrementNonce,
+    getNonce,
+  } = useHotWallet();
+  const { initiateTx, updateTx } = useTransactionTracker();
 
   const [stakeAmount, setStakeAmount] = useState<string>("");
 
@@ -57,7 +66,7 @@ const Staking = () => {
   const handleStake = async () => {
     setIsLoading(true);
     setErrorMessage("");
-
+    let placeholderHash: string | null = null;
     try {
       if (!hotWallet || !stakeAmount) {
         setErrorMessage("Please connect wallet and enter an amount");
@@ -73,9 +82,20 @@ const Staking = () => {
         return;
       }
 
-      const tx = await stakeETH(hotWallet, amountInWei);
-      await tx.wait();
-      await refreshBalance();
+      incrementNonce();
+      const currentNonce = getNonce();
+      const description = `Stake ETH #${currentNonce}`;
+      placeholderHash = initiateTx(description);
+
+      const txReceipt = await stakeETH(hotWallet, amountInWei, currentNonce);
+
+      // Update the optimistic transaction with the receipt and callbacks
+      if (placeholderHash) {
+        updateTx(placeholderHash, txReceipt);
+        placeholderHash = null;
+      }
+
+      refreshBalance();
       await fetchStakingInfo();
       setStakeAmount("");
     } catch (error) {

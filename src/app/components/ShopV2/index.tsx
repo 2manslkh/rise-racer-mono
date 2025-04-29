@@ -225,7 +225,9 @@ const ShopV2 = () => {
           // Define callbacks for the transaction tracker
           const callbacks: TransactionCallback = {
             onMined: (receipt: ethers.TransactionReceipt) => {
-              console.log(`Transaction ${receipt.hash} confirmed!`);
+              console.log(
+                `Transaction ${receipt.hash} confirmed! Triggering shop refetch...`
+              );
               toast.success("Upgrade confirmed!");
               // Call the function via the ref
               refetchShopDataRef.current();
@@ -245,6 +247,11 @@ const ShopV2 = () => {
           // Update the optimistic transaction with the receipt and callbacks
           if (placeholderHash) {
             updateTx(placeholderHash, txReceipt, callbacks);
+            // Cooldown for 1 second to ensure the transaction is mined
+            setTimeout(() => {
+              refetchShopDataRef.current();
+            }, 500);
+
             placeholderHash = null;
           }
 
