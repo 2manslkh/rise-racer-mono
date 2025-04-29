@@ -26,7 +26,8 @@ interface UseTransactionTrackerResult {
     initiateTx: (description: string) => string;
     updateTx: (
         placeholderHash: string,
-        txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string
+        txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string,
+        callbacks?: TransactionCallback
     ) => void;
     removeTx: (placeholderHash: string) => void;
     transactions: TransactionRecord[];
@@ -112,15 +113,14 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
     }, []);
 
     const updateTx = useCallback(
-        (placeholderHash: string, txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string) => {
-            const description = transactions.find(t => t.hash === placeholderHash)?.description || 'Transaction';
-            const callbacks: TransactionCallback = {
-                onFailed: (error) => toast.error(`${description} failed: ${error.message}`),
-                onDropped: () => toast.error(`${description} was dropped`),
-            };
+        (
+            placeholderHash: string,
+            txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string,
+            callbacks?: TransactionCallback
+        ) => {
             updatePendingTransaction(placeholderHash, txOrHash, callbacks);
         },
-        [toast, transactions]
+        []
     );
 
     const removeTx = useCallback((placeholderHash: string) => {
@@ -154,4 +154,7 @@ export const useTransactionTracker = (): UseTransactionTrackerResult => {
         clearAllTransactions,
         clearCompletedTransactions,
     };
-}; 
+};
+
+// Export the type for use in other components
+export type { TransactionCallback }; 

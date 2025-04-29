@@ -123,10 +123,8 @@ const Gameplay: React.FC<GameplayProps> = ({
     try {
       incrementNonce();
       const currentNonce = getNonce();
-
       // 1. Initiate optimistic transaction
       const description = `Race Click #${currentNonce}`;
-
       placeholderHash = initiateTx(description);
 
       // 2. Send the actual transaction

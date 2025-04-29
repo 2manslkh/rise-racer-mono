@@ -1,7 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Part } from "./type";
-import { initialPartsData, getUpgradeCost } from "./data";
+import { initialPartsData } from "./data";
 import PartItem from "./part";
 import { getBalance, getDecimals } from "@/app/lib/rise-crystals";
 import { useHotWallet } from "@/app/context/HotWalletContext";
@@ -9,122 +8,105 @@ import { ethers } from "ethers";
 import {
   PartType as CosmicPartType,
   upgradePart,
-  getEquippedPart,
-  getPartData,
+  // getEquippedPart, // Removed as it's no longer used
+  // getPartData, // Removed as it's no longer used
+  getShop,
+  Shop,
 } from "@/app/lib/cosmic-parts";
 import toast from "react-hot-toast";
+import {
+  useTransactionTracker,
+  TransactionCallback,
+} from "@/app/hooks/useTransactionTracker";
 
 const RISE_CRYSTAL_ICON = "/rise_crystal.svg";
 
-// Map from CosmicPartType to ShopV2 PartType
-const reversePartTypeMap = {
-  [CosmicPartType.ENGINE]: "Engine",
-  [CosmicPartType.TURBO]: "Turbo",
-  [CosmicPartType.CHASSIS]: "Chassis",
-  [CosmicPartType.WHEEL]: "Wheels",
+// Map from ShopV2 PartType to CosmicPartType
+// const partTypeMap: { [key: string]: CosmicPartType } = {
+//   Engine: CosmicPartType.ENGINE,
+//   Turbo: CosmicPartType.TURBO,
+//   Chassis: CosmicPartType.CHASSIS,
+//   Wheels: CosmicPartType.WHEEL,
+// };
+
+const partTypeMapV2: { [key: string]: CosmicPartType } = {
+  0: CosmicPartType.ENGINE,
+  1: CosmicPartType.TURBO,
+  2: CosmicPartType.CHASSIS,
+  3: CosmicPartType.WHEEL,
 };
 
 const ShopV2 = () => {
   // --- State Management (Replace with global state) ---
-  const [parts, setParts] = useState<Part[]>(initialPartsData);
+  // const [parts, setParts] = useState<Part[]>();
+  const [shopData, setShopData] = useState<Shop>();
   const [riseCrystals, setRiseCrystals] = useState<string>("0"); // Example starting crystals
-  const { hotWallet, incrementNonce, nonce } = useHotWallet();
+  const {
+    hotWallet,
+    incrementNonce,
+    refreshBalance,
+    fetchVelocityData,
+    getNonce,
+  } = useHotWallet();
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null); // Tracks which part is being upgraded
   const [txError, setTxError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  // -----------------------------------------------------
+  const { initiateTx, updateTx, removeTx } = useTransactionTracker();
 
-  // Fetch wallet balance and token decimals on component mount
-  useEffect(() => {
-    const fetchRiseCrystalsBalance = async () => {
-      if (!hotWallet || !hotWallet.provider) return;
-
-      try {
-        const provider = hotWallet.provider as ethers.Provider;
-        if (!hotWallet.address) return;
-
-        const balance = await getBalance(hotWallet.address, provider);
-        const decimals = await getDecimals(provider);
-
-        // Format the balance
-        const formatted = ethers.formatUnits(balance, decimals);
-        setRiseCrystals(formatted);
-      } catch (error) {
-        console.error("Failed to fetch Rise Crystals balance:", error);
-      }
-    };
-
-    fetchRiseCrystalsBalance();
+  // --- Data Fetching Declarations First ---
+  const refetchShopData = useCallback(async () => {
+    if (!hotWallet || !hotWallet.provider || !hotWallet.address) {
+      console.warn("Cannot refetch shop data: Missing wallet info.");
+      return;
+    }
+    console.log("Refetching shop data after transaction mined...");
+    try {
+      const newShopData = await getShop(hotWallet.address, hotWallet.provider);
+      console.log("🚀 | refetchShopData | newShopData:", newShopData);
+      setShopData(newShopData);
+      toast.success("Shop data updated!");
+    } catch (error) {
+      console.error("Failed to refetch shop data:", error);
+      toast.error("Failed to update shop data after transaction.");
+    }
   }, [hotWallet]);
 
-  // Fetch the current parts data from the blockchain
-  useEffect(() => {
-    const fetchPartsData = async () => {
-      if (!hotWallet || !hotWallet.provider || !hotWallet.address) {
-        setIsLoading(false);
-        return;
-      }
+  const fetchInitialShopData = useCallback(async () => {
+    if (!hotWallet || !hotWallet.provider || !hotWallet.address) {
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const provider = hotWallet.provider as ethers.Provider;
+      const address = hotWallet.address;
+      const shopData = await getShop(address, provider);
+      console.log("🚀 | fetchInitialShopData | shopData:", shopData);
+      setShopData(shopData);
 
-      setIsLoading(true);
-      try {
-        const provider = hotWallet.provider as ethers.Provider;
-        const address = hotWallet.address;
-
-        // Create a copy of the initial parts data
-        const updatedParts = [...initialPartsData];
-
-        // Fetch equipped parts for each part type
-        for (const partType of Object.values(CosmicPartType)) {
-          // Skip non-numeric values (enum can have both string and numeric keys)
-          if (isNaN(Number(partType))) continue;
-
-          try {
-            // Get the token ID of the equipped part for this type
-            const tokenId = await getEquippedPart(
-              address,
-              Number(partType),
-              provider
-            );
-
-            // If tokenId is 0, there's no equipped part for this type
-            if (tokenId === 0n) continue;
-
-            // Get the part data for this token ID
-            const partData = await getPartData(tokenId, provider);
-
-            // Find the corresponding part in our local state
-            const shopPartType = reversePartTypeMap[partData.partType];
-            const partIndex = updatedParts.findIndex(
-              (p) => p.type === shopPartType
-            );
-
-            if (partIndex !== -1) {
-              // Update the part with the current level from the blockchain
-              updatedParts[partIndex] = {
-                ...updatedParts[partIndex],
-                currentLevel: partData.level,
-              };
-            }
-          } catch (error) {
-            console.error(
-              `Failed to fetch part data for type ${partType}:`,
-              error
-            );
-          }
-        }
-
-        // Update the state with the fetched part levels
-        setParts(updatedParts);
-      } catch (error) {
-        console.error("Failed to fetch parts data:", error);
-        toast.error("Failed to load parts data from blockchain");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPartsData();
+      // setParts(updatedParts);
+    } catch (error) {
+      console.error("Failed to fetch initial parts data:", error);
+      toast.error("Failed to load parts data from blockchain");
+    } finally {
+      setIsLoading(false);
+    }
   }, [hotWallet]);
+
+  // --- Refs Initialized After Function Declarations ---
+  // Create a ref to hold the latest refetchShopData function
+  // Initialize with the function itself
+  const refetchShopDataRef = useRef(refetchShopData);
+
+  // --- Effects ---
+  useEffect(() => {
+    fetchInitialShopData();
+  }, [fetchInitialShopData]);
+
+  // Keep the ref updated with the latest refetchShopData function
+  useEffect(() => {
+    refetchShopDataRef.current = refetchShopData;
+  }, [refetchShopData]);
 
   // Refresh balance after upgrade
   useEffect(() => {
@@ -149,142 +131,106 @@ const ShopV2 = () => {
     }
   }, [isUpgrading, hotWallet]);
 
-  // Refresh part levels after an upgrade
-  useEffect(() => {
-    if (!isUpgrading && hotWallet && hotWallet.provider && hotWallet.address) {
-      const fetchPartLevels = async () => {
-        try {
-          const provider = hotWallet.provider as ethers.Provider;
-          const address = hotWallet.address!;
-
-          // Create a copy of the current parts data
-          const updatedParts = [...parts];
-
-          // Fetch equipped parts for each part type
-          for (const partType of Object.values(CosmicPartType)) {
-            // Skip non-numeric values
-            if (isNaN(Number(partType))) continue;
-
-            try {
-              // Get the token ID of the equipped part for this type
-              const tokenId = await getEquippedPart(
-                address,
-                Number(partType),
-                provider
-              );
-
-              // If tokenId is 0, there's no equipped part for this type
-              if (tokenId === 0n) continue;
-
-              // Get the part data for this token ID
-              const partData = await getPartData(tokenId, provider);
-
-              // Find the corresponding part in our local state
-              const shopPartType = reversePartTypeMap[partData.partType];
-              const partIndex = updatedParts.findIndex(
-                (p) => p.type === shopPartType
-              );
-
-              if (partIndex !== -1) {
-                // Update the part with the current level from the blockchain
-                updatedParts[partIndex] = {
-                  ...updatedParts[partIndex],
-                  currentLevel: partData.level,
-                };
-              }
-            } catch (error) {
-              console.error(
-                `Failed to refresh part data for type ${partType}:`,
-                error
-              );
-            }
-          }
-
-          // Update the state with the refreshed part levels
-          setParts(updatedParts);
-        } catch (error) {
-          console.error("Failed to refresh parts data:", error);
-        }
-      };
-
-      fetchPartLevels();
-    }
-  }, [isUpgrading, hotWallet, parts]);
-
+  // --- Upgrade Handler ---
   const handleUpgrade = useCallback(
     async (partId: string) => {
-      console.log("🚀 | partId:", partId);
+      let placeholderHash: string | null = null;
       if (!hotWallet || !hotWallet.provider) {
         setTxError("Wallet not connected");
         return;
       }
-
-      const partIndex = parts.findIndex((p) => p.id === partId);
-      if (partIndex === -1) return; // Part not found
-
-      console.log("🚀 | partIndex:", partIndex);
-      const partToUpgrade = parts[partIndex];
-      const cost = getUpgradeCost(partToUpgrade);
-      console.log("🚀 | partToUpgrade:", partToUpgrade);
+      if (!shopData) {
+        setTxError("Shop data not loaded yet.");
+        return;
+      }
+      let cost = 0;
+      if (partId === "0") {
+        cost = Number(ethers.formatUnits(shopData.engineCost, 18));
+      } else if (partId === "1") {
+        cost = Number(ethers.formatUnits(shopData.turboCost, 18));
+      } else if (partId === "2") {
+        cost = Number(ethers.formatUnits(shopData.chassisCost, 18));
+      } else if (partId === "3") {
+        cost = Number(ethers.formatUnits(shopData.wheelCost, 18));
+      }
 
       if (Number(riseCrystals) >= cost) {
         setIsUpgrading(partId);
         setTxError(null);
 
         try {
-          // Map the shop part type to the contract's part type enum
-          try {
-            // Call the contract upgrade function
-            toast.loading(`Upgrading ${partToUpgrade.name}...`, {
-              id: "upgrade-toast",
-            });
+          incrementNonce();
+          const currentNonce = getNonce();
+          const description = `Upgrade ${partId} #${currentNonce}`;
+          placeholderHash = initiateTx(description);
 
-            // Call the contract to upgrade the part
-            incrementNonce();
-            const tx = await upgradePart(hotWallet, partIndex, nonce);
-
-            // Wait for transaction to complete
-            const receipt = await tx.wait();
-
-            if (receipt && receipt.status === 1) {
-              // Transaction successful, update UI state
-              toast.success(
-                `${partToUpgrade.name} upgraded to level ${partToUpgrade.currentLevel + 1}!`,
-                { id: "upgrade-toast" }
-              );
-
-              // Note: We don't need to manually update the part level here anymore
-              // as the useEffect hook will fetch the updated level from the blockchain
-            } else {
-              toast.error("Transaction failed", { id: "upgrade-toast" });
-              setTxError("Transaction failed");
-            }
-          } catch (signerError) {
-            console.error("Failed to get signer:", signerError);
-            toast.error("Unable to sign transaction", { id: "upgrade-toast" });
-            setTxError(
-              "Unable to sign transaction: " +
-                (signerError instanceof Error
-                  ? signerError.message
-                  : String(signerError))
-            );
-          }
-        } catch (error) {
-          console.error("Error upgrading part:", error);
-          toast.error(
-            `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            { id: "upgrade-toast" }
+          const txReceipt = await upgradePart(
+            hotWallet,
+            partTypeMapV2[partId],
+            currentNonce
           );
-          setTxError(error instanceof Error ? error.message : "Unknown error");
+          console.log("🚀 | txReceipt:", txReceipt);
+
+          // Define callbacks for the transaction tracker
+          const callbacks: TransactionCallback = {
+            onMined: (receipt: ethers.TransactionReceipt) => {
+              console.log(`Transaction ${receipt.hash} confirmed!`);
+              toast.success("Upgrade confirmed!");
+              // Call the function via the ref
+              refetchShopDataRef.current();
+            },
+            onFailed: (error: Error) => {
+              console.error(`Upgrade transaction failed:`, error);
+              toast.error(`Upgrade failed: ${error.message}`);
+              setTxError(`Upgrade failed: ${error.message}`);
+            },
+            onDropped: () => {
+              console.warn(`Upgrade transaction dropped.`);
+              toast.error("Upgrade transaction was dropped. Please try again.");
+              setTxError("Upgrade transaction was dropped.");
+            },
+          };
+
+          // Update the optimistic transaction with the receipt and callbacks
+          if (placeholderHash) {
+            updateTx(placeholderHash, txReceipt, callbacks);
+            placeholderHash = null;
+          }
+
+          // Update balance immediately (optimistic)
+          refreshBalance();
+          fetchVelocityData();
+          // REMOVED IMMEDIATE SHOP REFETCH FROM HERE
+        } catch (error) {
+          console.error("Error during upgrade process:", error);
+          const errorMsg =
+            error instanceof Error ? error.message : "Unknown error";
+          toast.error(`Upgrade error: ${errorMsg}`, { id: "upgrade-toast" });
+          setTxError(errorMsg);
+          // If there was an error *before* updateTx, remove the placeholder
+          if (placeholderHash) {
+            removeTx(placeholderHash);
+          }
         } finally {
           setIsUpgrading(null);
         }
       } else {
-        // Cannot upgrade (not enough crystals)
         setTxError("Not enough Rise Crystals");
+        toast.error("Not enough Rise Crystals for upgrade");
       }
     },
-    [hotWallet, parts, riseCrystals]
+    [
+      hotWallet,
+      // shopData, // Removed dependency as handleUpgrade doesn't read it directly
+      riseCrystals,
+      initiateTx,
+      updateTx,
+      removeTx,
+      incrementNonce,
+      getNonce,
+      refreshBalance,
+      fetchVelocityData,
+    ]
   );
 
   return (
@@ -327,15 +273,63 @@ const ShopV2 = () => {
           className="relative w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col"
           style={{ maxHeight: "calc(100% - 80px)" }} // Adjust height as needed
         >
-          {parts.map((part) => (
-            <PartItem
-              key={part.id}
-              part={part}
-              onUpgrade={handleUpgrade}
-              currentRiseCrystals={Number(riseCrystals)}
-              isUpgrading={isUpgrading === part.id}
-            />
-          ))}
+          {/* Check if shopData is defined before mapping */}
+          {
+            shopData &&
+              (() => {
+                // Add log here to see if this re-runs and what shopData contains
+                console.log("Rendering PartItems, shopData:", shopData);
+                return initialPartsData.map((staticPart) => {
+                  let currentLevel = 0;
+                  let upgradeCost = 0;
+
+                  // Extract dynamic data from shopData based on staticPart.id (0, 1, 2, 3)
+                  switch (staticPart.id) {
+                    case "0": // Engine
+                      currentLevel = Number(shopData.engineLevel);
+                      upgradeCost = Number(
+                        ethers.formatUnits(shopData.engineCost, 18)
+                      );
+                      break;
+                    case "1": // Turbo
+                      currentLevel = Number(shopData.turboLevel);
+                      upgradeCost = Number(
+                        ethers.formatUnits(shopData.turboCost, 18)
+                      );
+                      break;
+                    case "2": // Chassis
+                      currentLevel = Number(shopData.chassisLevel);
+                      upgradeCost = Number(
+                        ethers.formatUnits(shopData.chassisCost, 18)
+                      );
+                      break;
+                    case "3": // Wheels
+                      currentLevel = Number(shopData.wheelLevel);
+                      upgradeCost = Number(
+                        ethers.formatUnits(shopData.wheelCost, 18)
+                      );
+                      break;
+                  }
+
+                  // Combine static and dynamic data for the PartItem prop
+                  const partItemProps = {
+                    ...staticPart,
+                    currentLevel,
+                    upgradeCost,
+                  };
+
+                  return (
+                    <PartItem
+                      key={staticPart.id}
+                      part={partItemProps} // Pass the combined props
+                      onUpgrade={handleUpgrade}
+                      currentRiseCrystals={Number(riseCrystals)}
+                      isUpgrading={isUpgrading === staticPart.id}
+                    />
+                  );
+                });
+              })() // Immediately invoke the function
+          }
         </div>
       )}
     </div>

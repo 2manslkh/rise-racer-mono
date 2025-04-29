@@ -11,8 +11,8 @@ if (!projectId) {
 }
 
 export const riseTestnet = defineChain({
-  id: 11155008,
-  caipNetworkId: "eip155:11155008",
+  id: 11155931,
+  caipNetworkId: "eip155:11155931",
   chainNamespace: "eip155",
   name: "RISE Testnet",
   nativeCurrency: {
@@ -22,12 +22,12 @@ export const riseTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ["https://staging.riselabs.xyz"],
-      webSocket: ["wss://staging.riselabs.xyz/ws"],
+      http: ["https://testnet.riselabs.xyz"],
+      webSocket: ["wss://testnet.riselabs.xyz/ws"],
     },
   },
   blockExplorers: {
-    default: { name: "Explorer", url: "https://staging.explorer.riselabs.xyz" },
+    default: { name: "Explorer", url: "https://testnet.explorer.riselabs.xyz" },
   },
 });
 

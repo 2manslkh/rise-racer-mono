@@ -66,7 +66,6 @@ export const getCurrentVelocity = async (playerAddress: string, provider?: ether
     // Pass only the provider if available, otherwise let getRiseRacerContract handle default/signer logic
     const contract = await getRiseRacerContract(provider);
     const playerInfo = await contract.getPlayerInfo(playerAddress);
-    console.log("🚀 | getCurrentVelocity | playerInfo:", playerInfo)
     // playerInfo structure: [velocity, currentUniverse, totalClicks, isStaking]
     return playerInfo[0]; // Return the velocity component
 };
@@ -101,21 +100,15 @@ export const clickRace = async (
         {
             nonce: nonce,
             gasLimit: 400000,
-            chainId: 11155008,
-            gasPrice: 17
+            chainId: ENVIRONMENT.CHAIN_ID,
+            gasPrice: ENVIRONMENT.DEFAULT_GAS_PRICE
         }
     );
 
     const signedTxData = await signer.signTransaction(signedTx);
-    // start timer
-    const startTime = Date.now();
 
     const receipt = await sendRawTransactionSync(signer.provider as ethers.JsonRpcProvider, signedTxData);
 
-    const endTime = Date.now();
-    const duration = endTime - startTime;
-    console.log(`Transaction took ${duration}ms`);
-    // Pass nonce and gasLimit
-
     return receipt; // Return the transaction response
 };
+
