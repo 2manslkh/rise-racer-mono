@@ -18,6 +18,7 @@ import {
   useTransactionTracker,
   TransactionCallback,
 } from "@/app/hooks/useTransactionTracker";
+import { PartType } from "./type"; // Try importing PartType from here
 
 const RISE_CRYSTAL_ICON = "/rise_crystal.svg";
 
@@ -36,10 +37,24 @@ const partTypeMapV2: { [key: string]: CosmicPartType } = {
   3: CosmicPartType.WHEEL,
 };
 
+// Define DisplayPart based on initialPartsData structure + dynamic fields
+interface DisplayPart {
+  id: string;
+  type: PartType; // Use the imported PartType
+  name: string;
+  imageUrl?: string;
+  baseVelocity: number;
+  velocityMultiplier: number;
+  // Dynamic fields updated from shopData
+  currentLevel: number;
+  upgradeCost: number;
+}
+
 const ShopV2 = () => {
   // --- State Management (Replace with global state) ---
   // const [parts, setParts] = useState<Part[]>();
   const [shopData, setShopData] = useState<Shop>();
+  const [displayParts, setDisplayParts] = useState<DisplayPart[]>([]);
   const [riseCrystals, setRiseCrystals] = useState<string>("0"); // Example starting crystals
   const {
     hotWallet,
@@ -130,6 +145,42 @@ const ShopV2 = () => {
       fetchBalance();
     }
   }, [isUpgrading, hotWallet]);
+
+  // --- Effect to compute displayParts when shopData changes ---
+  useEffect(() => {
+    if (shopData) {
+      console.log("Recalculating displayParts because shopData changed.");
+      const newDisplayParts = initialPartsData.map((staticPart) => {
+        let currentLevel = 0;
+        let upgradeCost = 0;
+        switch (staticPart.id) {
+          case "0": // Engine
+            currentLevel = Number(shopData.engineLevel);
+            upgradeCost = Number(ethers.formatUnits(shopData.engineCost, 18));
+            break;
+          case "1": // Turbo
+            currentLevel = Number(shopData.turboLevel);
+            upgradeCost = Number(ethers.formatUnits(shopData.turboCost, 18));
+            break;
+          case "2": // Chassis
+            currentLevel = Number(shopData.chassisLevel);
+            upgradeCost = Number(ethers.formatUnits(shopData.chassisCost, 18));
+            break;
+          case "3": // Wheels
+            currentLevel = Number(shopData.wheelLevel);
+            upgradeCost = Number(ethers.formatUnits(shopData.wheelCost, 18));
+            break;
+        }
+        // Combine static data with dynamic level and cost
+        return {
+          ...staticPart, // Spread static fields: id, type, name, imageUrl, baseVelocity, velocityMultiplier
+          currentLevel,
+          upgradeCost,
+        };
+      });
+      setDisplayParts(newDisplayParts);
+    }
+  }, [shopData]); // Only re-run when shopData changes
 
   // --- Upgrade Handler ---
   const handleUpgrade = useCallback(
@@ -268,68 +319,21 @@ const ShopV2 = () => {
           <span className="ml-2">Loading parts data...</span>
         </div>
       ) : (
-        /* Upgrade List */
+        /* Upgrade List - Render using displayParts */
         <div
           className="relative w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col"
           style={{ maxHeight: "calc(100% - 80px)" }} // Adjust height as needed
         >
-          {/* Check if shopData is defined before mapping */}
-          {
-            shopData &&
-              (() => {
-                // Add log here to see if this re-runs and what shopData contains
-                console.log("Rendering PartItems, shopData:", shopData);
-                return initialPartsData.map((staticPart) => {
-                  let currentLevel = 0;
-                  let upgradeCost = 0;
-
-                  // Extract dynamic data from shopData based on staticPart.id (0, 1, 2, 3)
-                  switch (staticPart.id) {
-                    case "0": // Engine
-                      currentLevel = Number(shopData.engineLevel);
-                      upgradeCost = Number(
-                        ethers.formatUnits(shopData.engineCost, 18)
-                      );
-                      break;
-                    case "1": // Turbo
-                      currentLevel = Number(shopData.turboLevel);
-                      upgradeCost = Number(
-                        ethers.formatUnits(shopData.turboCost, 18)
-                      );
-                      break;
-                    case "2": // Chassis
-                      currentLevel = Number(shopData.chassisLevel);
-                      upgradeCost = Number(
-                        ethers.formatUnits(shopData.chassisCost, 18)
-                      );
-                      break;
-                    case "3": // Wheels
-                      currentLevel = Number(shopData.wheelLevel);
-                      upgradeCost = Number(
-                        ethers.formatUnits(shopData.wheelCost, 18)
-                      );
-                      break;
-                  }
-
-                  // Combine static and dynamic data for the PartItem prop
-                  const partItemProps = {
-                    ...staticPart,
-                    currentLevel,
-                    upgradeCost,
-                  };
-
-                  return (
-                    <PartItem
-                      key={staticPart.id}
-                      part={partItemProps} // Pass the combined props
-                      onUpgrade={handleUpgrade}
-                      currentRiseCrystals={Number(riseCrystals)}
-                      isUpgrading={isUpgrading === staticPart.id}
-                    />
-                  );
-                });
-              })() // Immediately invoke the function
-          }
+          {/* Map over the pre-calculated displayParts state */}
+          {displayParts.map((part) => (
+            <PartItem
+              key={part.id}
+              part={part} // Pass the combined part data
+              onUpgrade={handleUpgrade}
+              currentRiseCrystals={Number(riseCrystals)}
+              isUpgrading={isUpgrading === part.id}
+            />
+          ))}
         </div>
       )}
     </div>
