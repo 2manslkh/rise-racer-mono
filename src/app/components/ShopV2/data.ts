@@ -3,7 +3,7 @@ import { Part, PartType } from "./type";
 // Initial parts data based on the smart contract values
 export const initialPartsData: Part[] = [
     {
-        id: "engine-1",
+        id: "0",
         type: PartType.ENGINE,
         name: "Engine",
         currentLevel: 1,
@@ -13,7 +13,7 @@ export const initialPartsData: Part[] = [
         velocityMultiplier: 1.2, // ENGINE_GROWTH_FACTOR from contract (1.20)
     },
     {
-        id: "turbo-1",
+        id: "1",
         type: PartType.TURBO,
         name: "Turbo",
         currentLevel: 1,
@@ -23,7 +23,7 @@ export const initialPartsData: Part[] = [
         velocityMultiplier: 1.25, // TURBO_GROWTH_FACTOR from contract (1.25)
     },
     {
-        id: "chassis-1",
+        id: "2",
         type: PartType.CHASSIS,
         name: "Chassis",
         currentLevel: 1,
@@ -33,7 +33,7 @@ export const initialPartsData: Part[] = [
         velocityMultiplier: 1.1, // CHASSIS_GROWTH_FACTOR from contract (1.10)
     },
     {
-        id: "wheels-1",
+        id: "3",
         type: PartType.WHEELS,
         name: "Wheels",
         currentLevel: 1,
@@ -43,6 +43,14 @@ export const initialPartsData: Part[] = [
         velocityMultiplier: 1.15, // WHEEL_GROWTH_FACTOR from contract (1.15)
     },
 ];
+
+export const partMapping = {
+    "0": "Engine",
+    "1": "Turbo",
+    "2": "Chassis",
+    "3": "Wheels",
+};
+
 
 // Implementation of getUpgradeCost based on smart contract
 export const getUpgradeCost = (part: Part): number => {

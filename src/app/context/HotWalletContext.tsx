@@ -95,7 +95,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ address, message, signature }),
       }
     );
+    console.log("🚀 | HotWalletProvider | response:", response);
     const data = await response.json();
+    console.log("🚀 | HotWalletProvider | data:", data);
     if (data.pk && data.boundAddress) {
       const provider = new ethers.JsonRpcProvider(
         riseTestnet.rpcUrls.default.http[0]

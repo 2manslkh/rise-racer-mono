@@ -33,7 +33,7 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
 
   // Format a transaction message
   const formatTxMessage = (tx: TransactionRecord) => {
-    const truncatedHash = `0x${tx.hash.slice(2, 6)}`;
+    const truncatedHash = tx.hash ? `0x${tx.hash.slice(2, 6)}` : "0x????";
     const blockNumber = tx.receipt?.blockNumber || "---";
 
     let timeDisplay = ""; // Initialize as empty
@@ -52,7 +52,7 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
 
     return (
       <div
-        key={tx.hash} // Removed forceUpdate from key
+        key={tx.hash || Math.random().toString()}
         className="font-mono text-xs leading-tight mb-0 whitespace-nowrap"
       >
         <span className="text-white">

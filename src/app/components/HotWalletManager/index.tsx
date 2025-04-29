@@ -16,7 +16,7 @@ import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
 import { riseTestnet } from "@/app/configuration/wagmi";
 
 // Define the target Chain ID
-const RISE_TESTNET_CHAIN_ID = 11155931;
+const RISE_TESTNET_CHAIN_ID = 11155008;
 const message = "Login to Rise Racers";
 
 const HotWalletManager = () => {

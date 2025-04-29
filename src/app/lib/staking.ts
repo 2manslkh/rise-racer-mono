@@ -1,5 +1,6 @@
-import { ethers } from 'ethers';
+import { ethers, TransactionReceipt } from 'ethers';
 import { ENVIRONMENT } from '../configuration/environment';
+import { sendRawTransactionSync } from './transaction-utils';
 
 // --- Staking Contract Address ---
 const stakingContractAddress = ENVIRONMENT.STAKING_CONTRACT_ADDRESS;
@@ -100,42 +101,52 @@ export const getTotalStaked = async (provider?: ethers.Provider): Promise<bigint
  * Stake ETH
  * @param signer The signer to send the transaction with
  * @param amount The amount of ETH to stake in wei
- * @returns A promise that resolves with the transaction response
+ * @param nonce The nonce to use for the transaction
+ * @returns A promise that resolves with the transaction receipt
  */
 export const stakeETH = async (
     signer: ethers.Signer,
-    amount: bigint
-): Promise<ethers.ContractTransactionResponse> => {
+    amount: bigint,
+    nonce: number
+): Promise<TransactionReceipt> => {
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
 
     const contract = await getStakingContract(signer);
-    const tx = await contract.stakeETH({ value: amount, gasLimit: 250000 });
+    const signedTx = await contract.stakeETH.populateTransaction(
+        { value: amount, gasLimit: 250000, nonce: nonce, chainId: ENVIRONMENT.CHAIN_ID, gasPrice: ENVIRONMENT.DEFAULT_GAS_PRICE }
+    );
 
-    // Track the transaction
-    // trackTransaction(tx, `Stake ${ethers.formatEther(amount)} ETH`);
+    const signedTxData = await signer.signTransaction(signedTx);
 
-    return tx;
+    const receipt = await sendRawTransactionSync(signer.provider as ethers.JsonRpcProvider, signedTxData);
+
+    return receipt;
 };
 
 /**
  * Unstake ETH
  * @param signer The signer to send the transaction with
- * @returns A promise that resolves with the transaction response
+ * @param nonce The nonce to use for the transaction
+ * @returns A promise that resolves with the transaction receipt
  */
 export const unstakeETH = async (
-    signer: ethers.Signer
-): Promise<ethers.ContractTransactionResponse> => {
+    signer: ethers.Signer,
+    nonce: number
+): Promise<TransactionReceipt> => {
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
 
     const contract = await getStakingContract(signer);
-    const tx = await contract.unstakeETH({ gasLimit: 250000 });
+    const signedTx = await contract.unstakeETH.populateTransaction(
+        { gasLimit: 250000, nonce: nonce, chainId: ENVIRONMENT.CHAIN_ID, gasPrice: ENVIRONMENT.DEFAULT_GAS_PRICE }
+    );
 
-    // Track the transaction
-    // trackTransaction(tx, "Unstake ETH");
+    const signedTxData = await signer.signTransaction(signedTx);
 
-    return tx;
-}; 
+    const receipt = await sendRawTransactionSync(signer.provider as ethers.JsonRpcProvider, signedTxData);
+
+    return receipt;
+};

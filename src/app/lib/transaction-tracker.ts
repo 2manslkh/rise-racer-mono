@@ -110,6 +110,42 @@ class TransactionTracker {
     }
 
     /**
+     * Track a transaction by hash only (for use with sendRawTransactionSync)
+     * @param txHash The transaction hash
+     * @param description Optional description of the transaction
+     * @param callbacks Optional callbacks for transaction events
+     * @returns The transaction hash
+     */
+    public trackByHash(
+        txHash: string,
+        description: string = "Transaction",
+        callbacks?: TransactionCallback
+    ): string {
+        const txRecord: TransactionRecord = {
+            hash: txHash,
+            description,
+            status: "pending",
+            timestamp: Date.now(),
+        };
+
+        this.transactions[txHash] = txRecord;
+
+        if (callbacks) {
+            this.callbacks[txHash] = callbacks;
+        }
+
+        // Persist to storage
+        this.saveToStorage();
+
+        // Start polling if not already polling
+        if (this.provider && !this.pollingTimer) {
+            this.startPolling();
+        }
+
+        return txHash;
+    }
+
+    /**
      * Get all transactions being tracked
      * @returns Array of transaction records
      */
@@ -204,22 +240,50 @@ class TransactionTracker {
      */
     public updatePendingTransaction(
         placeholderHash: string,
-        tx: ethers.ContractTransactionResponse,
+        txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string,
         callbacks?: TransactionCallback
     ): void {
         const existingRecord = this.transactions[placeholderHash];
         if (!existingRecord || existingRecord.status !== 'pending') {
             console.warn(`Optimistic transaction ${placeholderHash} not found or not pending.`);
-            // Optionally, still track the real transaction if placeholder is missing
-            // this.track(tx, existingRecord?.description || 'Transaction', callbacks);
             return;
         }
 
         // Remove the placeholder entry
         delete this.transactions[placeholderHash];
 
+        // Handle various input types
+        let realHash: string;
+        let isContractTransaction = false;
+
+        console.log("txOrHash type:", typeof txOrHash);
+        console.log("txOrHash value:", txOrHash);
+
+        if (typeof txOrHash === 'string') {
+            // It's just a hash
+            realHash = txOrHash;
+        } else if (txOrHash && typeof txOrHash === 'object') {
+            // Check if it has a hash property
+            if ('transactionHash' in txOrHash && typeof txOrHash.transactionHash === 'string') {
+                realHash = txOrHash.transactionHash;
+                // Check if it's a contract transaction response with a wait method
+                isContractTransaction = 'wait' in txOrHash && typeof txOrHash.wait === 'function';
+            } else {
+                // Try to find a hash property or a transaction hash in the object
+                console.error('Object provided to updatePendingTransaction has no valid hash property', txOrHash);
+
+                // Fallback: Keep using the placeholder hash since we couldn't find a real hash
+                realHash = placeholderHash;
+            }
+        } else {
+            console.error('Invalid transaction type provided to updatePendingTransaction:',
+                typeof txOrHash,
+                txOrHash ? Object.keys(txOrHash) : 'null or undefined');
+            // Fallback: Keep using the placeholder hash
+            realHash = placeholderHash;
+        }
+
         // Add the real transaction entry
-        const realHash = tx.hash;
         const txRecord: TransactionRecord = {
             ...existingRecord, // Keep original description and timestamp
             hash: realHash,
@@ -228,17 +292,20 @@ class TransactionTracker {
             receipt: undefined,
             error: undefined,
         };
+
+        // If it's a receipt, mark as mined immediately
+        if (typeof txOrHash === 'object' && txOrHash && 'blockNumber' in txOrHash) {
+            txRecord.status = 'mined';
+            txRecord.receipt = txOrHash as ethers.TransactionReceipt;
+            txRecord.minedTimestamp = Date.now();
+        }
+
         this.transactions[realHash] = txRecord;
 
         // Associate callbacks with the real hash
         if (callbacks) {
             this.callbacks[realHash] = callbacks;
         }
-        // Also copy callbacks from placeholder if they existed (might not be needed with current setup)
-        // if (this.callbacks[placeholderHash]) {
-        //     this.callbacks[realHash] = this.callbacks[placeholderHash];
-        //     delete this.callbacks[placeholderHash];
-        // }
 
         // Save changes
         this.saveToStorage();
@@ -248,32 +315,41 @@ class TransactionTracker {
             this.startPolling();
         }
 
-        // Set up the listener for the *real* transaction
-        tx.wait(0).then(
-            (receipt) => {
-                this.updateTransactionStatus(realHash, "mined", receipt || undefined);
-            },
-            (error) => {
-                // Check if it's an ethers error with specific codes
-                if (error && typeof error === 'object' && 'code' in error) {
-                    const ethersError = error as { code: string; reason?: string }; // Type assertion
+        // Set up the listener only if we have a transaction object with wait method
+        if (isContractTransaction) {
+            try {
+                // We know this is a ContractTransactionResponse with wait method
+                const tx = txOrHash as ethers.ContractTransactionResponse;
+                tx.wait(0).then(
+                    (receipt) => {
+                        this.updateTransactionStatus(realHash, "mined", receipt || undefined);
+                    },
+                    (error) => {
+                        // Check if it's an ethers error with specific codes
+                        if (error && typeof error === 'object' && 'code' in error) {
+                            const ethersError = error as { code: string; reason?: string }; // Type assertion
 
-                    if (ethersError.code === 'TRANSACTION_REPLACED') {
-                        if (ethersError.reason === 'cancelled') {
-                            this.updateTransactionStatus(realHash, "dropped", undefined, error as Error);
-                        } else { // 'replaced' or other reasons
-                            this.updateTransactionStatus(realHash, "dropped", undefined, error as Error);
+                            if (ethersError.code === 'TRANSACTION_REPLACED') {
+                                if (ethersError.reason === 'cancelled') {
+                                    this.updateTransactionStatus(realHash, "dropped", undefined, error as Error);
+                                } else { // 'replaced' or other reasons
+                                    this.updateTransactionStatus(realHash, "dropped", undefined, error as Error);
+                                }
+                            } else {
+                                // Handle other ethers errors or general errors
+                                this.updateTransactionStatus(realHash, "failed", undefined, error as Error);
+                            }
+                        } else {
+                            // Handle non-ethers errors or errors without a code
+                            this.updateTransactionStatus(realHash, "failed", undefined, error as Error);
                         }
-                    } else {
-                        // Handle other ethers errors or general errors
-                        this.updateTransactionStatus(realHash, "failed", undefined, error as Error);
                     }
-                } else {
-                    // Handle non-ethers errors or errors without a code
-                    this.updateTransactionStatus(realHash, "failed", undefined, error as Error);
-                }
+                );
+            } catch (err) {
+                console.error("Error calling tx.wait() in updatePendingTransaction:", err);
             }
-        );
+        }
+        // If we only have the hash or a receipt, we'll rely on polling to update the status
     }
 
     /**
@@ -563,10 +639,10 @@ export const initiatePendingTransaction = (description: string): string => {
  */
 export const updatePendingTransaction = (
     placeholderHash: string,
-    tx: ethers.ContractTransactionResponse,
+    txOrHash: ethers.ContractTransactionResponse | ethers.TransactionReceipt | string,
     callbacks?: TransactionCallback
 ): void => {
-    getTransactionTracker().updatePendingTransaction(placeholderHash, tx, callbacks);
+    getTransactionTracker().updatePendingTransaction(placeholderHash, txOrHash, callbacks);
 };
 
 /**
@@ -574,6 +650,17 @@ export const updatePendingTransaction = (
  */
 export const removePendingTransaction = (placeholderHash: string): void => {
     getTransactionTracker().removePendingTransaction(placeholderHash);
+};
+
+/**
+ * Track a transaction by hash (for transactions already submitted via sendRawTransactionSync)
+ */
+export const trackTransactionByHash = (
+    txHash: string,
+    description?: string,
+    callbacks?: TransactionCallback
+): string => {
+    return getTransactionTracker().trackByHash(txHash, description, callbacks);
 };
 
 export type { TransactionStatus, TransactionRecord, TransactionCallback }; 

@@ -1,5 +1,6 @@
-import { ethers } from 'ethers';
+import { ethers, TransactionReceipt } from 'ethers';
 import { ENVIRONMENT } from '../configuration/environment';
+import { sendRawTransactionSync } from './transaction-utils';
 
 // --- Contract ABI for Click ---
 const riseRacerAddress = ENVIRONMENT.RISE_RACER_ADDRESS;
@@ -65,7 +66,6 @@ export const getCurrentVelocity = async (playerAddress: string, provider?: ether
     // Pass only the provider if available, otherwise let getRiseRacerContract handle default/signer logic
     const contract = await getRiseRacerContract(provider);
     const playerInfo = await contract.getPlayerInfo(playerAddress);
-    console.log("🚀 | getCurrentVelocity | playerInfo:", playerInfo)
     // playerInfo structure: [velocity, currentUniverse, totalClicks, isStaking]
     return playerInfo[0]; // Return the velocity component
 };
@@ -75,12 +75,18 @@ export const getCurrentVelocity = async (playerAddress: string, provider?: ether
  * Requires a signer to send the transaction.
  * @param signer An ethers Signer instance to sign the transaction.
  * @param nonce The nonce to use for the transaction.
- * @returns A promise that resolves with the transaction response.
+ * @returns A promise that resolves with the transaction hash.
+ * 
+ * @example
+ * // Example usage with transaction tracker:
+ * const txHash = await clickRace(signer, nonce);
+ * // Track the transaction using the hash
+ * const trackingId = trackTxByHash(txHash, "Race Click");
  */
 export const clickRace = async (
     signer: ethers.Signer,
     nonce: number,
-): Promise<ethers.ContractTransactionResponse> => {
+): Promise<TransactionReceipt> => {
     if (!signer.provider) {
         throw new Error("Signer must be connected to a Provider to send a transaction.");
     }
@@ -90,8 +96,19 @@ export const clickRace = async (
         signer
     );
 
-    // Pass nonce and gasLimit
-    const tx = await clickContract.click({ nonce: nonce, gasLimit: 400000 });
+    const signedTx = await clickContract.click.populateTransaction(
+        {
+            nonce: nonce,
+            gasLimit: 400000,
+            chainId: ENVIRONMENT.CHAIN_ID,
+            gasPrice: ENVIRONMENT.DEFAULT_GAS_PRICE
+        }
+    );
 
-    return tx; // Return the transaction response
+    const signedTxData = await signer.signTransaction(signedTx);
+
+    const receipt = await sendRawTransactionSync(signer.provider as ethers.JsonRpcProvider, signedTxData);
+
+    return receipt; // Return the transaction response
 };
+
