@@ -155,19 +155,19 @@ export const GetLevelRequirement = (level: number = 1) => {
     case 5:
       return 11_200;
     case 6:
-      return 300_000;
+      return 299_792;
     case 7:
-      return 3_000_000;
+      return 2_997_925;
     case 8:
-      return 30_000_000;
+      return 29_979_246;
     case 9:
-      return 75_000_000;
+      return 74_948_115;
     case 10:
-      return 150_000_000;
+      return 149_896_229;
     case 11:
-      return 270_000_000;
+      return 269_813_212;
     case 12:
-      return 297_000_000;
+      return 296_794_533;
     case 13:
       return 299_792_458;
     default:
