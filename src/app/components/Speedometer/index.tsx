@@ -17,8 +17,8 @@ const Speedometer = ({
         <div className="relative w-[204px] h-[68px]">
           <Image src={"./Speedometer.svg"} alt="Speedometer" fill />
         </div>
-        <div className="absolute left-3 top-[2px] text-white font-zen flex items-center justify-between w-[85px]">
-          <p className="text-[17px]">{formatToScientific(currentProgress)}</p>
+        <div className="absolute left-2 top-[2px] text-white font-zen flex items-center justify-between w-[85px]">
+          <p className="text-[15px]">{formatToScientific(currentProgress)}</p>
           <p className="text-[7px]">m/s</p>
         </div>
 
