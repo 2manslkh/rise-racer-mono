@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   DrawRoad,
@@ -35,6 +35,7 @@ interface GameplayProps {
   gameStarted: boolean;
   heightPercentage?: number;
   vehicleTier?: number;
+  handlePreloading: Dispatch<SetStateAction<boolean>>;
 }
 
 // Define a threshold for rapid clicks (in milliseconds)
@@ -43,6 +44,7 @@ const COMBO_THRESHOLD_MS = 1000; // 1 second
 const Gameplay: React.FC<GameplayProps> = ({
   vehicleTier = 1,
   gameStarted,
+  handlePreloading,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -461,6 +463,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
       if (isPreloadingRef.current && roadY >= 1_000) {
         isPreloadingRef.current = false;
+        handlePreloading(false);
         roadSpeedRef.current = 0;
       }
 

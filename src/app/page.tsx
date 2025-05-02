@@ -35,6 +35,7 @@ export default function Home() {
   const viewportHeight = useViewportHeight();
   const { isConnected } = useAppKitAccount();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [isPreloadingGame, setIsPreloadingGame] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -151,6 +152,7 @@ export default function Home() {
 
             {hotWallet && (
               <StartButton
+                isPreloadingGame={isPreloadingGame}
                 disabled={gameStarted}
                 handleClick={() => handleMenuClick(MenuAction.START_GAME)}
               />
@@ -163,7 +165,10 @@ export default function Home() {
             />
 
             <div className="relative w-full h-full">
-              <Gameplay gameStarted={gameStarted} />
+              <Gameplay
+                gameStarted={gameStarted}
+                handlePreloading={setIsPreloadingGame}
+              />
 
               {activeView === Views.LEADERBOARD && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
@@ -180,7 +185,6 @@ export default function Home() {
                   <Staking />
                 </div>
               )}
-
 
               {!hotWallet && <BindHotWallet />}
               <LowBalanceModal
