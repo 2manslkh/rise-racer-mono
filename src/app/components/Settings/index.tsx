@@ -46,7 +46,7 @@ const Settings = ({
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[330px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[335px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         style={{
           width: "calc(100% - 28px)",
         }}
