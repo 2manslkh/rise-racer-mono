@@ -122,9 +122,9 @@ const ShopV2 = () => {
   }, [fetchInitialShopData]);
 
   // Keep the ref updated with the latest refetchShopData function
-  useEffect(() => {
-    refetchShopDataRef.current = refetchShopData;
-  }, [refetchShopData]);
+  // useEffect(() => {
+  //   refetchShopDataRef.current = refetchShopData;
+  // }, [refetchShopData]);
 
   // Refresh balance after upgrade
   useEffect(() => {
@@ -240,8 +240,6 @@ const ShopV2 = () => {
                 ),
                 value: receipt.hash,
               });
-              // Call the function via the ref
-              refetchShopDataRef.current();
             },
             onFailed: (error: Error) => {
               console.error(`Upgrade transaction failed:`, error);
@@ -261,15 +259,15 @@ const ShopV2 = () => {
             // Cooldown for 1 second to ensure the transaction is mined
             setTimeout(() => {
               refetchShopDataRef.current();
-            }, 500);
+              setIsUpgrading(null);
+              refreshBalance();
+              fetchVelocityData();
+            }, 2500);
 
             placeholderHash = null;
           }
 
           // Update balance immediately (optimistic)
-          refreshBalance();
-          fetchVelocityData();
-          // REMOVED IMMEDIATE SHOP REFETCH FROM HERE
         } catch (error) {
           console.error("Error during upgrade process:", error);
           const errorMsg =
@@ -282,7 +280,6 @@ const ShopV2 = () => {
             removeTx(placeholderHash);
           }
         } finally {
-          setIsUpgrading(null);
         }
       } else {
         console.log(cost, parseEther(riseCrystals));
