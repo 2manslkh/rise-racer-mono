@@ -1,7 +1,7 @@
 import { riseTestnet } from "../configuration/wagmi";
 
 export enum LOOKUP_ENTITIES {
-  TRANSACTION_HASH = "txn",
+  TRANSACTION_HASH = "tx",
   ADDRESS = "address",
   BLOCK = "block",
   TOKEN = "token",

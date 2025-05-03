@@ -155,7 +155,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     }
 
     roadSpeedRef.current += Number(incrementalSpeed);
-    if (roadSpeedRef.current === GetLevelRequirement(currentLevel)) {
+    if (roadSpeedRef.current >= GetLevelRequirement(currentLevel)) {
       previousLevelRef.current = currentLevel;
       if (currentLevel === 13) {
         // Rebirth scenario

@@ -40,7 +40,7 @@ const Speedometer = ({
               width={14}
               height={14}
             />
-            <p className="text-[14px]">{formatToScientific(riseCrystals)}</p>
+            <p className="text-[14px]">{+riseCrystals.toFixed(2)}</p>
           </div>
         </div>
       </div>

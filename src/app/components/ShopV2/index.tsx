@@ -13,12 +13,14 @@ import {
   getShop,
   Shop,
 } from "@/app/lib/cosmic-parts";
-import toast from "react-hot-toast";
 import {
   useTransactionTracker,
   TransactionCallback,
 } from "@/app/hooks/useTransactionTracker";
 import { PartType } from "./type"; // Try importing PartType from here
+import { useToast } from "@/app/hooks/useToast";
+import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
+import { riseTestnet } from "@/app/configuration/wagmi";
 
 const RISE_CRYSTAL_ICON = "/rise_crystal.svg";
 
@@ -67,6 +69,7 @@ const ShopV2 = () => {
   const [txError, setTxError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { initiateTx, updateTx, removeTx } = useTransactionTracker();
+  const toast = useToast();
 
   // --- Data Fetching Declarations First ---
   const refetchShopData = useCallback(async () => {
@@ -125,25 +128,23 @@ const ShopV2 = () => {
 
   // Refresh balance after upgrade
   useEffect(() => {
-    if (!isUpgrading) {
-      const fetchBalance = async () => {
-        if (!hotWallet || !hotWallet.provider || !hotWallet.address) return;
+    const fetchBalance = async () => {
+      if (!hotWallet || !hotWallet.provider || !hotWallet.address) return;
 
-        try {
-          const provider = hotWallet.provider as ethers.Provider;
-          const balance = await getBalance(hotWallet.address, provider);
-          const decimals = await getDecimals(provider);
+      try {
+        const provider = hotWallet.provider as ethers.Provider;
+        const balance = await getBalance(hotWallet.address, provider);
+        const decimals = await getDecimals(provider);
 
-          // Format the balance
-          const formatted = ethers.formatUnits(balance, decimals);
-          setRiseCrystals(formatted);
-        } catch (error) {
-          console.error("Failed to refresh balance:", error);
-        }
-      };
+        // Format the balance
+        const formatted = ethers.formatUnits(balance, decimals);
+        setRiseCrystals(formatted);
+      } catch (error) {
+        console.error("Failed to refresh balance:", error);
+      }
+    };
 
-      fetchBalance();
-    }
+    fetchBalance();
   }, [isUpgrading, hotWallet]);
 
   // --- Effect to compute displayParts when shopData changes ---
@@ -224,11 +225,21 @@ const ShopV2 = () => {
 
           // Define callbacks for the transaction tracker
           const callbacks: TransactionCallback = {
-            onMined: (receipt: ethers.TransactionReceipt) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onMined: (receipt: any) => {
               console.log(
-                `Transaction ${receipt.hash} confirmed! Triggering shop refetch...`
+                `Transaction ${receipt.transactionHash} confirmed! Triggering shop refetch...`
               );
-              toast.success("Upgrade confirmed!");
+              // toast.success("Upgrade confirmed!");
+              toast.transactionSuccess({
+                message: "Upgrade confirmed!",
+                link: getBlockExplorerUrl(
+                  receipt.transactionHash,
+                  riseTestnet.id,
+                  LOOKUP_ENTITIES.TRANSACTION_HASH
+                ),
+                value: receipt.hash,
+              });
               // Call the function via the ref
               refetchShopDataRef.current();
             },
@@ -263,7 +274,8 @@ const ShopV2 = () => {
           console.error("Error during upgrade process:", error);
           const errorMsg =
             error instanceof Error ? error.message : "Unknown error";
-          toast.error(`Upgrade error: ${errorMsg}`, { id: "upgrade-toast" });
+          // toast.error(`Upgrade error: ${errorMsg}`, { id: "upgrade-toast" });
+          toast.error(`Upgrade error: ${errorMsg}`);
           setTxError(errorMsg);
           // If there was an error *before* updateTx, remove the placeholder
           if (placeholderHash) {
@@ -307,7 +319,9 @@ const ShopV2 = () => {
       </div>
 
       <div className="relative w-full flex items-center justify-center gap-2 bg-black/30 py-2 rounded-lg">
-        <span className="font-semibold text-lg">{riseCrystals}</span>
+        <span className="font-semibold text-lg">
+          {(+riseCrystals).toFixed(2)}
+        </span>
         <div className="relative w-6 h-6">
           <Image src={RISE_CRYSTAL_ICON} alt="Rise Crystals" layout="fill" />
         </div>
