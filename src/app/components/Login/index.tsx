@@ -3,6 +3,7 @@ import WalletConnectButton from "../Shared/WalletConnectButton";
 import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useEffect, useState } from "react";
 import LoadingConnect from "../Shared/LoadingConnect";
+import TelegramInfo from "../TelegramInfo";
 
 function useHasMounted() {
   const [hasMounted, setHasMounted] = useState(false);
@@ -18,6 +19,7 @@ const Login = () => {
 
   return (
     <div className="relative w-full h-full">
+      <TelegramInfo />
       <div className="relative w-full h-full">
         <Image src={"/LoginBackground.png"} alt="Login Background" fill />
       </div>

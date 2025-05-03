@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import ContextProvider from "./context/WagmiContext";
 import { HotWalletProvider } from "./context/HotWalletContext";
 import { Toaster } from "react-hot-toast";
+import { TelegramAuthProvider } from "./context/TelegramContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -113,10 +114,11 @@ export default async function RootLayout({
             },
           }}
         />
-
-        <ContextProvider cookies={cookies}>
-          <HotWalletProvider>{children}</HotWalletProvider>
-        </ContextProvider>
+        <TelegramAuthProvider>
+          <ContextProvider cookies={cookies}>
+            <HotWalletProvider>{children}</HotWalletProvider>
+          </ContextProvider>
+        </TelegramAuthProvider>
       </body>
     </html>
   );
