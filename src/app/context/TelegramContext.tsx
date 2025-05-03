@@ -6,7 +6,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { retrieveRawInitData } from "@telegram-apps/sdk";
+import { retrieveRawInitData, retrieveLaunchParams } from "@telegram-apps/sdk";
 
 // Define types
 interface TelegramUser {
@@ -19,6 +19,7 @@ interface TelegramUser {
 
 interface TelegramAuthContextType {
   initData: string | null;
+  initDataRaw: string | null;
   isAuthenticated: boolean;
   user: TelegramUser | null;
   jwt: string | null;
@@ -45,20 +46,22 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
   const [jwt /* setJwt */] = useState<string | null>(null); // Commented out setJwt
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [initData, setInitData] = useState<string | null>(null);
+  const [initDataRaw, setInitDataRaw] = useState<string | null>(null);
+  const [initData, setInitData] = useState<unknown>(null);
 
   useEffect(() => {
     const authenticate = async () => {
       try {
-        const initDataRaw = retrieveRawInitData();
-        if (!initDataRaw) {
+        // const initDataRaw = retrieveRawInitData();
+        const launchParams = retrieveLaunchParams();
+        if (!launchParams) {
           setError("Not running in a Telegram Mini App");
           setIsLoading(false);
           return;
         }
 
-        setInitData(initDataRaw);
-
+        // setInitDataRaw(launchParams.tgWebAppData ?? null);
+        setInitData(launchParams);
         // const response = await fetch("https://your-server.com/api/auth", {
         //   method: "POST",
         //   headers: {
@@ -93,7 +96,16 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
 
   return (
     <TelegramAuthContext.Provider
-      value={{ isAuthenticated, user, jwt, userId, isLoading, error, initData }}
+      value={{
+        isAuthenticated,
+        user,
+        jwt,
+        userId,
+        isLoading,
+        error,
+        initData,
+        initDataRaw,
+      }}
     >
       {children}
     </TelegramAuthContext.Provider>

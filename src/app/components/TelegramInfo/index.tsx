@@ -2,8 +2,16 @@ import React from "react";
 import { useTMA } from "@/app/context/TelegramContext"; // Adjust path if needed
 
 const TelegramInfo: React.FC = () => {
-  const { initData, isAuthenticated, user, jwt, userId, isLoading, error } =
-    useTMA();
+  const {
+    initData,
+    initDataRaw,
+    isAuthenticated,
+    user,
+    jwt,
+    userId,
+    isLoading,
+    error,
+  } = useTMA();
 
   if (error) {
     return (
@@ -12,7 +20,7 @@ const TelegramInfo: React.FC = () => {
   }
 
   return (
-    <div className="font-mono text-xs text-white space-y-1 opacity-70">
+    <div className="font-mono text-xs text-white space-y-1 opacity-70 overflow-scroll max-h-[200px]">
       <div>{isAuthenticated ? "Authenticated" : "Not Authenticated"}</div>
       <div>User ID: {userId ?? "N/A"}</div>
       {user && (
@@ -21,8 +29,10 @@ const TelegramInfo: React.FC = () => {
         </pre>
       )}
       <div>JWT: {jwt ?? "N/A"}</div>
-      <pre className="p-0 m-0 bg-transparent whitespace-pre-wrap break-all overflow-scroll">
-        InitData: {initData ?? "N/A"}
+      <pre className="p-0 m-0 bg-transparent whitespace-pre-wrap break-all">
+        InitData: {JSON.stringify(initData, null, 2)}
+        <br />
+        InitDataRaw: {initDataRaw}
       </pre>
       {isLoading && <div>(Loading...)</div>}
     </div>
