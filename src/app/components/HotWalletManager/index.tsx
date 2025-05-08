@@ -111,13 +111,9 @@ const HotWalletManager = () => {
     signMessage(
       { message: message },
       {
-        onSuccess: async (data) => {
+        onSuccess: async () => {
           try {
-            await loadHotWallet({
-              address: mainWalletAddress,
-              message,
-              signature: data,
-            });
+            await loadHotWallet();
           } catch (error) {
             logError(error);
             toast.error("Error binding hot wallet");
