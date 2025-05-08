@@ -180,6 +180,62 @@ export function useToast() {
     return id;
   };
 
+  const transactionSuccess = ({
+    message,
+    link,
+    value,
+  }: {
+    message: string;
+    link: string;
+    value: string;
+  }) => {
+    const id = toast.custom(
+      (t) => (
+        <div
+          className={`base-toast ${t.visible ? "animate-enter" : "animate-leave"}`}
+        >
+          <span className="relative w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+            <svg
+              className="text-white w-4 h-4 animate-checkmark"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              viewBox="0 0 24 24"
+            >
+              <path
+                className="stroke-dasharray-[16] stroke-dashoffset-[16] animate-draw"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </span>
+          <div className="flex flex-col text-sm text-white">
+            <p>{message}</p>
+            {link && (
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-xs"
+              >
+                {value
+                  ? value.includes("0x")
+                    ? shortenAddress(value)
+                    : value
+                  : "View Details"}
+              </a>
+            )}
+          </div>
+        </div>
+      ),
+      {
+        duration: TOAST_DURATION,
+      }
+    );
+
+    activeToastsRef.current.push(id);
+    return id;
+  };
+
   const transactionPromise = useCallback(function <T>(
     promise: Promise<T>,
     config: ToastOptionsWithLink<T>
@@ -268,6 +324,7 @@ export function useToast() {
     show: (msg: Renderable, opts?: ToastOptions) => wrapToast(toast, msg, opts),
     promise,
     transactionPromise,
+    transactionSuccess,
     success,
     error,
   };
