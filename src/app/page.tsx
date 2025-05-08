@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Gameplay from "./components/Gameplay";
 import Navigation from "./components/Navigation";
 import Menu, { MenuAction } from "./components/Menu";
-import Login from "./components/Login";
 import Leaderboard from "./components/Leaderboard";
 import Staking from "./components/Staking";
 import { useHotWallet } from "./context/HotWalletContext";
@@ -13,6 +12,8 @@ import ShopV2 from "./components/ShopV2";
 import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
+import PlayViaTelegramButton from "./components/PlayViaTelegramButton";
+import Login from "./components/Login";
 
 export type User = {
   vehicle: number;
@@ -82,9 +83,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (player) {
-      loadHotWallet();
-    }
+    loadHotWallet();
   }, [player, loadHotWallet]);
 
   const handleMenuClick = (_menuAction: MenuAction) => {
@@ -138,7 +137,7 @@ export default function Home() {
       style={{ height: `${viewportHeight}px` }}
     >
       <div className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden">
-        {player ? (
+        {player.boundAddress ? (
           <div className="relative w-full h-full">
             {[Views.NULL, Views.SETTINGS, Views.TUTORIAL].includes(
               activeView
@@ -153,7 +152,7 @@ export default function Home() {
               />
             )}
 
-            {player && (
+            {!gameStarted && (
               <StartButton
                 isPreloadingGame={false}
                 disabled={gameStarted}
@@ -194,7 +193,7 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <Login />
+          <PlayViaTelegramButton />
         )}
       </div>
     </div>
