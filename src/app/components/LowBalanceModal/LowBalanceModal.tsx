@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import { formatEther } from "viem";
-import { useAccount } from "wagmi";
 import { useToast } from "@/app/hooks/useToast";
 import Image from "next/image"; // Import Image component
 import { shortenAddress } from "@/app/lib/address"; // Import shortenAddress
@@ -13,7 +12,6 @@ interface LowBalanceModalProps {
 }
 
 const LOW_BALANCE_THRESHOLD = 0.001; // ETH // Reverted to original threshold
-const RISE_TESTNET_CHAIN_ID = 11155008; // Define target chain ID
 const FAUCET_API_URL = "https://faucet-api.riselabs.xyz/faucet/request";
 const TURNSTILE_SITE_KEY = "0x4AAAAAABDerdTw43kK5pDL";
 
@@ -26,14 +24,12 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [isFaucetLoading, setIsFaucetLoading] = useState(false);
   const toast = useToast(); // Initialize toast
-  const { chainId, isConnected } = useAccount(); // Get network info
 
   const isLowBalance =
     balance !== undefined &&
     parseFloat(formatEther(balance)) < LOW_BALANCE_THRESHOLD;
 
   // Check if on the correct network
-  const isOnCorrectNetwork = isConnected && chainId === RISE_TESTNET_CHAIN_ID;
 
   const handleClose = () => {
     setIsOpen(false);
@@ -153,13 +149,6 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
             </div>
 
             <div className="flex flex-col items-center gap-3">
-              {isConnected && !isOnCorrectNetwork && (
-                <p className="text-orange-600 text-xs text-center">
-                  Your main wallet is not on RISE Testnet. This faucet request
-                  will top up your hot wallet (
-                  {shortenAddress(hotWalletAddress)}).
-                </p>
-              )}
               <Turnstile
                 siteKey={TURNSTILE_SITE_KEY}
                 onSuccess={(token: string) => {
