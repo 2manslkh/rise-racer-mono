@@ -12,8 +12,7 @@ import ShopV2 from "./components/ShopV2";
 import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
-import PlayViaTelegramButton from "./components/PlayViaTelegramButton";
-// import Login from "./components/Login";
+import RiseRacerLandingPage from "./components/RiseRacerLandingPage";
 
 export type User = {
   vehicle: number;
@@ -33,7 +32,6 @@ enum Views {
 
 export default function Home() {
   const viewportHeight = useViewportHeight();
-  // const { isConnected } = useAppKitAccount();
   const { player } = useTMA();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
@@ -132,12 +130,16 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="relative w-screen flex items-center justify-center bg-[#29004D]"
-      style={{ height: `${viewportHeight}px` }}
-    >
-      <div className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden">
-        {player.boundAddress ? (
+    <div className="relative w-full flex items-center justify-center bg-[#29004D] min-h-screen">
+      {player.boundAddress ? (
+        <div
+          className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden"
+          style={
+            player.boundAddress
+              ? { height: `${viewportHeight}px` }
+              : { height: "100%" }
+          }
+        >
           <div className="relative w-full h-full">
             {[Views.NULL, Views.SETTINGS, Views.TUTORIAL].includes(
               activeView
@@ -192,10 +194,10 @@ export default function Home() {
               />
             </div>
           </div>
-        ) : (
-          <PlayViaTelegramButton />
-        )}
-      </div>
+        </div>
+      ) : (
+        <RiseRacerLandingPage />
+      )}
     </div>
   );
 }
