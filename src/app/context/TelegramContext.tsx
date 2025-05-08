@@ -9,7 +9,7 @@ import React, {
 import {
   retrieveRawInitData,
   retrieveLaunchParams,
-  mockTelegramEnv,
+  // mockTelegramEnv,
 } from "@telegram-apps/sdk";
 
 // Define types

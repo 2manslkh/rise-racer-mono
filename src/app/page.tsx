@@ -13,7 +13,7 @@ import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
 import PlayViaTelegramButton from "./components/PlayViaTelegramButton";
-import Login from "./components/Login";
+// import Login from "./components/Login";
 
 export type User = {
   vehicle: number;

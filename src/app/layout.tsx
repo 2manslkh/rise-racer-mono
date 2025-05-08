@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import ContextProvider from "./context/WagmiContext";
 import { HotWalletProvider } from "./context/HotWalletContext";
 import { Toaster } from "react-hot-toast";
-import { TelegramAuthProvider, useTMA } from "./context/TelegramContext";
+import { TelegramAuthProvider } from "./context/TelegramContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
