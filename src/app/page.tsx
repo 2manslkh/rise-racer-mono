@@ -167,10 +167,7 @@ export default function Home() {
             />
 
             <div className="relative w-full h-full">
-              <Gameplay
-                gameStarted={gameStarted}
-                handlePreloading={setIsPreloadingGame}
-              />
+              <Gameplay gameStarted={gameStarted} handlePreloading={() => {}} />
 
               {activeView === Views.LEADERBOARD && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
