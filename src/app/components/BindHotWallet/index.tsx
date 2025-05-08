@@ -25,11 +25,7 @@ const BindHotWallet = () => {
       {
         onSuccess: async (data) => {
           try {
-            await loadHotWallet({
-              address: address,
-              message: "Login to Rise Racers",
-              signature: data,
-            });
+            await loadHotWallet();
             setLoading(false);
           } catch (error) {
             logError(error);

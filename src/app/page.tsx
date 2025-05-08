@@ -5,10 +5,8 @@ import Gameplay from "./components/Gameplay";
 import Navigation from "./components/Navigation";
 import Menu, { MenuAction } from "./components/Menu";
 import Login from "./components/Login";
-import { useAppKitAccount } from "@reown/appkit/react";
 import Leaderboard from "./components/Leaderboard";
 import Staking from "./components/Staking";
-import BindHotWallet from "./components/BindHotWallet";
 import { useHotWallet } from "./context/HotWalletContext";
 import useViewportHeight from "./hooks/useViewportHeight";
 import ShopV2 from "./components/ShopV2";
@@ -37,7 +35,6 @@ export default function Home() {
   // const { isConnected } = useAppKitAccount();
   const { player } = useTMA();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
-  const [isPreloadingGame, setIsPreloadingGame] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
