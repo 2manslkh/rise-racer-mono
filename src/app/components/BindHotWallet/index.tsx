@@ -23,7 +23,7 @@ const BindHotWallet = () => {
     signMessage(
       { message: "Login to Rise Racers" },
       {
-        onSuccess: async (data) => {
+        onSuccess: async () => {
           try {
             await loadHotWallet();
             setLoading(false);
