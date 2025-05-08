@@ -30,11 +30,7 @@ interface HotWalletContextProps {
   riseCrystalsBalance: bigint;
   address: string | null;
   isLoading: boolean;
-  loadHotWallet: (args: {
-    address: string;
-    message: string;
-    signature: string;
-  }) => Promise<void>;
+  loadHotWallet: () => Promise<void>;
   disconnectHotWallet: () => void;
   refreshBalance: () => void;
   nonce: number;
