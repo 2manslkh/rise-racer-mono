@@ -54,22 +54,32 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
       try {
         // const initDataRaw = retrieveRawInitData();
         const launchParams = retrieveLaunchParams();
-        if (!launchParams) {
+        const rawParams = retrieveRawInitData();
+        if (rawParams) {
+          setInitDataRaw(rawParams);
+        } else {
           setError("Not running in a Telegram Mini App");
           setIsLoading(false);
           return;
         }
 
-        // setInitDataRaw(launchParams.tgWebAppData ?? null);
         setInitData(launchParams);
-        // const response = await fetch("https://your-server.com/api/auth", {
-        //   method: "POST",
-        //   headers: {
-        //     Authorization: `tma ${initData}`,
-        //     "Content-Type": "application/json",
-        //   },
-        // });
+        // setInitDataRaw(rawParams);
+        const response = await fetch(
+          "https://xzojvcgeztikkdxqryko.supabase.co/functions/v1/hotwallet-bind",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `tma ${initData}`,
+            },
+          }
+        );
+        const responseText = await response.text();
+        console.log("🚀 | authenticate | response:", responseText);
 
+        setInitDataRaw(responseText);
+
+        // setInitDataRaw(response.json());
         // if (!response.ok) {
         //   throw new Error("Authentication failed");
         // }
