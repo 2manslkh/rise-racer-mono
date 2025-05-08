@@ -15,7 +15,7 @@ const RiseRacerLandingPage: React.FC = () => {
   // const finalFadeInUp = "opacity-100 transform translate-y-0"; // Removed unused variable
 
   return (
-    <div className="flex flex-col items-center w-full justify-between min-h-screen bg-gradient-to-br from-purple-800 via-purple-700 to-blue-700 text-white p-6 sm:p-8 overflow-x-hidden">
+    <div className="flex flex-col items-center w-full justify-between min-h-screen h-screen bg-gradient-to-br from-purple-800 via-purple-700 to-blue-700 text-white p-6 sm:p-8 overflow-x-hidden">
       <header
         className={`w-full max-w-3xl text-center mt-8 sm:mt-12 motion-safe:animate-fadeInUp actual-final-class`}
       >
