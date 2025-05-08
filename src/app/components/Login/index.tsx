@@ -3,7 +3,7 @@ import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useEffect, useState } from "react";
 import LoadingConnect from "../Shared/LoadingConnect";
 import TelegramInfo from "../TelegramInfo";
-
+import Image from "next/image";
 function useHasMounted() {
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
@@ -19,11 +19,11 @@ const Login = () => {
   return (
     <div className="relative w-full h-full">
       <div className="relative w-full h-full">
-        {/* <Image src={"/LoginBackground.png"} alt="Login Background" fill /> */}
+        <Image src={"/LoginBackground.png"} alt="Login Background" fill />
         <TelegramInfo />
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 top-[10px] w-[270px] h-[71px]">
-        {/* <Image src={"/RiseRacerLogo.png"} alt="Rise Racer" fill /> */}
+        <Image src={"/RiseRacerLogo.png"} alt="Rise Racer" fill />
       </div>
       <div className="absolute left-1/2 -translate-x-1/2 bottom-0">
         {hasMounted ? (

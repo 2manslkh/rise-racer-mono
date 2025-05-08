@@ -30,6 +30,7 @@ import { useToast } from "@/app/hooks/useToast";
 import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
 import TransactionLogs from "../TransactionLogs";
 import { formatEther } from "ethers";
+import { useTMA } from "@/app/context/TelegramContext";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -59,6 +60,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     refreshBalance,
     riseCrystalsBalance,
   } = useHotWallet();
+  const { player } = useTMA();
   const toast = useToast();
   const { initiateTx, updateTx, removeTx, transactions } =
     useTransactionTracker();
@@ -211,7 +213,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
-    if (!address) return;
+    if (!player) return;
 
     const shouldUpdate = GetShouldUpdateCanvas(
       previousLevelRef.current,
@@ -488,7 +490,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (bg.complete) {
       draw();
     }
-  }, [dimensions, currentLevel, address]);
+  }, [dimensions, currentLevel, player]);
 
   return (
     <div

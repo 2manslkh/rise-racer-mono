@@ -14,6 +14,7 @@ import { getCurrentVelocity, getVelocityPerClick } from "../lib/rise-racer";
 import { logError } from "../lib/error";
 import { GetCurrentLevel } from "../lib/gameplaySettings";
 import { getBalance as getRiseCrystalsBalance } from "../lib/rise-crystals";
+import { useTMA } from "./TelegramContext";
 
 export const MINIMUM_GAS = 1000000000000n;
 
@@ -70,6 +71,8 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     currentProgress: 5,
   });
 
+  const { player } = useTMA();
+
   const disconnectHotWallet = () => {
     setHotWallet(null);
     setAddress(null);
@@ -77,25 +80,9 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     setVelocityPerClick(null);
   };
 
-  const loadHotWallet = async ({
-    address,
-    message,
-    signature,
-  }: {
-    address: string;
-    message: string;
-    signature: string;
-  }) => {
+  const loadHotWallet = async () => {
     setIsLoading(true);
-    // POST request to https://xzojvcgeztikkdxqryko.supabase.co/functions/v1/hotwallet-bind
-    const response = await fetch(
-      "https://xzojvcgeztikkdxqryko.supabase.co/functions/v1/hotwallet-bind",
-      {
-        method: "POST",
-        body: JSON.stringify({ address, message, signature }),
-      }
-    );
-    const data = await response.json();
+    const data = player;
     if (data.pk && data.boundAddress) {
       const provider = new ethers.JsonRpcProvider(
         riseTestnet.rpcUrls.default.http[0]
@@ -118,7 +105,6 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       const initialNonce = await provider.getTransactionCount(wallet.address);
 
       // const initialNonce = await wallet.provider.getTransactionCount("pending");
-      console.log("🚀 | HotWalletProvider | initialNonce:", initialNonce);
       setNonce(initialNonce);
       setIsLoading(false);
     } else {
@@ -173,7 +159,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       setCurrentVelocity(null);
       setVelocityPerClick(null);
     }
-  }, [address, hotWallet?.provider]);
+  }, [player]);
 
   useEffect(() => {
     if (address) {

@@ -1,19 +1,20 @@
 import { useHotWallet } from "@/app/context/HotWalletContext";
 import { useToast } from "@/app/hooks/useToast";
 import { logError } from "@/app/lib/error";
-import { useAppKitAccount } from "@reown/appkit-controllers/react";
+// import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useState } from "react";
 import { useSignMessage } from "wagmi";
 
 const BindHotWallet = () => {
   const toast = useToast();
-  const { address } = useAppKitAccount();
+  const { address } = useHotWallet();
   const { signMessage } = useSignMessage();
   const { loadHotWallet } = useHotWallet();
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleBind = () => {
     if (loading) return;
+    console.log("🚀 | handleBind | address:", address);
     if (!address) {
       toast.error("Main wallet not connected.");
       return;

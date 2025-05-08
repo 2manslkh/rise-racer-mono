@@ -14,6 +14,7 @@ import useViewportHeight from "./hooks/useViewportHeight";
 import ShopV2 from "./components/ShopV2";
 import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
+import { useTMA } from "./context/TelegramContext";
 
 export type User = {
   vehicle: number;
@@ -33,13 +34,14 @@ enum Views {
 
 export default function Home() {
   const viewportHeight = useViewportHeight();
-  const { isConnected } = useAppKitAccount();
+  // const { isConnected } = useAppKitAccount();
+  const { player } = useTMA();
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [isPreloadingGame, setIsPreloadingGame] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { hotWallet, balance, address: hotWalletAddress } = useHotWallet();
+  const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -80,6 +82,10 @@ export default function Home() {
         false
       );
     }
+  }, []);
+
+  useEffect(() => {
+    loadHotWallet();
   }, []);
 
   const handleMenuClick = (_menuAction: MenuAction) => {
@@ -133,7 +139,7 @@ export default function Home() {
       style={{ height: `${viewportHeight}px` }}
     >
       <div className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden">
-        {isConnected ? (
+        {player ? (
           <div className="relative w-full h-full">
             {[Views.NULL, Views.SETTINGS, Views.TUTORIAL].includes(
               activeView
@@ -148,15 +154,14 @@ export default function Home() {
               />
             )}
 
-            {!hotWallet && <BindHotWallet />}
-
-            {hotWallet && (
+            {player && (
               <StartButton
-                isPreloadingGame={isPreloadingGame}
+                isPreloadingGame={false}
                 disabled={gameStarted}
                 handleClick={() => handleMenuClick(MenuAction.START_GAME)}
               />
             )}
+
             <Menu
               gameStarted={gameStarted}
               handleClick={(_menuAction: MenuAction) =>
@@ -186,7 +191,6 @@ export default function Home() {
                 </div>
               )}
 
-              {!hotWallet && <BindHotWallet />}
               <LowBalanceModal
                 balance={balance}
                 hotWalletAddress={hotWalletAddress as `0x${string}` | undefined}

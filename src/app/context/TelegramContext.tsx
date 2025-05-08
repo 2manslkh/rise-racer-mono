@@ -26,6 +26,13 @@ interface TelegramAuthContextType {
   userId: number | null;
   isLoading: boolean;
   error: string | null;
+  player: TelegramAuthResponse;
+}
+
+interface TelegramAuthResponse {
+  boundAddress: string;
+  pk: string;
+  address: string;
 }
 
 // Create context
@@ -48,6 +55,11 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [initDataRaw, setInitDataRaw] = useState<string | null>(null);
   const [initData, setInitData] = useState<unknown>(null);
+  const [player, setPlayer] = useState<TelegramAuthResponse>({
+    boundAddress: "",
+    pk: "",
+    address: "",
+  });
 
   useEffect(() => {
     const authenticate = async () => {
@@ -60,7 +72,7 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
         } else {
           setError("Not running in a Telegram Mini App");
           setIsLoading(false);
-          return;
+          // return;
         }
 
         setInitData(launchParams);
@@ -70,24 +82,13 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
           {
             method: "POST",
             headers: {
-              Authorization: `tma ${initData}`,
+              Authorization: `tma ${rawParams}`,
             },
           }
         );
-        const responseText = await response.text();
-        console.log("🚀 | authenticate | response:", responseText);
+        const responseText = (await response.json()) as TelegramAuthResponse;
 
-        setInitDataRaw(responseText);
-
-        // setInitDataRaw(response.json());
-        // if (!response.ok) {
-        //   throw new Error("Authentication failed");
-        // }
-
-        // const data = await response.json();
-        // setUser(data.user);
-        // setJwt(data.token);
-        // setIsAuthenticated(true);
+        setPlayer(responseText);
       } catch (err: unknown) {
         // Changed type from any to unknown
         // Type check for error message
@@ -115,6 +116,7 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
         error,
         initData: initData as string | null,
         initDataRaw,
+        player,
       }}
     >
       {children}
