@@ -1,4 +1,3 @@
-import Image from "next/image";
 import WalletConnectButton from "../Shared/WalletConnectButton";
 import { useAppKitAccount } from "@reown/appkit-controllers/react";
 import { useEffect, useState } from "react";

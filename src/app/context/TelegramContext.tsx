@@ -113,7 +113,7 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
         userId,
         isLoading,
         error,
-        initData,
+        initData: initData as string | null,
         initDataRaw,
       }}
     >
