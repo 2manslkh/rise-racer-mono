@@ -13,6 +13,8 @@ import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
 import RiseRacerLandingPage from "./components/RiseRacerLandingPage";
+import { init } from "@telegram-apps/sdk";
+import { viewport } from "@telegram-apps/sdk";
 
 export type User = {
   vehicle: number;
@@ -62,6 +64,24 @@ export default function Home() {
 
     setIsMusicPlaying(!isMusicPlaying);
   };
+
+  const requestFullscreen = async () => {
+    await viewport.mount();
+    await viewport.requestFullscreen();
+  };
+
+  useEffect(() => {
+    init();
+
+    // Check if fullscreen is supported
+    if (!viewport.isFullscreen() && viewport.width() < 765) {
+      console.log(viewport.isFullscreen());
+      // requestFullscreen();
+      requestFullscreen();
+
+      // viewport.requestFullscreen();
+    }
+  }, []);
 
   useEffect(() => {
     if (window) {

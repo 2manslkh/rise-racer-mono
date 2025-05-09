@@ -9,6 +9,9 @@ import React, {
 import {
   retrieveRawInitData,
   retrieveLaunchParams,
+  requestFullscreen,
+  init,
+  viewport,
   // mockTelegramEnv,
 } from "@telegram-apps/sdk";
 
@@ -91,6 +94,7 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
         }
       );
       const responseText = (await response.json()) as TelegramAuthResponse;
+      // await requestFullscreen();
 
       setPlayer(responseText);
     } catch (err: unknown) {
