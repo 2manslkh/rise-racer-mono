@@ -75,7 +75,6 @@ const ShopV2 = () => {
     console.log("Refetching shop data after transaction mined...");
     try {
       const newShopData = await getShop(hotWallet.address, hotWallet.provider);
-      console.log("🚀 | refetchShopData | newShopData:", newShopData);
       setShopData(newShopData);
       toast.success("Shop data updated!");
     } catch (error) {
@@ -94,7 +93,6 @@ const ShopV2 = () => {
       const provider = hotWallet.provider as ethers.Provider;
       const address = hotWallet.address;
       const shopData = await getShop(address, provider);
-      console.log("🚀 | fetchInitialShopData | shopData:", shopData);
       setShopData(shopData);
 
       // setParts(updatedParts);
@@ -216,7 +214,6 @@ const ShopV2 = () => {
             partTypeMapV2[partId],
             currentNonce
           );
-          console.log("🚀 | txReceipt:", txReceipt);
 
           // Define callbacks for the transaction tracker
           const callbacks: TransactionCallback = {

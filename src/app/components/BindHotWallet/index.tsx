@@ -14,7 +14,6 @@ const BindHotWallet = () => {
 
   const handleBind = () => {
     if (loading) return;
-    console.log("🚀 | handleBind | address:", address);
     if (!address) {
       toast.error("Main wallet not connected.");
       return;

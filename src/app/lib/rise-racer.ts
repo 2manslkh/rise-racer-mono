@@ -102,7 +102,6 @@ export const getPlayerInfo = async (
   // Pass only the provider if available, otherwise let getRiseRacerContract handle default/signer logic
   const contract = await getRiseRacerContract(provider);
   const playerInfo = await contract.getPlayerInfo(playerAddress);
-  console.log("🚀 | playerInfo:", playerInfo)
   // playerInfo structure: [velocity, currentUniverse, totalClicks, isStaking]
   return {
     velocity: playerInfo[0],

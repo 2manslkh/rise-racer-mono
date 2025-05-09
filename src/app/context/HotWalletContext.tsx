@@ -38,7 +38,6 @@ interface HotWalletContextProps {
   getNonce: () => number;
   currentVelocity: bigint | null;
   velocityPerClick: bigint | null;
-  isFetchingVelocity: boolean;
   user: User;
   wsProvider: ethers.WebSocketProvider | null;
 }
@@ -59,7 +58,6 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     null
   );
   const [riseCrystalsBalance, setRiseCrystalsBalance] = useState<bigint>(0n);
-  const [isFetchingVelocity, setIsFetchingVelocity] = useState(false);
   const [user, setUser] = useState<User>({
     vehicle: 1,
     currentLevel: 1,
@@ -78,7 +76,6 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const loadHotWallet = async () => {
     setIsLoading(true);
     const data = player;
-    console.log("🚀 | loadHotWal | data:", data);
     if (data.pk && data.boundAddress) {
       const provider = new ethers.JsonRpcProvider(
         riseTestnet.rpcUrls.default.http[0]
@@ -116,7 +113,6 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
           address,
           hotWallet.provider
         )) as PlayerInfoFull;
-        console.log("🚀 | refreshPlayerInfo | player:", player);
 
         setUser({
           vehicle: 1,
@@ -162,7 +158,6 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         getNonce,
         currentVelocity,
         velocityPerClick,
-        isFetchingVelocity,
         refreshPlayerInfo,
         user,
         wsProvider,

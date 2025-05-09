@@ -70,7 +70,6 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
     try {
       // const initDataRaw = retrieveRawInitData();
       const launchParams = retrieveLaunchParams();
-      console.log("🚀 | authenticate | launchParams:", launchParams);
       const rawParams = retrieveRawInitData();
       if (rawParams) {
         setInitDataRaw(rawParams);
