@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
+import { useHotWallet } from "@/app/context/HotWalletContext";
 import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
@@ -155,11 +155,12 @@ const HotWalletManager = () => {
       {hotWalletAddress ? (
         <div className="flex flex-col gap-2 text-sm">
           <p className="text-black text-inter">
-            Use this address to top up gas (ETH on RISE Testnet). Minimum your
-            wallet should have {ethers.formatEther(MINIMUM_GAS.toString())} ETH
+            Use this address to top up gas (ETH on RISE Testnet).
+            {/* Minimum your
+            wallet should have {ethers.formatEther(MINIMUM_GAS.toString())} ETH */}
           </p>
           {/* Top Up Section */}
-          <div className="flex items-center gap-2 mt-1">
+          {/* <div className="flex items-center gap-2 mt-1">
             <input
               type="number"
               step="0.01"
@@ -182,13 +183,13 @@ const HotWalletManager = () => {
             >
               {isTxLoading ? "Sending..." : "Top Up"}
             </button>
-          </div>
+          </div> */}
           {/* Network Warning Message */}
-          {isConnected && !isOnCorrectNetwork && (
+          {/* {isConnected && !isOnCorrectNetwork && (
             <p className="text-orange-600 text-xs mt-1">
               Please switch your wallet to RISE Testnet to proceed.
             </p>
-          )}
+          )} */}
           {/* {bindError && (
             <p className="text-red-500 text-xs mt-1">
               Error binding: {bindError.message}
