@@ -38,6 +38,7 @@ interface GameplayProps {
   vehicleTier?: number;
   handlePreloading: Dispatch<SetStateAction<boolean>>;
   isFullscreen: boolean;
+  setShowRebirthModal: Dispatch<SetStateAction<boolean>>;
 }
 
 // Define a threshold for rapid clicks (in milliseconds)
@@ -48,6 +49,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   gameStarted,
   isFullscreen,
   handlePreloading,
+  setShowRebirthModal,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -163,7 +165,8 @@ const Gameplay: React.FC<GameplayProps> = ({
       previousLevelRef.current = currentLevel;
       if (currentLevel === 13) {
         // Rebirth scenario
-        // TODO: Maybe need to add a modal say congrats rebirth
+        setShowRebirthModal(true);
+        roadSpeedRef.current = 1;
         setCurrentLevel(1);
       } else {
         setCurrentLevel((prevState) => prevState + 1);

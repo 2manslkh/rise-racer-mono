@@ -16,6 +16,7 @@ import RiseRacerLandingPage from "./components/RiseRacerLandingPage";
 import { expandViewport, init } from "@telegram-apps/sdk";
 
 import { mountViewport } from "@telegram-apps/sdk";
+import RebirthModal from "./components/RebirthModal";
 
 export type User = {
   vehicle: number;
@@ -44,6 +45,7 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
   const [isScreenReady, setIsScreenReady] = useState<boolean>(false);
+  const [showRebirth, setShowRebirth] = useState<boolean>(false);
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -206,6 +208,7 @@ export default function Home() {
                 gameStarted={gameStarted}
                 isFullscreen={isScreenReady}
                 handlePreloading={setIsPreloadingGame}
+                setShowRebirthModal={setShowRebirth}
               />
 
               {activeView === Views.LEADERBOARD && (
@@ -228,6 +231,8 @@ export default function Home() {
                 balance={balance}
                 hotWalletAddress={hotWalletAddress as `0x${string}` | undefined}
               />
+
+              {showRebirth && <RebirthModal handleShow={setShowRebirth} />}
             </div>
           </div>
         </div>
