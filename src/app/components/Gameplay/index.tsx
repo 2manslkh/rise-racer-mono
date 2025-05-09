@@ -30,7 +30,7 @@ import { useToast } from "@/app/hooks/useToast";
 import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
 import TransactionLogs from "../TransactionLogs";
 import { formatEther } from "ethers";
-import { useTMA } from "@/app/context/TelegramContext";
+// import { useTMA } from "@/app/context/TelegramContext";
 
 interface GameplayProps {
   gameStarted: boolean;
@@ -47,7 +47,7 @@ const COMBO_THRESHOLD_MS = 1000; // 1 second
 const Gameplay: React.FC<GameplayProps> = ({
   vehicleTier = 1,
   gameStarted,
-  isFullscreen,
+  // isFullscreen,
   handlePreloading,
   setShowRebirthModal,
 }) => {
@@ -64,7 +64,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     refreshPlayerInfo,
     riseCrystalsBalance,
   } = useHotWallet();
-  const { player } = useTMA();
+  // const { player } = useTMA();
   const toast = useToast();
   const { initiateTx, updateTx, removeTx, transactions } =
     useTransactionTracker();
@@ -219,8 +219,8 @@ const Gameplay: React.FC<GameplayProps> = ({
   // Drawing of canvas
   useEffect(() => {
     if (currentLevel === 0) return;
-    if (!isFullscreen) return;
-    if (!player) return;
+    // if (!isFullscreen) return;
+    // if (!player) return;
 
     const shouldUpdate = GetShouldUpdateCanvas(
       previousLevelRef.current,
@@ -236,7 +236,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     // To avoid having the canvas to render at the speed of 1_000_000
     const getVisualSpeed = () => {
       if (isPreloadingRef.current) return 100;
-      return Math.min(roadSpeedRef.current, 10);
+      return Math.min(roadSpeedRef.current, 100);
     };
 
     const canvas = canvasRef.current;
@@ -305,7 +305,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
         sideObjects.forEach((obj) => {
           // obj.y += roadSpeedRef.current / 10;
-          obj.y += getVisualSpeed();
+          obj.y += getVisualSpeed() / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -397,7 +397,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         }
 
         sideObjects.forEach((obj) => {
-          obj.y += getVisualSpeed();
+          obj.y += getVisualSpeed() / 10;
           // obj.y += roadSpeedRef.current / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
@@ -444,7 +444,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
         sideObjects.forEach((obj) => {
           // obj.y += roadSpeedRef.current / 10;
-          obj.y += getVisualSpeed();
+          obj.y += getVisualSpeed() / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -468,7 +468,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       }
 
       // roadY += roadSpeedRef.current / 10;
-      roadY += getVisualSpeed();
+      roadY += getVisualSpeed() / 10;
 
       if (isPreloadingRef.current && roadY >= 1_000) {
         isPreloadingRef.current = false;
@@ -497,7 +497,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (bg.complete) {
       draw();
     }
-  }, [dimensions, currentLevel, player, isFullscreen]);
+  }, [dimensions, currentLevel]);
 
   return (
     <div
