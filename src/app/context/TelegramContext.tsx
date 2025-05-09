@@ -6,14 +6,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import {
-  retrieveRawInitData,
-  retrieveLaunchParams,
-  requestFullscreen,
-  init,
-  viewport,
-  // mockTelegramEnv,
-} from "@telegram-apps/sdk";
+import { retrieveRawInitData, retrieveLaunchParams } from "@telegram-apps/sdk";
 
 // Define types
 interface TelegramUser {
