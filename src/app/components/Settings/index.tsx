@@ -1,7 +1,7 @@
 import Toggle from "../Shared/Toggle";
-import { useAppKitAccount } from "@reown/appkit-controllers/react";
-import { useDisconnect } from "@reown/appkit/react";
-import { shortenAddress } from "@/app/lib/address";
+// import { useAppKitAccount } from "@reown/appkit-controllers/react";
+// import { useDisconnect } from "@reown/appkit/react";
+// import { shortenAddress } from "@/app/lib/address";
 import HotWalletManager from "../HotWalletManager";
 import { useHotWallet } from "@/app/context/HotWalletContext";
 import { useEffect } from "react";
@@ -17,14 +17,14 @@ const Settings = ({
   musicPlaying: boolean;
   toggleMusicPlaying: () => void;
 }) => {
-  const { address } = useAppKitAccount();
-  const { disconnect } = useDisconnect();
-  const { disconnectHotWallet, refreshBalance } = useHotWallet();
+  // const { address } = useAppKitAccount();
+  // const { disconnect } = useDisconnect();
+  const { refreshBalance } = useHotWallet();
 
-  const handleDisconnect = async () => {
-    disconnectHotWallet();
-    await disconnect();
-  };
+  // const handleDisconnect = async () => {
+  //   disconnectHotWallet();
+  //   await disconnect();
+  // };
 
   useEffect(() => {
     refreshBalance();
@@ -46,7 +46,7 @@ const Settings = ({
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[335px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 right-[14px] z-2 h-[275px] origin-top-right ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         style={{
           width: "calc(100% - 28px)",
         }}
@@ -72,7 +72,7 @@ const Settings = ({
             </div>
 
             {/* Main Wallet */}
-            <div className="relative w-full flex items-center gap-2 justify-between">
+            {/* <div className="relative w-full flex items-center gap-2 justify-between">
               <p className="text-black text-inter font-bold text-lg">
                 Main{" "}
                 <span className="font-normal">
@@ -86,7 +86,7 @@ const Settings = ({
               >
                 Disconnect
               </button>
-            </div>
+            </div> */}
 
             {/* Replace Hot Wallet display with the manager component */}
             <HotWalletManager />

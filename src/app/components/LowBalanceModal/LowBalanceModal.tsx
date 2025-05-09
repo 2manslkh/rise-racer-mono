@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { useToast } from "@/app/hooks/useToast";
 import Image from "next/image"; // Import Image component
@@ -24,10 +24,13 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [isFaucetLoading, setIsFaucetLoading] = useState(false);
   const toast = useToast(); // Initialize toast
+  const [isLowBalance, setIsLowBalance] = useState<boolean>(false);
 
-  const isLowBalance =
-    balance !== undefined &&
-    parseFloat(formatEther(balance)) < LOW_BALANCE_THRESHOLD;
+  useEffect(() => {
+    if (balance) {
+      setIsLowBalance(parseFloat(formatEther(balance)) < LOW_BALANCE_THRESHOLD);
+    }
+  }, [balance]);
 
   // Check if on the correct network
 
@@ -117,7 +120,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
               </p>
               <button
                 onClick={handleClose}
-                className="text-gray-500 hover:text-gray-700 text-2xl leading-none p-1"
+                className="text-gray-500 hover:text-gray-700 text-4xl leading-none p-1"
                 disabled={isFaucetLoading}
               >
                 &times;
@@ -141,7 +144,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
                 <p className="text-xs text-red-600 font-semibold">
                   (Low:{" "}
                   {balance !== undefined
-                    ? formatEther(balance).slice(0, 5)
+                    ? formatEther(balance).slice(0, 7)
                     : "?"}{" "}
                   ETH)
                 </p>
