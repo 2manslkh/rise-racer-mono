@@ -68,15 +68,15 @@ const Gameplay: React.FC<GameplayProps> = ({
     useTransactionTracker();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const roadSpeedRef = useRef<number>(1000);
+  const roadSpeedRef = useRef<number>(100);
   const [clickEffects, setClickEffects] = useState<
     { id: string; x: number; y: number }[]
   >([]);
-  const previousLevelRef = useRef<number>(0);
+  const previousLevelRef = useRef<number>(1);
   const [showLevelTransition, setShowLevelTransition] =
     useState<boolean>(false);
   const isPreloadingRef = useRef<boolean>(true);
-  const [currentLevel, setCurrentLevel] = useState<number>(1);
+  const [currentLevel, setCurrentLevel] = useState<number>(0);
 
   // Combo state
   const [comboCount, setComboCount] = useState<number>(0);
@@ -215,6 +215,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
+    if (currentLevel === 0) return;
     if (!isFullscreen) return;
     if (!player) return;
 
@@ -231,7 +232,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
     // To avoid having the canvas to render at the speed of 1_000_000
     const getVisualSpeed = () => {
-      if (isPreloadingRef.current) return 1000;
+      if (isPreloadingRef.current) return 100;
       return Math.min(roadSpeedRef.current, 10);
     };
 

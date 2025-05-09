@@ -39,6 +39,7 @@ export default function Home() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const [isPreloadingGame, setIsPreloadingGame] = useState<boolean>(true);
   // const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
@@ -187,7 +188,7 @@ export default function Home() {
 
             {!gameStarted && (
               <StartButton
-                isPreloadingGame={false}
+                isPreloadingGame={isPreloadingGame}
                 disabled={gameStarted}
                 handleClick={() => handleMenuClick(MenuAction.START_GAME)}
               />
@@ -204,7 +205,7 @@ export default function Home() {
               <Gameplay
                 gameStarted={gameStarted}
                 isFullscreen={isScreenReady}
-                handlePreloading={() => {}}
+                handlePreloading={setIsPreloadingGame}
               />
 
               {activeView === Views.LEADERBOARD && (

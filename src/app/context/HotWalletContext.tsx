@@ -60,8 +60,8 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const [riseCrystalsBalance, setRiseCrystalsBalance] = useState<bigint>(0n);
   const [user, setUser] = useState<User>({
     vehicle: 1,
-    currentLevel: 1,
-    currentProgress: 5,
+    currentLevel: 0,
+    currentProgress: 0,
   });
 
   const { player } = useTMA();
