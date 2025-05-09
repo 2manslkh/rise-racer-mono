@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { ethers } from "ethers";
 import { riseTestnet } from "../configuration/wagmi";
-import { getCurrentVelocity, getVelocityPerClick } from "../lib/rise-racer";
+import { getPlayerInfo, PlayerInfoFull } from "../lib/rise-racer";
 import { logError } from "../lib/error";
 import { GetCurrentLevel } from "../lib/gameplaySettings";
 import { getBalance as getRiseCrystalsBalance } from "../lib/rise-crystals";
@@ -31,15 +31,14 @@ interface HotWalletContextProps {
   address: string | null;
   isLoading: boolean;
   loadHotWallet: () => Promise<void>;
+  refreshPlayerInfo: () => Promise<void>;
   disconnectHotWallet: () => void;
-  refreshBalance: () => void;
   nonce: number;
   incrementNonce: () => void;
   getNonce: () => number;
   currentVelocity: bigint | null;
   velocityPerClick: bigint | null;
   isFetchingVelocity: boolean;
-  fetchVelocityData: () => Promise<void>;
   user: User;
   wsProvider: ethers.WebSocketProvider | null;
 }
@@ -110,60 +109,35 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const refreshBalance = async () => {
+  const refreshPlayerInfo = useCallback(async () => {
     if (address && hotWallet?.provider) {
       try {
-        const currentBalance = await hotWallet.provider.getBalance(address);
-        setBalance(currentBalance);
-
-        const riseCrystalsBalance = await getRiseCrystalsBalance(
+        const player = (await getPlayerInfo(
           address,
           hotWallet.provider
-        );
-        setRiseCrystalsBalance(riseCrystalsBalance);
-      } catch (error) {
-        logError(error);
-        console.error("Failed to refresh balance:", error);
-      }
-    }
-  };
-
-  const fetchVelocityData = useCallback(async () => {
-    if (address && hotWallet?.provider) {
-      setIsFetchingVelocity(true);
-      try {
-        const [fetchedVelocity, fetchedVpc] = await Promise.all([
-          getCurrentVelocity(address, hotWallet.provider),
-          getVelocityPerClick(address, hotWallet.provider),
-        ]);
+        )) as PlayerInfoFull;
+        console.log("🚀 | refreshPlayerInfo | player:", player);
 
         setUser({
           vehicle: 1,
-          currentLevel: GetCurrentLevel(Number(fetchedVelocity)),
-          currentProgress: Number(fetchedVelocity),
+          currentLevel: GetCurrentLevel(Number(player.velocity)),
+          currentProgress: Number(player.velocity),
         });
-        setCurrentVelocity(fetchedVelocity);
-        setVelocityPerClick(fetchedVpc);
+        setCurrentVelocity(player.velocity);
+        setVelocityPerClick(player.clickPower);
+        setRiseCrystalsBalance(player.riseCrystalBalance);
       } catch (error) {
         logError(error);
-        console.error("Failed to fetch velocity data:", error);
-        setCurrentVelocity(null);
-        setVelocityPerClick(null);
-      } finally {
-        setIsFetchingVelocity(false);
+        console.error("Failed to refresh player info:", error);
       }
-    } else {
-      setCurrentVelocity(null);
-      setVelocityPerClick(null);
     }
-  }, [player]);
+  }, [address, hotWallet?.provider]);
 
   useEffect(() => {
     if (address) {
-      refreshBalance();
-      fetchVelocityData();
+      refreshPlayerInfo();
     }
-  }, [address, fetchVelocityData]);
+  }, [address, refreshPlayerInfo]);
 
   const incrementNonce = () => {
     setNonce((prevNonce) => prevNonce + 1);
@@ -183,14 +157,13 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
         isLoading,
         loadHotWallet,
         disconnectHotWallet,
-        refreshBalance,
         nonce,
         incrementNonce,
         getNonce,
         currentVelocity,
         velocityPerClick,
         isFetchingVelocity,
-        fetchVelocityData,
+        refreshPlayerInfo,
         user,
         wsProvider,
       }}

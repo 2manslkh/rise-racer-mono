@@ -28,7 +28,7 @@ const HotWalletManager = () => {
     isLoading: isHotWalletLoading,
     loadHotWallet,
     balance,
-    refreshBalance,
+    refreshPlayerInfo,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
   const [topUpAmount, setTopUpAmount] = useState("");
@@ -88,7 +88,7 @@ const HotWalletManager = () => {
             }),
             error: (err) => `Transaction failed: ${err.message}`,
           });
-          refreshBalance();
+          refreshPlayerInfo();
         },
         onError: (error) => {
           toast.error(`Transaction failed: ${error.message}`);

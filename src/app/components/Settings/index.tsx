@@ -19,7 +19,7 @@ const Settings = ({
 }) => {
   // const { address } = useAppKitAccount();
   // const { disconnect } = useDisconnect();
-  const { refreshBalance } = useHotWallet();
+  const { refreshPlayerInfo } = useHotWallet();
 
   // const handleDisconnect = async () => {
   //   disconnectHotWallet();
@@ -27,7 +27,7 @@ const Settings = ({
   // };
 
   useEffect(() => {
-    refreshBalance();
+    refreshPlayerInfo();
   }, [open]);
 
   return (

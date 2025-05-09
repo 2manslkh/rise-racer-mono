@@ -58,13 +58,8 @@ const ShopV2 = () => {
   const [shopData, setShopData] = useState<Shop>();
   const [displayParts, setDisplayParts] = useState<DisplayPart[]>([]);
   const [riseCrystals, setRiseCrystals] = useState<string>("0"); // Example starting crystals
-  const {
-    hotWallet,
-    incrementNonce,
-    refreshBalance,
-    fetchVelocityData,
-    getNonce,
-  } = useHotWallet();
+  const { hotWallet, incrementNonce, refreshPlayerInfo, getNonce } =
+    useHotWallet();
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null); // Tracks which part is being upgraded
   const [txError, setTxError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -260,8 +255,7 @@ const ShopV2 = () => {
             setTimeout(() => {
               refetchShopDataRef.current();
               setIsUpgrading(null);
-              refreshBalance();
-              fetchVelocityData();
+              refreshPlayerInfo();
             }, 2500);
 
             placeholderHash = null;
@@ -289,15 +283,13 @@ const ShopV2 = () => {
     },
     [
       hotWallet,
-      // shopData, // Removed dependency as handleUpgrade doesn't read it directly
       riseCrystals,
       initiateTx,
       updateTx,
       removeTx,
       incrementNonce,
       getNonce,
-      refreshBalance,
-      fetchVelocityData,
+      refreshPlayerInfo,
     ]
   );
 

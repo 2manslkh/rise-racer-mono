@@ -57,7 +57,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     address,
     getNonce,
     incrementNonce,
-    refreshBalance,
+    refreshPlayerInfo,
     riseCrystalsBalance,
   } = useHotWallet();
   const { player } = useTMA();
@@ -144,7 +144,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       });
 
       // 4. Update the balance
-      refreshBalance();
+      refreshPlayerInfo();
     } catch (error) {
       logError(error);
       toast.error("Click transaction failed. See console for details.");

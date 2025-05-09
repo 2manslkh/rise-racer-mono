@@ -17,7 +17,7 @@ const Staking = () => {
     hotWallet,
     address,
     balance,
-    refreshBalance,
+    refreshPlayerInfo,
     incrementNonce,
     getNonce,
   } = useHotWallet();
@@ -95,7 +95,7 @@ const Staking = () => {
         placeholderHash = null;
       }
 
-      refreshBalance();
+      refreshPlayerInfo();
       await fetchStakingInfo();
       setStakeAmount("");
     } catch (error) {
@@ -147,7 +147,7 @@ const Staking = () => {
         placeholderHash = null;
       }
 
-      refreshBalance();
+      refreshPlayerInfo();
       await fetchStakingInfo();
     } catch (error) {
       console.error("Unstaking failed:", error);
