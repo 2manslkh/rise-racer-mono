@@ -13,7 +13,14 @@ import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
 import RiseRacerLandingPage from "./components/RiseRacerLandingPage";
-import { init, viewport } from "@telegram-apps/sdk";
+import { expandViewport, init, viewport } from "@telegram-apps/sdk";
+
+import {
+  mountViewport,
+  isViewportMounting,
+  isViewportMounted,
+  viewportMountError,
+} from "@telegram-apps/sdk";
 
 export type User = {
   vehicle: number;
@@ -40,6 +47,7 @@ export default function Home() {
   // const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
+  const [isScreenReady, setIsScreenReady] = useState<boolean>(false);
 
   useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
@@ -65,25 +73,29 @@ export default function Home() {
     setIsMusicPlaying(!isMusicPlaying);
   };
 
-  const requestFullscreen = async () => {
-    await viewport.mount();
-    viewport.expand();
-  };
+  // const requestFullscreen = async () => {
+  //   await viewport.mount();
+  //   viewport.expand();
+  // };
 
   useEffect(() => {
     if (player) {
       init();
 
-      // Check if fullscreen is supported
-      if (!viewport.isFullscreen() && viewport.width() < 765) {
-        console.log(viewport.isFullscreen());
-        // requestFullscreen();
-        requestFullscreen();
-        // viewport.requestFullscreen();
+      if (mountViewport.isAvailable()) {
+        try {
+          mountViewport();
+        } catch (err) {
+          console.log(err);
+        }
       }
-      // setIsFullscreen(true);
+
+      if (expandViewport.isAvailable()) {
+        expandViewport();
+      }
     }
-  }, []);
+    setIsScreenReady(true);
+  }, [player]);
 
   useEffect(() => {
     if (window) {
@@ -103,7 +115,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    loadHotWallet();
+    if (player) {
+      loadHotWallet();
+    }
   }, [player]);
 
   const handleMenuClick = (_menuAction: MenuAction) => {
@@ -194,7 +208,7 @@ export default function Home() {
             <div className="relative w-full h-full">
               <Gameplay
                 gameStarted={gameStarted}
-                isFullscreen={viewport.isFullscreen()}
+                isFullscreen={isScreenReady}
                 handlePreloading={() => {}}
               />
 
