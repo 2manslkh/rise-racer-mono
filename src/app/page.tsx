@@ -40,10 +40,6 @@ export default function Home() {
   const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
 
   useEffect(() => {
-    import("eruda").then((lib) => lib.default.init());
-  }, []);
-
-  useEffect(() => {
     audioRef.current = new Audio("/music/night-racer.mp3");
     audioRef.current.loop = true;
 

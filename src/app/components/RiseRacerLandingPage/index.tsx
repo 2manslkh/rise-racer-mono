@@ -1,9 +1,13 @@
 "use client";
 
+import { useTMA } from "@/app/context/TelegramContext";
 import Image from "next/image";
 import React from "react";
+import Spinner from "../Shared/Loader/Spinner";
 
 const RiseRacerLandingPage: React.FC = () => {
+  const { isLoading } = useTMA();
+
   const handleOpenTelegramLink = () => {
     window.open("https://t.me/riseracer", "_blank", "noopener,noreferrer");
   };
@@ -73,19 +77,23 @@ const RiseRacerLandingPage: React.FC = () => {
         className="w-full max-w-sm text-center mb-12 sm:mb-16 motion-safe:animate-fadeInUp actual-final-class"
         style={{ animationDelay: "1.4s" }}
       >
-        <button
-          onClick={handleOpenTelegramLink}
-          className=" hover:cursor-pointer flex items-center justify-center w-full px-8 py-4 text-xl font-bold text-white bg-sky-500 rounded-xl shadow-xl hover:bg-sky-600 focus:outline-none focus:ring-4 focus:ring-sky-400 focus:ring-opacity-60 transition-all duration-200 ease-in-out transform hover:scale-105 group"
-        >
-          <Image
-            src="/telegram-logo.svg"
-            alt="Telegram Logo"
-            width={32}
-            height={32}
-            className="mr-3  "
-          />
-          Play now on Telegram
-        </button>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <button
+            onClick={handleOpenTelegramLink}
+            className=" hover:cursor-pointer flex items-center justify-center w-full px-8 py-4 text-xl font-bold text-white bg-sky-500 rounded-xl shadow-xl hover:bg-sky-600 focus:outline-none focus:ring-4 focus:ring-sky-400 focus:ring-opacity-60 transition-all duration-200 ease-in-out transform hover:scale-105 group"
+          >
+            <Image
+              src="/telegram-logo.svg"
+              alt="Telegram Logo"
+              width={32}
+              height={32}
+              className="mr-3  "
+            />
+            Play now on Telegram
+          </button>
+        )}
       </main>
 
       <footer

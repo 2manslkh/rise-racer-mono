@@ -111,6 +111,10 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
 
   const userId = user ? user.telegram_id : null;
 
+  useEffect(() => {
+    import("eruda").then((lib) => lib.default.init());
+  }, []);
+
   return (
     <TelegramAuthContext.Provider
       value={{
