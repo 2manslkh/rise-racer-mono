@@ -37,6 +37,7 @@ interface GameplayProps {
   heightPercentage?: number;
   vehicleTier?: number;
   handlePreloading: Dispatch<SetStateAction<boolean>>;
+  isFullscreen: boolean;
 }
 
 // Define a threshold for rapid clicks (in milliseconds)
@@ -45,6 +46,7 @@ const COMBO_THRESHOLD_MS = 1000; // 1 second
 const Gameplay: React.FC<GameplayProps> = ({
   vehicleTier = 1,
   gameStarted,
+  isFullscreen,
   handlePreloading,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -213,6 +215,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
   // Drawing of canvas
   useEffect(() => {
+    if (!isFullscreen) return;
     if (!player) return;
 
     const shouldUpdate = GetShouldUpdateCanvas(
@@ -490,7 +493,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     if (bg.complete) {
       draw();
     }
-  }, [dimensions, currentLevel, player]);
+  }, [dimensions, currentLevel, player, isFullscreen]);
 
   return (
     <div

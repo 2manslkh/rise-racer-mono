@@ -38,6 +38,7 @@ export default function Home() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
 
@@ -78,9 +79,9 @@ export default function Home() {
       console.log(viewport.isFullscreen());
       // requestFullscreen();
       requestFullscreen();
-
       // viewport.requestFullscreen();
     }
+    setIsFullscreen(true);
   }, []);
 
   useEffect(() => {
@@ -190,7 +191,11 @@ export default function Home() {
             />
 
             <div className="relative w-full h-full">
-              <Gameplay gameStarted={gameStarted} handlePreloading={() => {}} />
+              <Gameplay
+                gameStarted={gameStarted}
+                isFullscreen={viewport.isFullscreen()}
+                handlePreloading={() => {}}
+              />
 
               {activeView === Views.LEADERBOARD && (
                 <div className="absolute top-0 left-0 right-0 bottom-0">
