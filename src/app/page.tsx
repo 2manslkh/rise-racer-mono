@@ -82,7 +82,7 @@ export default function Home() {
 
   useEffect(() => {
     loadHotWallet();
-  }, [player, loadHotWallet]);
+  }, [player]);
 
   const handleMenuClick = (_menuAction: MenuAction) => {
     switch (_menuAction) {
