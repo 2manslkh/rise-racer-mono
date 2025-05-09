@@ -68,7 +68,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     useTransactionTracker();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const roadSpeedRef = useRef<number>(100);
+  const roadSpeedRef = useRef<number>(1000);
   const [clickEffects, setClickEffects] = useState<
     { id: string; x: number; y: number }[]
   >([]);
@@ -231,7 +231,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
     // To avoid having the canvas to render at the speed of 1_000_000
     const getVisualSpeed = () => {
-      if (isPreloadingRef.current) return 100;
+      if (isPreloadingRef.current) return 1000;
       return Math.min(roadSpeedRef.current, 10);
     };
 
@@ -301,7 +301,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
         sideObjects.forEach((obj) => {
           // obj.y += roadSpeedRef.current / 10;
-          obj.y += getVisualSpeed() / 10;
+          obj.y += getVisualSpeed();
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -393,7 +393,7 @@ const Gameplay: React.FC<GameplayProps> = ({
         }
 
         sideObjects.forEach((obj) => {
-          obj.y += getVisualSpeed() / 10;
+          obj.y += getVisualSpeed();
           // obj.y += roadSpeedRef.current / 10;
 
           const distanceFromTop = obj.y - obj.spawnY;
@@ -440,7 +440,7 @@ const Gameplay: React.FC<GameplayProps> = ({
 
         sideObjects.forEach((obj) => {
           // obj.y += roadSpeedRef.current / 10;
-          obj.y += getVisualSpeed() / 10;
+          obj.y += getVisualSpeed();
 
           const distanceFromTop = obj.y - obj.spawnY;
           const maxDistance = height - obj.spawnY;
@@ -464,7 +464,7 @@ const Gameplay: React.FC<GameplayProps> = ({
       }
 
       // roadY += roadSpeedRef.current / 10;
-      roadY += getVisualSpeed() / 10;
+      roadY += getVisualSpeed();
 
       if (isPreloadingRef.current && roadY >= 1_000) {
         isPreloadingRef.current = false;
