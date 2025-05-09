@@ -13,14 +13,9 @@ import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
 import RiseRacerLandingPage from "./components/RiseRacerLandingPage";
-import { expandViewport, init, viewport } from "@telegram-apps/sdk";
+import { expandViewport, init } from "@telegram-apps/sdk";
 
-import {
-  mountViewport,
-  isViewportMounting,
-  isViewportMounted,
-  viewportMountError,
-} from "@telegram-apps/sdk";
+import { mountViewport } from "@telegram-apps/sdk";
 
 export type User = {
   vehicle: number;
