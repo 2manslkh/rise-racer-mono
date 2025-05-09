@@ -13,8 +13,7 @@ import LowBalanceModal from "./components/LowBalanceModal";
 import StartButton from "./components/Shared/StartButton";
 import { useTMA } from "./context/TelegramContext";
 import RiseRacerLandingPage from "./components/RiseRacerLandingPage";
-import { init } from "@telegram-apps/sdk";
-import { viewport } from "@telegram-apps/sdk";
+import { init, viewport } from "@telegram-apps/sdk";
 
 export type User = {
   vehicle: number;
@@ -38,7 +37,7 @@ export default function Home() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<Views>(Views.NULL);
   const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  // const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
 
@@ -82,7 +81,7 @@ export default function Home() {
         requestFullscreen();
         // viewport.requestFullscreen();
       }
-      setIsFullscreen(true);
+      // setIsFullscreen(true);
     }
   }, []);
 

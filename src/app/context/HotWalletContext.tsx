@@ -76,7 +76,7 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
   const loadHotWallet = async () => {
     setIsLoading(true);
     const data = player;
-    if (data.pk && data.boundAddress) {
+    if (data && data.pk && data.boundAddress) {
       const provider = new ethers.JsonRpcProvider(
         riseTestnet.rpcUrls.default.http[0]
       );

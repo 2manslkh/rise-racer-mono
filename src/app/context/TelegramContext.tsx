@@ -26,7 +26,7 @@ interface TelegramAuthContextType {
   userId: number | null;
   isLoading: boolean;
   error: string | null;
-  player: TelegramAuthResponse;
+  player: TelegramAuthResponse | null;
   authenticate: () => Promise<void>;
 }
 

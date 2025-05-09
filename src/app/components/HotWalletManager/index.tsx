@@ -1,26 +1,26 @@
-import React, { useState } from "react";
+import React from "react";
 import { useHotWallet } from "@/app/context/HotWalletContext";
 import { shortenAddress } from "@/app/lib/address";
 import { copyToClipboard } from "@/app/lib/copy";
 import Image from "next/image";
 import {
   useAccount,
-  usePublicClient,
-  useSendTransaction,
+  // usePublicClient,
+  // useSendTransaction,
   useSignMessage,
 } from "wagmi"; // Assuming wagmi hooks are available via AppKit context
-import { ethers, parseEther } from "ethers";
+import { ethers } from "ethers";
 import { logError } from "@/app/lib/error";
 import { useToast } from "@/app/hooks/useToast";
-import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
-import { riseTestnet } from "@/app/configuration/wagmi";
+// import { getBlockExplorerUrl, LOOKUP_ENTITIES } from "@/app/lib/url";
+// import { riseTestnet } from "@/app/configuration/wagmi";
 
 // Define the target Chain ID
 const RISE_TESTNET_CHAIN_ID = 11155008;
 const message = "Login to Rise Racers";
 
 const HotWalletManager = () => {
-  const publicClient = usePublicClient();
+  // const publicClient = usePublicClient();
   const toast = useToast();
   const {
     // hotWallet, // Removed unused hotWallet
@@ -28,16 +28,16 @@ const HotWalletManager = () => {
     isLoading: isHotWalletLoading,
     loadHotWallet,
     balance,
-    refreshPlayerInfo,
+    // refreshPlayerInfo,
   } = useHotWallet();
   const { address: mainWalletAddress, isConnected, chainId } = useAccount();
-  const [topUpAmount, setTopUpAmount] = useState("");
+  // const [topUpAmount, setTopUpAmount] = useState("");
   const { signMessage } = useSignMessage();
-  const {
-    // data: hash,
-    isPending: isTxLoading,
-    sendTransaction,
-  } = useSendTransaction();
+  // const {
+  //   data: hash,
+  //   isPending: isTxLoading,
+  //   sendTransaction,
+  // } = useSendTransaction();
 
   // Check if the connected wallet is on the correct network
   const isOnCorrectNetwork = isConnected && chainId === RISE_TESTNET_CHAIN_ID;
@@ -51,52 +51,52 @@ const HotWalletManager = () => {
     }
   };
 
-  const handleTopUp = async () => {
-    // Add network check
-    if (!isOnCorrectNetwork) {
-      toast.error("Please connect to RISE Testnet to top up.");
-      return;
-    }
-    if (!sendTransaction || !hotWalletAddress || !topUpAmount) return;
-    const amountWei = parseEther(topUpAmount);
-    if (amountWei <= BigInt(0)) {
-      toast.error("Please enter a valid amount > 0");
-      return;
-    }
+  // const handleTopUp = async () => {
+  //   // Add network check
+  //   if (!isOnCorrectNetwork) {
+  //     toast.error("Please connect to RISE Testnet to top up.");
+  //     return;
+  //   }
+  //   if (!sendTransaction || !hotWalletAddress || !topUpAmount) return;
+  //   const amountWei = parseEther(topUpAmount);
+  //   if (amountWei <= BigInt(0)) {
+  //     toast.error("Please enter a valid amount > 0");
+  //     return;
+  //   }
 
-    sendTransaction(
-      {
-        to: hotWalletAddress as `0x${string}`,
-        value: amountWei,
-      },
-      {
-        onSuccess: (txnHash) => {
-          const waitPromise = publicClient!.waitForTransactionReceipt({
-            hash: txnHash,
-          });
+  //   sendTransaction(
+  //     {
+  //       to: hotWalletAddress as `0x${string}`,
+  //       value: amountWei,
+  //     },
+  //     {
+  //       onSuccess: (txnHash) => {
+  //         const waitPromise = publicClient!.waitForTransactionReceipt({
+  //           hash: txnHash,
+  //         });
 
-          toast.transactionPromise(waitPromise, {
-            loading: "Sending Transaction",
-            success: () => ({
-              message: "Top-up confirmed!",
-              link: getBlockExplorerUrl(
-                txnHash,
-                riseTestnet.id,
-                LOOKUP_ENTITIES.TRANSACTION_HASH
-              ),
-              value: txnHash,
-            }),
-            error: (err) => `Transaction failed: ${err.message}`,
-          });
-          refreshPlayerInfo();
-        },
-        onError: (error) => {
-          toast.error(`Transaction failed: ${error.message}`);
-        },
-      }
-    );
-    setTopUpAmount("");
-  };
+  //         toast.transactionPromise(waitPromise, {
+  //           loading: "Sending Transaction",
+  //           success: () => ({
+  //             message: "Top-up confirmed!",
+  //             link: getBlockExplorerUrl(
+  //               txnHash,
+  //               riseTestnet.id,
+  //               LOOKUP_ENTITIES.TRANSACTION_HASH
+  //             ),
+  //             value: txnHash,
+  //           }),
+  //           error: (err) => `Transaction failed: ${err.message}`,
+  //         });
+  //         refreshPlayerInfo();
+  //       },
+  //       onError: (error) => {
+  //         toast.error(`Transaction failed: ${error.message}`);
+  //       },
+  //     }
+  //   );
+  //   setTopUpAmount("");
+  // };
 
   const handleBind = async () => {
     // Add network check
