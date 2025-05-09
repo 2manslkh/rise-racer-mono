@@ -124,11 +124,11 @@ const HotWalletManager = () => {
   };
 
   return (
-    <div className="relative w-full flex flex-col gap-2 border-t border-gray-200 pt-2 mt-2">
+    <div className="relative w-full flex flex-col gap-1 border-t border-gray-200 pt-2 mt-2">
       {/* Wallet Info and Copy */}
       <div className="relative w-full flex items-center gap-2 justify-between">
         <p className="text-black text-inter font-bold text-lg">
-          Burner Wallet
+          Wallet
           {hotWalletAddress && (
             <span className="font-normal ml-1">
               ({shortenAddress(hotWalletAddress)})
