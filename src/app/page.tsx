@@ -67,7 +67,7 @@ export default function Home() {
 
   const requestFullscreen = async () => {
     await viewport.mount();
-    await viewport.requestFullscreen();
+    viewport.expand();
   };
 
   useEffect(() => {
