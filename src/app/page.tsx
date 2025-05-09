@@ -72,16 +72,18 @@ export default function Home() {
   };
 
   useEffect(() => {
-    init();
+    if (player) {
+      init();
 
-    // Check if fullscreen is supported
-    if (!viewport.isFullscreen() && viewport.width() < 765) {
-      console.log(viewport.isFullscreen());
-      // requestFullscreen();
-      requestFullscreen();
-      // viewport.requestFullscreen();
+      // Check if fullscreen is supported
+      if (!viewport.isFullscreen() && viewport.width() < 765) {
+        console.log(viewport.isFullscreen());
+        // requestFullscreen();
+        requestFullscreen();
+        // viewport.requestFullscreen();
+      }
+      setIsFullscreen(true);
     }
-    setIsFullscreen(true);
   }, []);
 
   useEffect(() => {
@@ -152,7 +154,7 @@ export default function Home() {
 
   return (
     <div className="relative w-full flex items-center justify-center bg-[#29004D] min-h-screen">
-      {player.boundAddress ? (
+      {player && player.boundAddress ? (
         <div
           className="relative w-full h-full max-w-[430px] md:max-h-[750px] overflow-hidden"
           style={

@@ -56,11 +56,7 @@ export const TelegramAuthProvider: React.FC<TelegramAuthProviderProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [initDataRaw, setInitDataRaw] = useState<string | null>(null);
   const [initData, setInitData] = useState<unknown>(null);
-  const [player, setPlayer] = useState<TelegramAuthResponse>({
-    boundAddress: "",
-    pk: "",
-    address: "",
-  });
+  const [player, setPlayer] = useState<TelegramAuthResponse | null>(null);
 
   const authenticate = async () => {
     try {
