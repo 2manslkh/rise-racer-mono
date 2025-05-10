@@ -29,14 +29,10 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   const { loadHotWallet } = useHotWallet();
 
   useEffect(() => {
-    console.log(
-      "🚀 | useEffect | LOW_BALANCE_THRESHOLD:",
-      LOW_BALANCE_THRESHOLD
-    );
-    console.log("🚀 | useEffect | balance:", balance);
-
-    setIsLowBalance((balance as bigint) < LOW_BALANCE_THRESHOLD);
-  }, []);
+    if (balance !== undefined) {
+      setIsLowBalance(balance < LOW_BALANCE_THRESHOLD);
+    }
+  }, [balance]);
 
   // Check if on the correct network
 
