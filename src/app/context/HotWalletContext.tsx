@@ -13,7 +13,7 @@ import { riseTestnet } from "../configuration/wagmi";
 import { getPlayerInfo, PlayerInfoFull } from "../lib/rise-racer";
 import { logError } from "../lib/error";
 import { GetCurrentLevel } from "../lib/gameplaySettings";
-import { getBalance as getRiseCrystalsBalance } from "../lib/rise-crystals";
+// import { getBalance as getRiseCrystalsBalance } from "../lib/rise-crystals";
 import { useTMA } from "./TelegramContext";
 
 export const MINIMUM_GAS = 1000000000000n;
