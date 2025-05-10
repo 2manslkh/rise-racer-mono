@@ -5,11 +5,13 @@ import { TransactionRecord } from "@/app/lib/transaction-tracker";
 interface TransactionLogsProps {
   transactions: TransactionRecord[];
   address: string | null | undefined; // User's address to check login status
+  show: boolean;
 }
 
 const TransactionLogs: React.FC<TransactionLogsProps> = ({
   transactions,
   address,
+  show,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
@@ -70,7 +72,7 @@ const TransactionLogs: React.FC<TransactionLogsProps> = ({
   };
 
   // Only render if logged in and there are transactions to show
-  if (!address || recentSortedTransactions.length === 0) {
+  if (!address || recentSortedTransactions.length === 0 || !show) {
     return null;
   }
 

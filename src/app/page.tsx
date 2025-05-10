@@ -17,6 +17,8 @@ import { expandViewport, init } from "@telegram-apps/sdk";
 
 import { mountViewport } from "@telegram-apps/sdk";
 import RebirthModal from "./components/RebirthModal";
+import TransactionLogs from "./components/TransactionLogs";
+import { useTransactionTracker } from "./hooks/useTransactionTracker";
 
 export type User = {
   vehicle: number;
@@ -163,6 +165,8 @@ export default function Home() {
     );
   };
 
+  const { transactions } = useTransactionTracker();
+
   return (
     <div className="relative w-full flex items-center justify-center bg-[#29004D] min-h-screen">
       {player && player.boundAddress ? (
@@ -187,6 +191,13 @@ export default function Home() {
                 toggleTutorial={handleTutorialClick}
               />
             )}
+
+            {/* Transaction Log Component */}
+            <TransactionLogs
+              transactions={transactions}
+              address={player.boundAddress}
+              show={activeView === Views.NULL}
+            />
 
             {!gameStarted && (
               <StartButton

@@ -328,10 +328,7 @@ const ShopV2 = () => {
         </div>
       ) : (
         /* Upgrade List - Render using displayParts */
-        <div
-          className="relative w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col"
-          style={{ maxHeight: "calc(100% - 120px)" }} // Adjust height as needed
-        >
+        <div className="relative w-full flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-500 scrollbar-track-purple-900 gap-4 flex flex-col pb-20">
           {/* Map over the pre-calculated displayParts state */}
           {displayParts.map((part) => (
             <PartItem

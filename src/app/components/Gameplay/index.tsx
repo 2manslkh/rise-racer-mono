@@ -28,7 +28,7 @@ import { clickRace } from "@/app/lib/rise-racer";
 import { useToast } from "@/app/hooks/useToast";
 
 import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
-import TransactionLogs from "../TransactionLogs";
+// import TransactionLogs from "../TransactionLogs";
 import { formatEther } from "ethers";
 // import { useTMA } from "@/app/context/TelegramContext";
 
@@ -533,9 +533,6 @@ const Gameplay: React.FC<GameplayProps> = ({
       <div className="absolute bottom-[145px] left-1/2 transform -translate-x-1/2 w-[140px]">
         <Image src={vehicle} alt="Car" />
       </div>
-
-      {/* Transaction Log Component */}
-      <TransactionLogs transactions={transactions} address={address} />
 
       <div className="absolute bottom-[80px] left-0">
         <Speedometer
