@@ -58,7 +58,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     balance,
     velocityPerClick,
     user,
-    address,
+    // address,
     getNonce,
     incrementNonce,
     refreshPlayerInfo,
@@ -66,8 +66,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   } = useHotWallet();
   // const { player } = useTMA();
   const toast = useToast();
-  const { initiateTx, updateTx, removeTx, transactions } =
-    useTransactionTracker();
+  const { initiateTx, updateTx, removeTx } = useTransactionTracker();
   const incrementalSpeed = velocityPerClick;
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const roadSpeedRef = useRef<number>(100);
