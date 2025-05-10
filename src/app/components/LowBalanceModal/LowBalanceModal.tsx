@@ -27,7 +27,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   const [isLowBalance, setIsLowBalance] = useState<boolean>(false);
 
   useEffect(() => {
-    if (balance) {
+    if (balance !== undefined) {
       setIsLowBalance(parseFloat(formatEther(balance)) < LOW_BALANCE_THRESHOLD);
     }
   }, [balance]);
