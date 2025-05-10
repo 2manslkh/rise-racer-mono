@@ -43,7 +43,7 @@ export default function Home() {
   const [isPreloadingGame, setIsPreloadingGame] = useState<boolean>(true);
   // const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { balance, address: hotWalletAddress, loadHotWallet } = useHotWallet();
+  const { balance, loadHotWallet } = useHotWallet();
   const [isScreenReady, setIsScreenReady] = useState<boolean>(false);
   const [showRebirth, setShowRebirth] = useState<boolean>(false);
 
@@ -229,7 +229,9 @@ export default function Home() {
 
               <LowBalanceModal
                 balance={balance}
-                hotWalletAddress={hotWalletAddress as `0x${string}` | undefined}
+                hotWalletAddress={
+                  player.boundAddress as `0x${string}` | undefined
+                }
               />
 
               {showRebirth && <RebirthModal handleShow={setShowRebirth} />}

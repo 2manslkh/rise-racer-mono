@@ -85,12 +85,8 @@ export const HotWalletProvider = ({ children }: { children: ReactNode }) => {
       );
       const wallet = new ethers.Wallet(data.pk, provider);
       const balance = await provider.getBalance(data.boundAddress);
-      const riseCrystalsBalance = await getRiseCrystalsBalance(
-        data.boundAddress,
-        provider
-      );
+
       setBalance(balance);
-      setRiseCrystalsBalance(riseCrystalsBalance);
       setHotWallet(wallet);
       setWsProvider(wsProvider);
       setAddress(data.boundAddress);
