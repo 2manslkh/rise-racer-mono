@@ -12,7 +12,7 @@ interface LowBalanceModalProps {
   onFaucetSuccess?: () => void;
 }
 
-const LOW_BALANCE_THRESHOLD = parseEther("0.001"); // ETH // Reverted to original threshold
+const LOW_BALANCE_THRESHOLD = parseEther("0.0001"); // ETH // Reverted to original threshold
 const FAUCET_API_URL = "https://faucet-api.riselabs.xyz/faucet/request";
 const TURNSTILE_SITE_KEY = "0x4AAAAAABDerdTw43kK5pDL";
 
@@ -27,12 +27,35 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   const toast = useToast(); // Initialize toast
   const [isLowBalance, setIsLowBalance] = useState<boolean>(false);
   const { loadHotWallet } = useHotWallet();
+  const [isPolling, setIsPolling] = useState(false);
 
   useEffect(() => {
     if (balance !== undefined) {
       setIsLowBalance(balance < LOW_BALANCE_THRESHOLD);
     }
-  }, [balance]);
+    // If polling and balance is now sufficient, close modal and stop polling
+    if (
+      isPolling &&
+      balance !== undefined &&
+      balance >= LOW_BALANCE_THRESHOLD
+    ) {
+      setIsOpen(false);
+      setIsPolling(false);
+      onFaucetSuccess?.();
+    }
+  }, [balance, isPolling]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+    if (isPolling) {
+      interval = setInterval(() => {
+        loadHotWallet();
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPolling, loadHotWallet]);
 
   // Check if on the correct network
 
@@ -78,11 +101,9 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
         result.message || "Faucet request successful! ETH incoming."
       );
 
-      setTimeout(() => {
-        loadHotWallet();
-        setIsOpen(false);
-        onFaucetSuccess?.();
-      }, 1000);
+      // Start polling for balance after faucet request
+      loadHotWallet();
+      setIsPolling(true);
     } catch (error: unknown) {
       console.error("Faucet request error:", error);
       const errorMessage =
@@ -95,9 +116,6 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   };
 
   if (!isLowBalance || !isOpen || !hotWalletAddress) {
-    console.log("🚀 | LowBalanceModal | isLowBalance:", isLowBalance);
-    console.log("🚀 | LowBalanceModal | isOpen:", isOpen);
-    console.log("🚀 | LowBalanceModal | hotWalletAddress:", hotWalletAddress);
     return null;
   }
 
