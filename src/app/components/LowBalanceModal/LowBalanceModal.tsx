@@ -1,9 +1,10 @@
 import { FC, useEffect, useState } from "react";
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { useToast } from "@/app/hooks/useToast";
 import Image from "next/image"; // Import Image component
 import { shortenAddress } from "@/app/lib/address"; // Import shortenAddress
 import { Turnstile } from "@marsidev/react-turnstile";
+import { useHotWallet } from "@/app/context/HotWalletContext";
 
 interface LowBalanceModalProps {
   balance: bigint | undefined;
@@ -11,7 +12,7 @@ interface LowBalanceModalProps {
   onFaucetSuccess?: () => void;
 }
 
-const LOW_BALANCE_THRESHOLD = 0.001; // ETH // Reverted to original threshold
+const LOW_BALANCE_THRESHOLD = parseEther("0.001"); // ETH // Reverted to original threshold
 const FAUCET_API_URL = "https://faucet-api.riselabs.xyz/faucet/request";
 const TURNSTILE_SITE_KEY = "0x4AAAAAABDerdTw43kK5pDL";
 
@@ -25,12 +26,17 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   const [isFaucetLoading, setIsFaucetLoading] = useState(false);
   const toast = useToast(); // Initialize toast
   const [isLowBalance, setIsLowBalance] = useState<boolean>(false);
+  const { loadHotWallet } = useHotWallet();
 
   useEffect(() => {
-    if (balance) {
-      setIsLowBalance(parseFloat(formatEther(balance)) < LOW_BALANCE_THRESHOLD);
-    }
-  }, [balance]);
+    console.log(
+      "🚀 | useEffect | LOW_BALANCE_THRESHOLD:",
+      LOW_BALANCE_THRESHOLD
+    );
+    console.log("🚀 | useEffect | balance:", balance);
+
+    setIsLowBalance((balance as bigint) < LOW_BALANCE_THRESHOLD);
+  }, []);
 
   // Check if on the correct network
 
@@ -77,8 +83,10 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
       );
 
       setTimeout(() => {
+        loadHotWallet();
+        setIsOpen(false);
         onFaucetSuccess?.();
-      }, 5000);
+      }, 1000);
     } catch (error: unknown) {
       console.error("Faucet request error:", error);
       const errorMessage =
@@ -91,6 +99,9 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
   };
 
   if (!isLowBalance || !isOpen || !hotWalletAddress) {
+    console.log("🚀 | LowBalanceModal | isLowBalance:", isLowBalance);
+    console.log("🚀 | LowBalanceModal | isOpen:", isOpen);
+    console.log("🚀 | LowBalanceModal | hotWalletAddress:", hotWalletAddress);
     return null;
   }
 
@@ -116,7 +127,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
                   WebkitTextStroke: "1.5px #74007E",
                 }}
               >
-                Request Faucet ETH
+                Prove you are not a bot
               </p>
               <button
                 onClick={handleClose}
@@ -164,6 +175,10 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
                 }}
                 onError={() => toast.error("CAPTCHA verification failed.")}
               />
+              <p className="text-sm text-gray-600 mt-2">
+                This step is required to prove you are not a bot. After passing,
+                your wallet will be funded and the game will continue.
+              </p>
               <p className="text-sm text-gray-600 mt-2">{statusMessage}</p>
             </div>
           </div>
