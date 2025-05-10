@@ -76,7 +76,7 @@ const ShopV2 = () => {
     try {
       const newShopData = await getShop(hotWallet.address, hotWallet.provider);
       setShopData(newShopData);
-      toast.success("Shop data updated!");
+      // toast.success("Shop data updated!");
     } catch (error) {
       console.error("Failed to refetch shop data:", error);
       toast.error("Failed to update shop data after transaction.");
