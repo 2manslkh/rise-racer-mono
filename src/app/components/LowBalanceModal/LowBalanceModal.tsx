@@ -1,20 +1,18 @@
 import { FC, useEffect, useState } from "react";
-import { formatEther, parseEther } from "viem";
+import { formatEther } from "viem";
 import { useToast } from "@/app/hooks/useToast";
-import Image from "next/image"; // Import Image component
-import { shortenAddress } from "@/app/lib/address"; // Import shortenAddress
+import Image from "next/image";
+import { shortenAddress } from "@/app/lib/address";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { useHotWallet } from "@/app/context/HotWalletContext";
+import { FAUCET_API_URL, LOW_BALANCE_THRESHOLD } from "@/app/lib/faucet";
+import { ENVIRONMENT } from "@/app/configuration/environment";
 
 interface LowBalanceModalProps {
   balance: bigint | undefined;
   hotWalletAddress: `0x${string}` | undefined;
   onFaucetSuccess?: () => void;
 }
-
-const LOW_BALANCE_THRESHOLD = parseEther("0.0001"); // ETH // Reverted to original threshold
-const FAUCET_API_URL = "https://faucet-api.riselabs.xyz/faucet/request";
-const TURNSTILE_SITE_KEY = "0x4AAAAAABDerdTw43kK5pDL";
 
 const LowBalanceModal: FC<LowBalanceModalProps> = ({
   balance,
@@ -166,19 +164,21 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
                 <p className="text-xs text-gray-600">
                   {shortenAddress(hotWalletAddress)}
                 </p>
-                <p className="text-xs text-red-600 font-semibold">
-                  (Low:{" "}
-                  {balance !== undefined
-                    ? formatEther(balance).slice(0, 7)
-                    : "?"}{" "}
-                  ETH)
-                </p>
+                {balance !== undefined && (
+                  <p className="text-xs text-red-600 font-semibold">
+                    (Low:{" "}
+                    {balance !== undefined
+                      ? formatEther(balance).slice(0, 7)
+                      : "?"}{" "}
+                    ETH)
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="flex flex-col items-center gap-3">
               <Turnstile
-                siteKey={TURNSTILE_SITE_KEY}
+                siteKey={ENVIRONMENT.TURNSTILE_SITE_KEY}
                 onSuccess={(token: string) => {
                   setTurnstileToken(token);
                   requestFaucetEth(token);
@@ -189,7 +189,7 @@ const LowBalanceModal: FC<LowBalanceModalProps> = ({
                 }}
                 onError={() => toast.error("CAPTCHA verification failed.")}
               />
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-600 mt-2 text-center">
                 This step is required to prove you are not a bot. After passing,
                 your wallet will be funded and the game will continue.
               </p>

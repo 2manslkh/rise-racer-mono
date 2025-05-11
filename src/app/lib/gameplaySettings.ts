@@ -1,24 +1,44 @@
-import Tier1 from "../assets/vehicle/tier1.svg";
-import Tier2 from "../assets/vehicle/tier2.svg";
-import Tier3 from "../assets/vehicle/tier3.svg";
-import Tier4 from "../assets/vehicle/tier4.svg";
-import Tier5 from "../assets/vehicle/tier5.svg";
+import Tier1_Body from "../assets/vehicle/tier1_body.svg";
+import Tier1_Wheel from "../assets/vehicle/tier1_wheel.svg";
+import Tier2_Body from "../assets/vehicle/tier2_body.svg";
+import Tier2_Wheel from "../assets/vehicle/tier2_wheel.svg";
+import Tier3_Body from "../assets/vehicle/tier3_body.svg";
+import Tier3_Wheel from "../assets/vehicle/tier3_wheel.svg";
+import Tier4_Body from "../assets/vehicle/tier4.svg";
+import Tier5_Body from "../assets/vehicle/tier5.svg";
 import { hexToRgba } from "../components/Gameplay/canvas/util";
 
 export const GetVehicle = (tier: number = 1) => {
   switch (tier) {
     case 1:
-      return Tier1;
+      return [Tier1_Wheel, Tier1_Body];
     case 2:
-      return Tier2;
+      return [Tier2_Wheel, Tier2_Body];
     case 3:
-      return Tier3;
+      return [Tier3_Wheel, Tier3_Body];
     case 4:
-      return Tier4;
+      return [null, Tier4_Body];
     case 5:
-      return Tier5;
+      return [null, Tier5_Body];
     default:
-      return Tier1;
+      return [Tier1_Wheel, Tier1_Body];
+  }
+};
+
+export const GetVehicleBodyPosition = (tier: number = 1) => {
+  switch (tier) {
+    case 1:
+      return 13;
+    case 2:
+      return 12;
+    case 3:
+      return -10;
+    case 4:
+      return -20;
+    case 5:
+      return -10;
+    default:
+      return 13;
   }
 };
 

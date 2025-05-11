@@ -1,6 +1,6 @@
 "use client";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import {
   DrawRoad,
   DrawSideDivider,
@@ -16,13 +16,12 @@ import {
   GetCenterDividerColor,
   GetLevelRequirement,
   GetShouldUpdateCanvas,
-  GetVehicle,
   LoadSideObjectImages,
   OverlayObject,
   SideObject,
 } from "@/app/lib/gameplaySettings";
 import Speedometer from "../Speedometer";
-import { MINIMUM_GAS, useHotWallet } from "@/app/context/HotWalletContext";
+import { useHotWallet } from "@/app/context/HotWalletContext";
 import { logError } from "@/app/lib/error";
 import { clickRace } from "@/app/lib/rise-racer";
 import { useToast } from "@/app/hooks/useToast";
@@ -30,6 +29,8 @@ import { useToast } from "@/app/hooks/useToast";
 import { useTransactionTracker } from "@/app/hooks/useTransactionTracker";
 // import TransactionLogs from "../TransactionLogs";
 import { formatEther } from "ethers";
+import { LOW_BALANCE_THRESHOLD } from "@/app/lib/faucet";
+import VehicleMorph from "../Shared/VehicleMorph";
 // import { useTMA } from "@/app/context/TelegramContext";
 
 interface GameplayProps {
@@ -73,20 +74,17 @@ const Gameplay: React.FC<GameplayProps> = ({
   const [clickEffects, setClickEffects] = useState<
     { id: string; x: number; y: number }[]
   >([]);
-  const previousLevelRef = useRef<number>(1);
+  const previousLevelRef = useRef<number>(0);
   const [showLevelTransition, setShowLevelTransition] =
     useState<boolean>(false);
   const isPreloadingRef = useRef<boolean>(true);
   const [currentLevel, setCurrentLevel] = useState<number>(0);
 
   // Combo state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [comboCount, setComboCount] = useState<number>(0);
   const lastClickTimeRef = useRef<number>(0);
   const comboResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const vehicle = GetVehicle(vehicleTier);
-
-  // Fetch Rise Crystals balance
 
   // Function to reset combo
   const resetCombo = () => {
@@ -101,7 +99,7 @@ const Gameplay: React.FC<GameplayProps> = ({
   // Each click will increase the speed
   const handleClick = async (e: React.PointerEvent<HTMLDivElement>) => {
     if (!gameStarted || !hotWallet) return;
-    if (balance < MINIMUM_GAS) {
+    if (balance < LOW_BALANCE_THRESHOLD) {
       toast.error("Insufficient funds in burner wallet");
       resetCombo();
       return;
@@ -476,15 +474,15 @@ const Gameplay: React.FC<GameplayProps> = ({
       }
 
       // Draw Combo Meter Text if combo > 1
-      if (comboCount > 1) {
-        ctx.font = "bold 30px Arial"; // Adjust font size and style as needed
-        ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // White text with slight transparency
-        ctx.textAlign = "center";
-        ctx.shadowColor = "black";
-        ctx.shadowBlur = 5;
-        ctx.fillText(`Combo: ${comboCount}x`, width / 2, height * 0.15); // Position near top-center
-        ctx.shadowBlur = 0; // Reset shadow blur
-      }
+      // if (comboCount > 1) {
+      //   ctx.font = "bold 30px Arial"; // Adjust font size and style as needed
+      //   ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // White text with slight transparency
+      //   ctx.textAlign = "center";
+      //   ctx.shadowColor = "black";
+      //   ctx.shadowBlur = 5;
+      //   ctx.fillText(`Combo: ${comboCount}x`, width / 2, height * 0.15); // Position near top-center
+      //   ctx.shadowBlur = 0; // Reset shadow blur
+      // }
 
       requestAnimationFrame(draw);
     };
@@ -530,7 +528,10 @@ const Gameplay: React.FC<GameplayProps> = ({
       ))}
 
       <div className="absolute bottom-[145px] left-1/2 transform -translate-x-1/2 w-[140px]">
-        <Image src={vehicle} alt="Car" />
+        <VehicleMorph
+          isMoving={roadSpeedRef.current > 0}
+          vehicleTier={vehicleTier}
+        />
       </div>
 
       <div className="absolute bottom-[80px] left-0">

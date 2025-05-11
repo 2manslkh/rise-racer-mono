@@ -188,7 +188,7 @@ const Staking = () => {
       )}
 
       <div
-        className="relative flex flex-col w-full overflow-y-auto"
+        className="relative flex flex-col w-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         style={{ height: "calc(100% - 40px - 68px - 40px - 20px)" }}
       >
         {/* Current Staking Status */}
