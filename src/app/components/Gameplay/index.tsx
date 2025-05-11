@@ -174,7 +174,7 @@ const Gameplay: React.FC<GameplayProps> = ({
     const newClick = {
       id: `click-${Date.now()}-${Math.random()}`,
       x: e.clientX - (rect?.left ?? 0),
-      y: e.clientY - (rect?.top ?? 0),
+      y: e.clientY - (rect?.top ?? 0) - 30,
     };
 
     setClickEffects((prev) => [...prev, newClick]);
