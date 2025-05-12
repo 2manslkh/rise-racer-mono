@@ -97,7 +97,7 @@ const Leaderboard = () => {
   }, [address]);
 
   return (
-    <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-2 items-center gap-4">
+    <div className="relative w-full h-full bg-[#2A004F] flex flex-col p-3 items-center gap-4">
       <p
         className="font-zen text-white text-[26px] relative"
         style={{

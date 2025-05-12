@@ -291,7 +291,7 @@ const ShopV2 = () => {
   );
 
   return (
-    <div className="relative w-full h-full bg-[#2A004F] flex flex-col py-4 px-4 items-center gap-4 text-white shadow-lg">
+    <div className="relative w-full h-full bg-[#2A004F] flex flex-col p-3 items-center gap-2 text-white shadow-lg">
       {/* Header */}
       <div className="relative w-full flex items-center justify-center px-3">
         <p
