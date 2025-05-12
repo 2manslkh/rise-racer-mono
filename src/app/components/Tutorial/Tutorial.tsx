@@ -21,7 +21,7 @@ const Tutorial = ({
       )}
 
       <div
-        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 left-[14px] z-2 h-[350px] md:h-[300px] origin-top-left ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
+        className={`absolute bg-white shadow-xl rounded-[12px] transition-all duration-500 ease-in-out top-3 left-[14px] z-2 h-[350px] md:h-[280px] origin-top-left ${open ? "opacity-100 scale-100" : "opacity-0 scale-0"}`}
         style={{
           width: "calc(100% - 28px)",
         }}
